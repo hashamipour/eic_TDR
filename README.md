@@ -57,14 +57,6 @@ Executables produced in `build/`:
 
 ## Run
 
-### Plotting executable
-
-```bash
-./build/ddis_plots_q2 /path/to/input.root
-```
-
-This reads histograms/trees from `input.root` and produces plots using ROOT.
-
 ### Skim executable
 
 ```bash
@@ -73,6 +65,15 @@ This reads histograms/trees from `input.root` and produces plots using ROOT.
 - `data/filelist.txt` — list of input ROOT files (one per line)
 - `skim_q2.root` — output skim file name
 - `100` — optional max events (example placeholder)
+
+### Plotting executable
+
+```bash
+./build/ddis_plots_q2 /path/to/input.root
+```
+
+This reads histograms/trees from `input.root` and produces plots using ROOT.
+
 
 > Adjust arguments to match your program’s `usage` string printed on invalid input.
 
