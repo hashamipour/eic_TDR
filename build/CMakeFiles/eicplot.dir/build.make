@@ -53,10 +53,10 @@ RM = /opt/software/linux-debian13-x86_64_v2/gcc-14.2.0/cmake-3.30.5-n6sxdcjovoqm
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hh/Downloads/eic_TDR_Q2_reorganized_patched
+CMAKE_SOURCE_DIR = /home/hh/Downloads/eic_TDR
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build
+CMAKE_BINARY_DIR = /home/hh/Downloads/eic_TDR/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/eicplot.dir/depend.make
@@ -70,32 +70,32 @@ include CMakeFiles/eicplot.dir/progress.make
 include CMakeFiles/eicplot.dir/flags.make
 
 CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o: CMakeFiles/eicplot.dir/flags.make
-CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o: /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/plotting/Plotting.cpp
+CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o: /home/hh/Downloads/eic_TDR/plotting/Plotting.cpp
 CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o: CMakeFiles/eicplot.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o -MF CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o.d -o CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o -c /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/plotting/Plotting.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o -MF CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o.d -o CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o -c /home/hh/Downloads/eic_TDR/plotting/Plotting.cpp
 
 CMakeFiles/eicplot.dir/plotting/Plotting.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/eicplot.dir/plotting/Plotting.cpp.i"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/plotting/Plotting.cpp > CMakeFiles/eicplot.dir/plotting/Plotting.cpp.i
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hh/Downloads/eic_TDR/plotting/Plotting.cpp > CMakeFiles/eicplot.dir/plotting/Plotting.cpp.i
 
 CMakeFiles/eicplot.dir/plotting/Plotting.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/eicplot.dir/plotting/Plotting.cpp.s"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/plotting/Plotting.cpp -o CMakeFiles/eicplot.dir/plotting/Plotting.cpp.s
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hh/Downloads/eic_TDR/plotting/Plotting.cpp -o CMakeFiles/eicplot.dir/plotting/Plotting.cpp.s
 
 CMakeFiles/eicplot.dir/utility/Utility.cpp.o: CMakeFiles/eicplot.dir/flags.make
-CMakeFiles/eicplot.dir/utility/Utility.cpp.o: /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/utility/Utility.cpp
+CMakeFiles/eicplot.dir/utility/Utility.cpp.o: /home/hh/Downloads/eic_TDR/utility/Utility.cpp
 CMakeFiles/eicplot.dir/utility/Utility.cpp.o: CMakeFiles/eicplot.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/eicplot.dir/utility/Utility.cpp.o"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/eicplot.dir/utility/Utility.cpp.o -MF CMakeFiles/eicplot.dir/utility/Utility.cpp.o.d -o CMakeFiles/eicplot.dir/utility/Utility.cpp.o -c /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/utility/Utility.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/eicplot.dir/utility/Utility.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/eicplot.dir/utility/Utility.cpp.o -MF CMakeFiles/eicplot.dir/utility/Utility.cpp.o.d -o CMakeFiles/eicplot.dir/utility/Utility.cpp.o -c /home/hh/Downloads/eic_TDR/utility/Utility.cpp
 
 CMakeFiles/eicplot.dir/utility/Utility.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/eicplot.dir/utility/Utility.cpp.i"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/utility/Utility.cpp > CMakeFiles/eicplot.dir/utility/Utility.cpp.i
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hh/Downloads/eic_TDR/utility/Utility.cpp > CMakeFiles/eicplot.dir/utility/Utility.cpp.i
 
 CMakeFiles/eicplot.dir/utility/Utility.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/eicplot.dir/utility/Utility.cpp.s"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/utility/Utility.cpp -o CMakeFiles/eicplot.dir/utility/Utility.cpp.s
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hh/Downloads/eic_TDR/utility/Utility.cpp -o CMakeFiles/eicplot.dir/utility/Utility.cpp.s
 
 # Object files for target eicplot
 eicplot_OBJECTS = \
@@ -109,7 +109,7 @@ libeicplot.a: CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o
 libeicplot.a: CMakeFiles/eicplot.dir/utility/Utility.cpp.o
 libeicplot.a: CMakeFiles/eicplot.dir/build.make
 libeicplot.a: CMakeFiles/eicplot.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libeicplot.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libeicplot.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/eicplot.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/eicplot.dir/link.txt --verbose=$(VERBOSE)
 
@@ -122,6 +122,6 @@ CMakeFiles/eicplot.dir/clean:
 .PHONY : CMakeFiles/eicplot.dir/clean
 
 CMakeFiles/eicplot.dir/depend:
-	cd /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/hh/Downloads/eic_TDR_Q2_reorganized_patched /home/hh/Downloads/eic_TDR_Q2_reorganized_patched /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build/CMakeFiles/eicplot.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/hh/Downloads/eic_TDR/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/hh/Downloads/eic_TDR /home/hh/Downloads/eic_TDR /home/hh/Downloads/eic_TDR/build /home/hh/Downloads/eic_TDR/build /home/hh/Downloads/eic_TDR/build/CMakeFiles/eicplot.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/eicplot.dir/depend
 

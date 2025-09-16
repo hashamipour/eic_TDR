@@ -1,5 +1,5 @@
 CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.o: \
-  /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/analysis/DDIS_Skim_Q2.cpp \
+  /home/hh/Downloads/eic_TDR/analysis/DDIS_Skim_Q2.cpp \
   /opt/local/include/root/TROOT.h /opt/local/include/root/TDirectory.h \
   /opt/local/include/root/TNamed.h /opt/local/include/root/TObject.h \
   /opt/local/include/root/Rtypes.h /opt/local/include/root/RtypesCore.h \
@@ -450,7 +450,7 @@ CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.o: \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/stl_deque.h \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/deque.tcc \
   /opt/local/include/root/TTreeReaderArray.h \
-  /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/include/Utility.hpp \
+  /home/hh/Downloads/eic_TDR/include/Utility.hpp \
   /opt/local/include/root/Math/Vector4D.h \
   /opt/local/include/root/Math/Vector4Dfwd.h \
   /opt/local/include/root/Math/GenVector/PxPyPzE4D.h \

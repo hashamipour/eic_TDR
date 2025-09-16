@@ -57,10 +57,10 @@ RM = /opt/software/linux-debian13-x86_64_v2/gcc-14.2.0/cmake-3.30.5-n6sxdcjovoqm
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hh/Downloads/eic_TDR_Q2_reorganized_patched
+CMAKE_SOURCE_DIR = /home/hh/Downloads/eic_TDR
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build
+CMAKE_BINARY_DIR = /home/hh/Downloads/eic_TDR/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build/CMakeFiles /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles /home/hh/Downloads/eic_TDR/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

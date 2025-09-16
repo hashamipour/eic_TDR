@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/clang++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/include -I/opt/local/include/root
+CXX_INCLUDES = -I/home/hh/Downloads/eic_TDR/include -I/opt/local/include/root
 
 CXX_FLAGS = -std=gnu++20
 

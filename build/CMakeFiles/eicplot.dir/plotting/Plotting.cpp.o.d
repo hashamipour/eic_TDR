@@ -1,6 +1,6 @@
 CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o: \
-  /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/plotting/Plotting.cpp \
-  /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/include/Plotting.hpp \
+  /home/hh/Downloads/eic_TDR/plotting/Plotting.cpp \
+  /home/hh/Downloads/eic_TDR/include/Plotting.hpp \
   /opt/local/include/root/TFile.h \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/atomic \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/version.h \
