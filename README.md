@@ -1,4 +1,4 @@
-# eic_TDR_Q2 — Clean Layout
+# eic_TDR
 
 This repository organizes your EIC DDIS **Q²** analysis into a modular, extendable structure.
 
