@@ -461,16 +461,16 @@ PlotOptionsBinnedRelRes::PlotOptionsBinnedRelRes(const TString& histName,
                                                  const char* title,
                                                  const char* xLabel,
                                                  const char* yLabel,
-                                                 double xMinFit,
-                                                 double xMaxFit,
+                                                 const std::vector<std::pair<double, double>>& fitRanges,
                                                  const char* saveName,
                                                  const char* binSavePrefix)
     : m_histName(histName),
       m_title(title),
       m_xLabel(xLabel),
       m_yLabel(yLabel),
-      m_xMinFit(xMinFit),
-      m_xMaxFit(xMaxFit),
+      m_fitRanges(fitRanges),
+      m_xMinFit(0.0),
+      m_xMaxFit(0.0),
       m_saveName(saveName),
       m_binSavePrefix(binSavePrefix) {}
 
@@ -660,8 +660,22 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
             continue;
         }
 
-        // Use the new, robust method to set the fit range
-        SetFitRangeByBins(projY);
+        // Determine fit range: use provided ranges or automatic detection
+        if (m_fitRanges.empty()) {
+            // Use the automatic method to set the fit range
+            SetFitRangeByBins(projY);
+        } else {
+            // Use provided fit ranges (bin index j-1 since j starts from 1)
+            if (j - 1 < static_cast<int>(m_fitRanges.size())) {
+                m_xMinFit = m_fitRanges[j - 1].first;
+                m_xMaxFit = m_fitRanges[j - 1].second;
+            } else {
+                // If not enough ranges provided, fall back to automatic for this bin
+                std::cerr << "Warning: Not enough fit ranges provided for bin " << j 
+                          << ". Using automatic range detection." << std::endl;
+                SetFitRangeByBins(projY);
+            }
+        }
         
         double _center = h_RelRes_binned->GetXaxis()->GetBinCenter(j);
         
@@ -701,6 +715,7 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
         statsBox->AddText(Form("#chi^{2} / ndf: %.1f / %d", gaus->GetChisquare(), gaus->GetNDF()));
         statsBox->AddText(Form("Mean: %.5f #pm %.5f", mean, gaus->GetParError(1)));
         statsBox->AddText(Form("Sigma: %.4f #pm %.5f", sigma, gaus->GetParError(2)));
+        statsBox->AddText(Form("Fit range: [%.3f, %.3f]", m_xMinFit, m_xMaxFit));
         statsBox->Draw();
         
         c_proj->Update();
@@ -771,6 +786,8 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
     // delete shade;
     delete line;
 }
+
+/////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 
 // PlotOptionsResponseMatrix implementation

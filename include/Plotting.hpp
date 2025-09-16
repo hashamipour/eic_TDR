@@ -8,6 +8,7 @@
 #include <TLegend.h>
 #include <TGraphErrors.h>
 #include <vector>
+#include <utility>
 
 // Forward declaration of TFile
 class TFile;
@@ -82,8 +83,7 @@ public:
                             const char* title,
                             const char* xLabel,
                             const char* yLabel,
-                            double xMinFit,
-                            double xMaxFit,
+                            const std::vector<std::pair<double, double>>& fitRanges,
                             const char* saveName,
                             const char* binSavePrefix);
     void SetFitRangeByRMS(TH1D* hist);
@@ -95,8 +95,9 @@ private:
     const char* m_title;
     const char* m_xLabel;
     const char* m_yLabel;
-    double m_xMinFit;
-    double m_xMaxFit;
+    std::vector<std::pair<double, double>> m_fitRanges;
+    double m_xMinFit;  // Current bin's fit range min
+    double m_xMaxFit;  // Current bin's fit range max
     const char* m_saveName;
     const char* m_binSavePrefix;
 };
