@@ -1,0 +1,2 @@
+/usr/bin/ar qc libeicplot.a CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o CMakeFiles/eicplot.dir/utility/Utility.cpp.o
+/usr/bin/ranlib libeicplot.a
