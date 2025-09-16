@@ -105,4 +105,4 @@ If you previously used relative includes like `#include "../utilities/Utility.hp
 #include "Plotting.hpp"
 ```
 
-If you want me to **tighten include hygiene** further (remove unused headers or split large headers), share compilation errors/warnings and I’ll iterate.
+TODO : **tighten include hygiene** further (remove unused headers or split large headers).
