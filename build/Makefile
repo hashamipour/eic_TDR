@@ -200,6 +200,19 @@ ddis_skim_q2/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2.dir/build.make CMakeFiles/ddis_skim_q2.dir/build
 .PHONY : ddis_skim_q2/fast
 
+#=============================================================================
+# Target rules for targets named ddis_skim_q2_xy
+
+# Build rule for target.
+ddis_skim_q2_xy: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_skim_q2_xy
+.PHONY : ddis_skim_q2_xy
+
+# fast build rule for target.
+ddis_skim_q2_xy/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2_xy.dir/build.make CMakeFiles/ddis_skim_q2_xy.dir/build
+.PHONY : ddis_skim_q2_xy/fast
+
 analysis/DDIS_Plots_Q2_OOP.o: analysis/DDIS_Plots_Q2_OOP.cpp.o
 .PHONY : analysis/DDIS_Plots_Q2_OOP.o
 
@@ -247,6 +260,30 @@ analysis/DDIS_Skim_Q2.s: analysis/DDIS_Skim_Q2.cpp.s
 analysis/DDIS_Skim_Q2.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2.dir/build.make CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.s
 .PHONY : analysis/DDIS_Skim_Q2.cpp.s
+
+analysis/DDIS_Skim_Q2_with_xy.o: analysis/DDIS_Skim_Q2_with_xy.cpp.o
+.PHONY : analysis/DDIS_Skim_Q2_with_xy.o
+
+# target to build an object file
+analysis/DDIS_Skim_Q2_with_xy.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2_xy.dir/build.make CMakeFiles/ddis_skim_q2_xy.dir/analysis/DDIS_Skim_Q2_with_xy.cpp.o
+.PHONY : analysis/DDIS_Skim_Q2_with_xy.cpp.o
+
+analysis/DDIS_Skim_Q2_with_xy.i: analysis/DDIS_Skim_Q2_with_xy.cpp.i
+.PHONY : analysis/DDIS_Skim_Q2_with_xy.i
+
+# target to preprocess a source file
+analysis/DDIS_Skim_Q2_with_xy.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2_xy.dir/build.make CMakeFiles/ddis_skim_q2_xy.dir/analysis/DDIS_Skim_Q2_with_xy.cpp.i
+.PHONY : analysis/DDIS_Skim_Q2_with_xy.cpp.i
+
+analysis/DDIS_Skim_Q2_with_xy.s: analysis/DDIS_Skim_Q2_with_xy.cpp.s
+.PHONY : analysis/DDIS_Skim_Q2_with_xy.s
+
+# target to generate assembly for a file
+analysis/DDIS_Skim_Q2_with_xy.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2_xy.dir/build.make CMakeFiles/ddis_skim_q2_xy.dir/analysis/DDIS_Skim_Q2_with_xy.cpp.s
+.PHONY : analysis/DDIS_Skim_Q2_with_xy.cpp.s
 
 plotting/Plotting.o: plotting/Plotting.cpp.o
 .PHONY : plotting/Plotting.o
@@ -310,6 +347,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... ddis_plots_q2"
 	@echo "... ddis_skim_q2"
+	@echo "... ddis_skim_q2_xy"
 	@echo "... eicplot"
 	@echo "... analysis/DDIS_Plots_Q2_OOP.o"
 	@echo "... analysis/DDIS_Plots_Q2_OOP.i"
@@ -317,6 +355,9 @@ help:
 	@echo "... analysis/DDIS_Skim_Q2.o"
 	@echo "... analysis/DDIS_Skim_Q2.i"
 	@echo "... analysis/DDIS_Skim_Q2.s"
+	@echo "... analysis/DDIS_Skim_Q2_with_xy.o"
+	@echo "... analysis/DDIS_Skim_Q2_with_xy.i"
+	@echo "... analysis/DDIS_Skim_Q2_with_xy.s"
 	@echo "... plotting/Plotting.o"
 	@echo "... plotting/Plotting.i"
 	@echo "... plotting/Plotting.s"

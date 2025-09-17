@@ -66,6 +66,7 @@ CMAKE_BINARY_DIR = /home/hh/Downloads/eic_TDR/build
 all: CMakeFiles/eicplot.dir/all
 all: CMakeFiles/ddis_plots_q2.dir/all
 all: CMakeFiles/ddis_skim_q2.dir/all
+all: CMakeFiles/ddis_skim_q2_xy.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -76,6 +77,7 @@ preinstall:
 clean: CMakeFiles/eicplot.dir/clean
 clean: CMakeFiles/ddis_plots_q2.dir/clean
 clean: CMakeFiles/ddis_skim_q2.dir/clean
+clean: CMakeFiles/ddis_skim_q2_xy.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -85,7 +87,7 @@ clean: CMakeFiles/ddis_skim_q2.dir/clean
 CMakeFiles/eicplot.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/eicplot.dir/build.make CMakeFiles/eicplot.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/eicplot.dir/build.make CMakeFiles/eicplot.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=5,6,7 "Built target eicplot"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=7,8,9 "Built target eicplot"
 .PHONY : CMakeFiles/eicplot.dir/all
 
 # Build rule for subdir invocation for target.
@@ -155,6 +157,32 @@ ddis_skim_q2: CMakeFiles/ddis_skim_q2.dir/rule
 CMakeFiles/ddis_skim_q2.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2.dir/build.make CMakeFiles/ddis_skim_q2.dir/clean
 .PHONY : CMakeFiles/ddis_skim_q2.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/ddis_skim_q2_xy.dir
+
+# All Build rule for target.
+CMakeFiles/ddis_skim_q2_xy.dir/all: CMakeFiles/eicplot.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2_xy.dir/build.make CMakeFiles/ddis_skim_q2_xy.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2_xy.dir/build.make CMakeFiles/ddis_skim_q2_xy.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=5,6 "Built target ddis_skim_q2_xy"
+.PHONY : CMakeFiles/ddis_skim_q2_xy.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/ddis_skim_q2_xy.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles 5
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ddis_skim_q2_xy.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles 0
+.PHONY : CMakeFiles/ddis_skim_q2_xy.dir/rule
+
+# Convenience name for target.
+ddis_skim_q2_xy: CMakeFiles/ddis_skim_q2_xy.dir/rule
+.PHONY : ddis_skim_q2_xy
+
+# clean rule for target.
+CMakeFiles/ddis_skim_q2_xy.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2_xy.dir/build.make CMakeFiles/ddis_skim_q2_xy.dir/clean
+.PHONY : CMakeFiles/ddis_skim_q2_xy.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
