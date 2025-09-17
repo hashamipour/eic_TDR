@@ -87,28 +87,34 @@ int main(int argc, char** argv) {
     // ));
 
     // Binned relative resolution plot configurations
-    // plots.push_back(new PlotOptionsBinnedRelRes(
-    //     "Q2_RelRes_binned_EM",
-    //     "Relative bin by bin resolution (EM);Q^{2}_{MC};#frac{Q^{2}_{EM} - Q^{2}_{MC}}{Q^{2}_{MC}}",// title, x label, y label
-    //     "Q^{2}_{EM}",
-    //     "",
-    //     {},
-    //     "figs/DDIS_Q2RelRes_binned_EM.png",
-    //     "DDIS_Q2RelRes_binned_EM"
-    // ));
     plots.push_back(new PlotOptionsBinnedRelRes(
-        "Q2_RelRes_binned_DA",
-        "Relative bin by bin resolution (DA);Q^{2}_{MC};#frac{Q^{2}_{DA} - Q^{2}_{MC}}{Q^{2}_{MC}}", // title, x label, y label
-        "Q^{2}_{DA}",
+        "Q2_RelRes_binned_EM",
+        "Relative bin by bin resolution (EM);Q^{2}_{MC};#frac{Q^{2}_{EM} - Q^{2}_{MC}}{Q^{2}_{MC}}",// title, x label, y label
+        "Q^{2}_{EM}",
         "",
-        {{-0.0, 0.0}, {-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},
-            {-0.0, 0.0},{-0.0, 0.0},{-0.01, 0.03},{-0.01, 0.025},{-0.01, 0.025},
-            {-0.015, 0.035},{-0.01, 0.025},{-0.01, 0.025},{-0.019, 0.029},{-0.01, 0.02},
-            {-0.015, 0.03},{-0.01, 0.0275},{-0.017, 0.027},{-0.025, 0.03},{-0.08, 0.08},
-            {-0.05, 0.06},{-0.05, 0.065},{-0.05, 0.06}},
-        "figs/DDIS_Q2RelRes_binned_DA.png",
-        "DDIS_Q2RelRes_binned_DA"
+        {
+         {-0.0, 0.0}, {-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},
+         {-0.0, 0.0},{-0.0, 0.0},{-0.02, 0.02},{-0.02, 0.025},{-0.022, 0.025},
+         {-0.027, 0.028},{-0.018, 0.02},{-0.022, 0.02},{-0.02, 0.015},{-0.018, 0.02},
+         {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
+         {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
+        },
+        "figs/DDIS_Q2RelRes_binned_EM.png",
+        "DDIS_Q2RelRes_binned_EM"
     ));
+    // plots.push_back(new PlotOptionsBinnedRelRes(
+    //     "Q2_RelRes_binned_DA",
+    //     "Relative bin by bin resolution (DA);Q^{2}_{MC};#frac{Q^{2}_{DA} - Q^{2}_{MC}}{Q^{2}_{MC}}", // title, x label, y label
+    //     "Q^{2}_{DA}",
+    //     "",
+    //     {{-0.0, 0.0}, {-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},
+    //         {-0.0, 0.0},{-0.0, 0.0},{-0.01, 0.03},{-0.01, 0.025},{-0.01, 0.025},
+    //         {-0.015, 0.035},{-0.01, 0.025},{-0.01, 0.025},{-0.019, 0.029},{-0.01, 0.02},
+    //         {-0.015, 0.03},{-0.01, 0.0275},{-0.017, 0.027},{-0.025, 0.03},{-0.08, 0.08},
+    //         {-0.05, 0.06},{-0.05, 0.065},{-0.05, 0.06}},
+    //     "figs/DDIS_Q2RelRes_binned_DA.png",
+    //     "DDIS_Q2RelRes_binned_DA"
+    // ));
     // plots.push_back(new PlotOptionsBinnedRelRes(
     //     "Q2_RelRes_binned_ESigma",
     //     ";Q^{2}_{MC};#frac{Q^{2}_{ESigma} - Q^{2}_{MC}}{Q^{2}_{MC}}",
