@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/analysis/DDIS_Skim_Q2.cpp" "CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.o" "gcc" "CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.o.d"
+  "/home/hh/Downloads/eic_TDR/analysis/DDIS_Skim_Q2.cpp" "CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.o" "gcc" "CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

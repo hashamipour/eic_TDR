@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/plotting/Plotting.cpp" "CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o" "gcc" "CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o.d"
-  "/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/utility/Utility.cpp" "CMakeFiles/eicplot.dir/utility/Utility.cpp.o" "gcc" "CMakeFiles/eicplot.dir/utility/Utility.cpp.o.d"
+  "/home/hh/Downloads/eic_TDR/plotting/Plotting.cpp" "CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o" "gcc" "CMakeFiles/eicplot.dir/plotting/Plotting.cpp.o.d"
+  "/home/hh/Downloads/eic_TDR/utility/Utility.cpp" "CMakeFiles/eicplot.dir/utility/Utility.cpp.o" "gcc" "CMakeFiles/eicplot.dir/utility/Utility.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

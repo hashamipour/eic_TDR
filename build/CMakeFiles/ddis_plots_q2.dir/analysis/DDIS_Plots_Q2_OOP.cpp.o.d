@@ -1,6 +1,6 @@
 CMakeFiles/ddis_plots_q2.dir/analysis/DDIS_Plots_Q2_OOP.cpp.o: \
-  /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/analysis/DDIS_Plots_Q2_OOP.cpp \
-  /home/hh/Downloads/eic_TDR_Q2_reorganized_patched/include/Plotting.hpp \
+  /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_OOP.cpp \
+  /home/hh/Downloads/eic_TDR/include/Plotting.hpp \
   /opt/local/include/root/TFile.h \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/atomic \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/version.h \

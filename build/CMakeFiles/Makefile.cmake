@@ -7,7 +7,7 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/home/hh/Downloads/eic_TDR_Q2_reorganized_patched/CMakeLists.txt"
+  "/home/hh/Downloads/eic_TDR/CMakeLists.txt"
   "CMakeFiles/3.30.5/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.30.5/CMakeSystem.cmake"
   "/opt/local/share/root/cmake/ROOTConfig-targets-release.cmake"
