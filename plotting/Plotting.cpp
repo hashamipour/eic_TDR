@@ -847,8 +847,6 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
         // Use SetAxisRange for the Y-axis of a TH2 histogram
         h_matrix_perc->GetYaxis()->SetRangeUser(this->m_yRange.first, this->m_yRange.second);
     }
-    std::cout << "Actual X range: " << h_matrix_perc->GetXaxis()->GetXmin()
-          << " - " << h_matrix_perc->GetXaxis()->GetXmax() << std::endl;
 
     // Calculate percentages for each bin
     int nbinsX = h_matrix_orig->GetNbinsX();

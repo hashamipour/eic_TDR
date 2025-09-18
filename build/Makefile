@@ -226,6 +226,19 @@ ddis_plots_q2_xy/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/build
 .PHONY : ddis_plots_q2_xy/fast
 
+#=============================================================================
+# Target rules for targets named ddis_plots_all
+
+# Build rule for target.
+ddis_plots_all: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_plots_all
+.PHONY : ddis_plots_all
+
+# fast build rule for target.
+ddis_plots_all/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_all.dir/build.make CMakeFiles/ddis_plots_all.dir/build
+.PHONY : ddis_plots_all/fast
+
 analysis/DDIS_Plots_Q2_OOP.o: analysis/DDIS_Plots_Q2_OOP.cpp.o
 .PHONY : analysis/DDIS_Plots_Q2_OOP.o
 
@@ -249,6 +262,30 @@ analysis/DDIS_Plots_Q2_OOP.s: analysis/DDIS_Plots_Q2_OOP.cpp.s
 analysis/DDIS_Plots_Q2_OOP.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2.dir/build.make CMakeFiles/ddis_plots_q2.dir/analysis/DDIS_Plots_Q2_OOP.cpp.s
 .PHONY : analysis/DDIS_Plots_Q2_OOP.cpp.s
+
+analysis/DDIS_Plots_Q2_OOP_allvars.o: analysis/DDIS_Plots_Q2_OOP_allvars.cpp.o
+.PHONY : analysis/DDIS_Plots_Q2_OOP_allvars.o
+
+# target to build an object file
+analysis/DDIS_Plots_Q2_OOP_allvars.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_all.dir/build.make CMakeFiles/ddis_plots_all.dir/analysis/DDIS_Plots_Q2_OOP_allvars.cpp.o
+.PHONY : analysis/DDIS_Plots_Q2_OOP_allvars.cpp.o
+
+analysis/DDIS_Plots_Q2_OOP_allvars.i: analysis/DDIS_Plots_Q2_OOP_allvars.cpp.i
+.PHONY : analysis/DDIS_Plots_Q2_OOP_allvars.i
+
+# target to preprocess a source file
+analysis/DDIS_Plots_Q2_OOP_allvars.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_all.dir/build.make CMakeFiles/ddis_plots_all.dir/analysis/DDIS_Plots_Q2_OOP_allvars.cpp.i
+.PHONY : analysis/DDIS_Plots_Q2_OOP_allvars.cpp.i
+
+analysis/DDIS_Plots_Q2_OOP_allvars.s: analysis/DDIS_Plots_Q2_OOP_allvars.cpp.s
+.PHONY : analysis/DDIS_Plots_Q2_OOP_allvars.s
+
+# target to generate assembly for a file
+analysis/DDIS_Plots_Q2_OOP_allvars.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_all.dir/build.make CMakeFiles/ddis_plots_all.dir/analysis/DDIS_Plots_Q2_OOP_allvars.cpp.s
+.PHONY : analysis/DDIS_Plots_Q2_OOP_allvars.cpp.s
 
 analysis/DDIS_Plots_Q2_OOP_with_xy.o: analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o
 .PHONY : analysis/DDIS_Plots_Q2_OOP_with_xy.o
@@ -382,6 +419,7 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
+	@echo "... ddis_plots_all"
 	@echo "... ddis_plots_q2"
 	@echo "... ddis_plots_q2_xy"
 	@echo "... ddis_skim_q2"
@@ -390,6 +428,9 @@ help:
 	@echo "... analysis/DDIS_Plots_Q2_OOP.o"
 	@echo "... analysis/DDIS_Plots_Q2_OOP.i"
 	@echo "... analysis/DDIS_Plots_Q2_OOP.s"
+	@echo "... analysis/DDIS_Plots_Q2_OOP_allvars.o"
+	@echo "... analysis/DDIS_Plots_Q2_OOP_allvars.i"
+	@echo "... analysis/DDIS_Plots_Q2_OOP_allvars.s"
 	@echo "... analysis/DDIS_Plots_Q2_OOP_with_xy.o"
 	@echo "... analysis/DDIS_Plots_Q2_OOP_with_xy.i"
 	@echo "... analysis/DDIS_Plots_Q2_OOP_with_xy.s"

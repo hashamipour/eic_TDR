@@ -27,4 +27,7 @@ target_link_libraries(ddis_skim_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
 add_executable(ddis_plots_q2_xy analysis/DDIS_Plots_Q2_OOP_with_xy.cpp)
 target_link_libraries(ddis_plots_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
 
+add_executable(ddis_plots_all analysis/DDIS_Plots_Q2_OOP_allvars.cpp)
+target_link_libraries(ddis_plots_all PRIVATE eicplot ${ROOT_LIBRARIES})
+
 install(TARGETS ddis_plots_q2 ddis_skim_q2 RUNTIME DESTINATION bin)
