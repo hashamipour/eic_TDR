@@ -799,14 +799,19 @@ PlotOptionsResponseMatrix::PlotOptionsResponseMatrix(const TString& histName,
                                                      const char* yLabel,
                                                      const char* saveName,
                                                      const bool  isLogX,
-                                                     const bool  isLogY
-                                                    )
+                                                     const bool  isLogY,
+                                                     const std::pair<double, double>& xRange,
+                                                     const std::pair<double, double>& yRange)
     : m_histName(histName),
       m_xLabel(xLabel),
       m_yLabel(yLabel),
-      m_isLogX(isLogX),
-      m_isLogY(isLogY),
-      m_saveName(saveName) {}
+      m_saveName(saveName) 
+      {
+        this->m_isLogX = isLogX;
+        this->m_isLogY = isLogY;
+        this->m_xRange = xRange;
+        this->m_yRange = yRange;
+      }
 
 void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     // Retrieve the 2D histogram from the input file
@@ -834,13 +839,21 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     c->SetLeftMargin(0.15);
     c->SetTopMargin(0.1);
     c->SetBottomMargin(0.1);
-    // h_matrix_perc->GetXaxis()->SetRangeUser(4, 300);
-    // h_matrix_perc->GetYaxis()->SetRangeUser(4, 300);
+    if ( (this->m_xRange.first != -999.) && (this->m_xRange.second != -999.)){
+        // Use SetAxisRange for the X-axis of a TH2 histogram
+        h_matrix_perc->GetXaxis()->SetRangeUser(this->m_xRange.first, this->m_xRange.second);
+    }
+    if ((this->m_yRange.first != -999.) && (this->m_yRange.second != -999.)){
+        // Use SetAxisRange for the Y-axis of a TH2 histogram
+        h_matrix_perc->GetYaxis()->SetRangeUser(this->m_yRange.first, this->m_yRange.second);
+    }
+    std::cout << "Actual X range: " << h_matrix_perc->GetXaxis()->GetXmin()
+          << " - " << h_matrix_perc->GetXaxis()->GetXmax() << std::endl;
 
     // Calculate percentages for each bin
     int nbinsX = h_matrix_orig->GetNbinsX();
     int nbinsY = h_matrix_orig->GetNbinsY();
-    std::cout << "Number of bins in X: " << nbinsX << ", Y: " << nbinsY << std::endl;
+    // std::cout << "Number of bins in X: " << nbinsX << ", Y: " << nbinsY << std::endl;
     for (int ix = 1; ix <= nbinsX; ix++) {
         double total_true = 0.0;
         for (int iy = 1; iy <= nbinsY; iy++) {

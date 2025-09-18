@@ -18,6 +18,12 @@ class PlotOptions {
 public:
     virtual ~PlotOptions();
     virtual void Plot(TFile* inputFile) = 0;
+protected:
+    PlotOptions() = default;
+    bool m_isLogX = false;
+    bool m_isLogY = false;
+    std::pair<double, double> m_xRange = {-999., -999.};
+    std::pair<double, double> m_yRange = {-999., -999.};
 };
 
 // Derived class for 1D histogram plotting
@@ -32,7 +38,8 @@ public:
                     const char* saveName,
                     const bool isLogX = false,
                     const bool isLogY = false,
-                    const bool normalizeToPDF = false);
+                    const bool normalizeToPDF = false
+                );
                   
     void Plot(TFile* inputFile) override;
 
@@ -47,6 +54,9 @@ private:
     bool m_isLogX;
     bool m_isLogY;
     bool m_normalizeToPDF;
+    // Member variables for axis ranges
+    std::pair<double, double> m_xRange;
+    std::pair<double, double> m_yRange;
 };
 
 // Derived class for 1D relative resolution plots with Gaussian fit
@@ -110,7 +120,9 @@ public:
                               const char* yLabel,
                               const char* saveName,
                               const bool  isLogX=true,
-                              const bool  isLogY=true
+                              const bool  isLogY=true,
+                              const std::pair<double, double>& xRange = {-999., -999.},
+                              const std::pair<double, double>& yRange = {-999., -999.}
                              );
     
     void Plot(TFile* inputFile) override;
