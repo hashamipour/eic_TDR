@@ -118,9 +118,9 @@ PlotOptions1D::PlotOptions1D(const std::vector<TString>& histNames,
                              const char* xLabel,
                              const char* yLabel,
                              const char* saveName,
-                             const bool isLogX,
-                             const bool isLogY,
-                             const bool normalizeToPDF)
+                             const bool  isLogX,
+                             const bool  isLogY,
+                             const bool  normalizeToPDF)
     : m_histNames(histNames),
       m_legendEntries(legendEntries),
       m_drawOptions(drawOptions),
@@ -777,9 +777,9 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
 
     // double y_min = g->GetYaxis()->GetXmin();
     // double y_max = g->GetYaxis()->GetXmax();
-    g_RMS->GetYaxis()->SetRangeUser(-0.1,0.1);
+    // g_RMS->GetYaxis()->SetRangeUser(-0.1,0.1);
     // g_RMS->GetXaxis()->SetRangeUser(1.0,200);
-    g->GetXaxis()->SetRangeUser(1.0,200);
+    // g->GetXaxis()->SetRangeUser(1.0,200);
 
     c->Update();
     c->SaveAs(m_saveName);
@@ -797,10 +797,15 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
 PlotOptionsResponseMatrix::PlotOptionsResponseMatrix(const TString& histName,
                                                      const char* xLabel,
                                                      const char* yLabel,
-                                                     const char* saveName)
+                                                     const char* saveName,
+                                                     const bool  isLogX,
+                                                     const bool  isLogY
+                                                    )
     : m_histName(histName),
       m_xLabel(xLabel),
       m_yLabel(yLabel),
+      m_isLogX(isLogX),
+      m_isLogY(isLogY),
       m_saveName(saveName) {}
 
 void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
@@ -829,8 +834,8 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     c->SetLeftMargin(0.15);
     c->SetTopMargin(0.1);
     c->SetBottomMargin(0.1);
-    h_matrix_perc->GetXaxis()->SetRangeUser(4, 300);
-    h_matrix_perc->GetYaxis()->SetRangeUser(4, 300);
+    // h_matrix_perc->GetXaxis()->SetRangeUser(4, 300);
+    // h_matrix_perc->GetYaxis()->SetRangeUser(4, 300);
 
     // Calculate percentages for each bin
     int nbinsX = h_matrix_orig->GetNbinsX();
@@ -905,8 +910,8 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     // gStyle->SetPalette(kStarryNight); // Set color palette
     SetCustomPalette(); // Call the function to set custom palette
     // TColor::InvertPalette();   // Invert colors for better visibility
-    c->SetLogx();
-    c->SetLogy();
+    if (m_isLogX) c->SetLogx();
+    if (m_isLogY) c->SetLogy();
     c->Update();
     c->SaveAs(m_saveName);
 

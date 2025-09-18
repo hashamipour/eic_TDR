@@ -108,7 +108,10 @@ public:
     PlotOptionsResponseMatrix(const TString& histName,
                               const char* xLabel,
                               const char* yLabel,
-                              const char* saveName);
+                              const char* saveName,
+                              const bool  isLogX=true,
+                              const bool  isLogY=true
+                             );
     
     void Plot(TFile* inputFile) override;
 
@@ -117,6 +120,8 @@ private:
     const char* m_xLabel;
     const char* m_yLabel;
     const char* m_saveName;
+    bool m_isLogX;
+    bool m_isLogY;
 };
 
 #endif // PLOTTING_HPP

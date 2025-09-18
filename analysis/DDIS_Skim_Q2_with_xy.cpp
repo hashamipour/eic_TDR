@@ -306,10 +306,11 @@ int main(int argc, char** argv) {
 
     // === New histograms for Bjorken-x and inelasticity y ===
     // x histograms (0..1)
-    TH1D* h_x_EM     = new TH1D("x_EM",     "electron method;x_{Bj}", 200, 0.0, 1.0);
-    TH1D* h_x_DA     = new TH1D("x_DA",     "DA method;x_{Bj}",       200, 0.0, 1.0);
-    TH1D* h_x_ESigma = new TH1D("x_ESigma", "ESigma method;x_{Bj}",   200, 0.0, 1.0);
-    TH1D* h_x_truth  = new TH1D("x_truth",  "truth;x_{Bj}",           200, 0.0, 1.0);
+    std::vector<Double_t> x_bins = GetLogBins(1e-4, 1.0, 50);
+    TH1D* h_x_EM     = new TH1D("x_EM",     "electron method;x_{Bj}", x_bins.size()-1, x_bins.data());
+    TH1D* h_x_DA     = new TH1D("x_DA",     "DA method;x_{Bj}",       x_bins.size()-1, x_bins.data());
+    TH1D* h_x_ESigma = new TH1D("x_ESigma", "ESigma method;x_{Bj}",   x_bins.size()-1, x_bins.data());
+    TH1D* h_x_truth  = new TH1D("x_truth",  "truth;x_{Bj}",           x_bins.size()-1, x_bins.data());
 
     // y histograms (0..1)
     TH1D* h_y_EM     = new TH1D("y_EM",     "electron method;y", 200, 0.0, 1.0);
