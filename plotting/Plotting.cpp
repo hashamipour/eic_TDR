@@ -6,105 +6,9 @@
 #include <iostream>
 #include <TStyle.h>  // for gStyle
 #include <TPaveText.h>
+#include "Utility.hpp"
 
-
-// Function to define and set a custom color palette
-void SetCustomPalette() {
-    // Define the number of primary colors and the total number of color levels in the palette
-    const Int_t NRGBs = 5; // We have 5 distinct colors
-    const Int_t NCont = 255; // Number of smoothly interpolated colors in the palette
-
-    // Define the hexadecimal color codes from your image
-    // You can also add more colors for finer gradient control if needed
-    // These are the "anchor" points for the gradient.
-    // https://digitalsynopsis.com/design/beautiful-color-gradient-palettes/
-    // NUMBER 11
-    // we can call it "SolarSplash"
-    // UInt_t colors[NRGBs] = {
-    //     0x35BBCA, // color 1
-    //     0x0191B4, // color 2
-    //     0xF8D90F, // color 3
-    //     0xD3DD18, // color 4
-    //     0xFE7A15  // color 5
-    //     // 0xD46C4E  // color 5, a bit softer than FE7A15
-    // };
-
-
-    // another one I found online; https://www.schemecolor.com/best-gradient.php
-    // we can call it "CandyEclipse"
-    //     UInt_t colors[NRGBs] = {
-    //     0xFEE27A, // color 1
-    //     0xFEA959, // color 2
-    //     0xFF605D, // color 3
-    //     0xF13484, // color 4
-    //     0x8D379E  // color 5
-    // };
-
-
-    // yet another one, from https://www.schemecolor.com/yellow-green-gradient-color-scheme.php
-    // we can call it "LemonLush"
-    //     UInt_t colors[NRGBs] = {
-    //     0xFEFE69, // color 1
-    //     0xDDF969, // color 2
-    //     0xA9F36A, // color 3
-    //     0x78EC6C, // color 4
-    //     0x57E86B  // color 5
-    // };
-
-    // another choice, from https://www.schemecolor.com/green-yellow-gradient-color-scheme.php
-    // with modifications to make it more green
-    // we can call it "CitrusFade"
-        // UInt_t colors[NRGBs] = {
-        //     0xFFFF00, // Fluorescent Yellow
-        //     0xC6F94D, // Citrus Lime
-        //     0x7ED957, // Leafy Green
-        //     0x4CCB5B, // Spring Green
-        //     0x249E57  // Lush Mid-Green
-        // };
-
-
-    // a three color gradient inspired by the former
-    // we can call it "PetalFlare"
-UInt_t colors[NRGBs] = {
-    0xE85A78, // Rosy Crimson (with pink undertone)
-    0xF57C3A, // Early Orange (10% mark)
-    0xFFE94F, // Bright Yellow
-    0xA4D65E, // Zesty Green
-    0x2FAE5E  // Slightly Darker Green
-};
-
-    // Convert hex colors to RGB values (ROOT expects RGB from 0.0 to 1.0)
-    // TColor::SetRGB takes unsigned char (0-255) for R, G, B
-    Double_t stops[NRGBs]; // Position of each color in the gradient (0.0 to 1.0)
-    Double_t red[NRGBs], green[NRGBs], blue[NRGBs];
-
-    for (int i = 0; i < NRGBs; ++i) {
-        // Calculate stop position (evenly distributed for now)
-        stops[i] = (Double_t)i / (NRGBs - 1.0);
-
-        // Extract RGB components from hex
-        UChar_t r = (colors[i] >> 16) & 0xFF;
-        UChar_t g = (colors[i] >> 8) & 0xFF;
-        UChar_t b = colors[i] & 0xFF;
-
-        // Convert to Double_t for TColor::CreateGradientColorTable
-        red[i] = (Double_t)r / 255.0;
-        green[i] = (Double_t)g / 255.0;
-        blue[i] = (Double_t)b / 255.0;
-    }
-
-    // Create the gradient color table
-    // This defines the smooth transition between the specified colors
-    TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
-
-    // Set the number of contours (color levels) for the palette
-    gStyle->SetNumberContours(NCont);
-
-    // You might want to call gStyle->SetPalette(NCont) as well,
-    // but CreateGradientColorTable often implicitly sets the palette.
-    // If not, explicitly set it:
-    // gStyle->SetPalette(NCont, 0); // 0 means use the current gradient table
-}
+/////////////////////////////////////////////////////////////////
 
 
 // PlotOptions destructor
@@ -425,18 +329,46 @@ void PlotOptionsRelRes::Plot(TFile* inputFile) {
     hist->SetMarkerStyle(20);
     hist->Draw("pe");
     
-    // Use bins to set the best fit range and get optimized parameters
-    SetFitRangeByBins(hist);
+
+    bool skipFit = 
+        (TMath::AreEqualRel(m_xMinFit, 0., 1e-6) && TMath::AreEqualRel(m_xMaxFit, 0., 1e-6));
+    if (skipFit) {
+        Logger::info("Skipping fitting as per user request: [" + std::string(m_saveName) + "]");
+        c->SaveAs(m_saveName);
+        delete c;
+        return; // Skip fitting and just save the histogram
+    }
+    bool autoFitRange = 
+        (TMath::AreEqualRel(m_xMinFit, -999., 1e-6) && TMath::AreEqualRel(m_xMaxFit, -999., 1e-6));
+    if (autoFitRange) {
+         // Use bins to set the best fit range and get optimized parameters
+        SetFitRangeByBins(hist);
     
-    std::cout << "peak at: " << hist->GetBinCenter(hist->GetMaximumBin()) << std::endl;
-    std::cout << "Chosen fit range: [" << m_xMinFit << ", " << m_xMaxFit << "]" << std::endl;
+        // std::cout << "peak at: " << hist->GetBinCenter(hist->GetMaximumBin()) << std::endl;
+        Logger::debug(" Auto. Chosen fit range: [" + std::to_string(m_xMinFit) + ", " + std::to_string(m_xMaxFit) + "]");
+
+        if (autoFitRange) {
+        Logger::warning("Skipping fitting as no fit range found. If you want a fit please provide fit range: [" + std::string(m_saveName) + "]");
+        c->SaveAs(m_saveName);
+        delete c;
+        return; // Skip fitting and just save the histogram
+    }
+    }
+    else {
+        // Use user-defined fit range and initial parameters
+        Logger::info("Using user-defined fit range: [" + std::to_string(m_xMinFit) + ", " + std::to_string(m_xMaxFit) + "] for " + std::string(m_saveName));
+    }
+
+    m_bestMean      = hist->GetBinCenter(hist->GetMaximumBin());
+    m_bestSigma     = hist->GetRMS();
+    m_bestAmplitude = hist->GetMaximum();
     
     // Create the final fit function with optimized parameters as starting values
     TF1* gaussianFit = new TF1("gaussianFit", "gaus", m_xMinFit, m_xMaxFit);
     gaussianFit->SetParameters(m_bestAmplitude, m_bestMean, m_bestSigma);
     
-    std::cout << "Using optimized parameters as starting values: mean=" << m_bestMean 
-              << ", sigma=" << m_bestSigma << ", amplitude=" << m_bestAmplitude << std::endl;
+    // std::cout << "Using optimized parameters as starting values: mean=" << m_bestMean 
+    //          << ", sigma=" << m_bestSigma << ", amplitude=" << m_bestAmplitude << std::endl;
     
     // Fit without parameter limits
     hist->Fit("gaussianFit", "RQ+");
@@ -455,6 +387,7 @@ void PlotOptionsRelRes::Plot(TFile* inputFile) {
     c->SaveAs(m_saveName);
     delete c;
     delete latex;
+    return;
 }
 
 /////////////////////////////////////////////////////////////////
@@ -691,9 +624,9 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
 
         TCanvas* c_proj = new TCanvas(Form("c_proj_%s_%d", m_binSavePrefix, j),
                                       Form("Bin Projection %d", j), 800, 600);
-        projY->SetTitle(Form("%s Bin: %.1f-%.1f", m_xLabel, 
-                             h_RelRes_binned->GetXaxis()->GetBinLowEdge(j), 
-                             h_RelRes_binned->GetXaxis()->GetBinUpEdge(j)));
+        projY->SetTitle(Form("%s Bin: %.1e-%.1e", m_xLabel, 
+                     h_RelRes_binned->GetXaxis()->GetBinLowEdge(j), 
+                     h_RelRes_binned->GetXaxis()->GetBinUpEdge(j)));
         
         // Disable automatic stats box
         projY->SetStats(0);
@@ -839,13 +772,13 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     c->SetLeftMargin(0.15);
     c->SetTopMargin(0.1);
     c->SetBottomMargin(0.1);
-    if ( (this->m_xRange.first != -999.) && (this->m_xRange.second != -999.)){
-        // Use SetAxisRange for the X-axis of a TH2 histogram
-        h_matrix_perc->GetXaxis()->SetRangeUser(this->m_xRange.first, this->m_xRange.second);
+
+    // This is the correct position for the log scale calls
+    if (m_isLogX) {
+        c->SetLogx();
     }
-    if ((this->m_yRange.first != -999.) && (this->m_yRange.second != -999.)){
-        // Use SetAxisRange for the Y-axis of a TH2 histogram
-        h_matrix_perc->GetYaxis()->SetRangeUser(this->m_yRange.first, this->m_yRange.second);
+    if (m_isLogY) {
+        c->SetLogy();
     }
 
     // Calculate percentages for each bin
@@ -864,7 +797,7 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
                 double content = h_matrix_orig->GetBinContent(ix, iy);
                 double percentage = (content / total_true) * 100.0;
 
-                // std::cout << "Bin (" << x << ", " << y << ") = " << content << " -> " << percentage << "%" << std::endl;
+                // std::cout << "Bin (" << ix << ", " << iy << ") = " << content << " -> " << percentage << "%" << std::endl;
                 // if (m_histName.Contains("Corr_Q2_EM")) {
                 //  std::cout << "bin content: " << content << ", total_true: " << total_true << ", percentage: " << percentage << std::endl;
                 // }
@@ -885,6 +818,21 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     h_matrix_perc->GetYaxis()->SetTitleOffset(1.3);
     gPad->Clear();
     h_matrix_perc->Draw("COLZ"); // COLZ creates a heatmap
+
+
+    // if ( (this->m_xRange.first != -999.) && (this->m_xRange.second != -999.)){
+    //     // Use SetAxisRange for the X-axis of a TH2 histogram
+    //     h_matrix_perc->GetXaxis()->SetRangeUser(this->m_xRange.first, this->m_xRange.second);
+    //     // Use SetAxisRange for the Y-axis of a TH2 histogram
+    //     h_matrix_perc->GetYaxis()->SetRangeUser(this->m_yRange.first, this->m_yRange.second);
+    // }
+    if ((this->m_xRange.first != -999.) && (this->m_xRange.second != -999.)){
+    h_matrix_perc->GetXaxis()->SetLimits(this->m_xRange.first, this->m_xRange.second);
+}
+if ((this->m_yRange.first != -999.) && (this->m_yRange.second != -999.)){
+    h_matrix_perc->GetYaxis()->SetLimits(this->m_yRange.first, this->m_yRange.second);
+}
+
 
     // Draw the percentage values as text on the plot
     TText t;
@@ -921,8 +869,8 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     // gStyle->SetPalette(kStarryNight); // Set color palette
     SetCustomPalette(); // Call the function to set custom palette
     // TColor::InvertPalette();   // Invert colors for better visibility
-    if (m_isLogX) c->SetLogx();
-    if (m_isLogY) c->SetLogy();
+    // if (m_isLogX) c->SetLogx();
+    // if (m_isLogY) c->SetLogy();
     c->Update();
     c->SaveAs(m_saveName);
 

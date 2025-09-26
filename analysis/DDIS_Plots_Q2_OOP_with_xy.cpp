@@ -125,21 +125,21 @@ int main(int argc, char** argv) {
         "Q2_RelRes_EM",// histogram name
         "#frac{Q^{2}_{EM} - Q^{2}_{MC}}{ Q^{2}_{MC}}",// x label
         "Counts",// y label
-        -0.025, 0.02,// fit range
+        -0.01, 0.01,// fit range
         "figs/DDIS_Q2RelRes_EM.png"// save name
     ));
     plots.push_back(new PlotOptionsRelRes(
         "Q2_RelRes_DA",
         "Q^{2}_{DA} - Q^{2}_{MC} / Q^{2}_{MC}",
         "Counts",
-        -0.02, 0.03,
+        -0.005, 0.02,
         "figs/DDIS_Q2RelRes_DA.png"
     ));
     plots.push_back(new PlotOptionsRelRes(
         "Q2_RelRes_ESigma",
         "Q^{2}_{reco} - Q^{2}_{MC} / Q^{2}_{MC}",
         "Counts",
-        -0.02, 0.03,
+        -0.01, 0.01,// fit range
         "figs/DDIS_Q2RelRes_ESigma.png"
     ));
 
@@ -155,14 +155,14 @@ int main(int argc, char** argv) {
         "x_RelRes_DA",
         "#frac{x_{DA} - x_{MC}}{X_{MC}}",
         "Counts",
-        -0.02, 0.03,
+        0., 0.,// Skip fitting and just save the histogram
         "figs/DDIS_RelRes_xBj_DA.png"
     ));
     plots.push_back(new PlotOptionsRelRes(
         "x_RelRes_ESigma",
         "#frac{x_{E#Sigma} - x_{MC}}{X_{MC}}",
         "Counts",
-        -0.02, 0.03,
+        0., 0.,// Skip fitting and just save the histogram
         "figs/DDIS_RelRes_x_ESigma.png"
     ));
 
@@ -171,21 +171,22 @@ int main(int argc, char** argv) {
         "y_RelRes_EM",// histogram name
         "#frac{y_{EM} - y_{MC}}{ y_{MC}}",// x label
         "Counts",// y label
-        -0.025, 0.02,// fit range
+        -0.009, 0.009,// fit range
+        // -999, -999.,// auto fit range
         "figs/DDIS_RelRes_y_EM.png"// save name
     ));
     plots.push_back(new PlotOptionsRelRes(
         "y_RelRes_DA",
         "#frac{y_{DA} - y_{MC}}{y_{MC}}",
         "Counts",
-        -0.02, 0.03,
+        0., 0.,// Skip fitting and just save the histogram
         "figs/DDIS_RelRes_y_DA.png"
     ));
     plots.push_back(new PlotOptionsRelRes(
         "y_RelRes_ESigma",
         "#frac{y_{E#Sigma} - y_{MC}}{y_{MC}}",
         "Counts",
-        -0.02, 0.03,
+        0., 0.,// Skip fitting and just save the histogram
         "figs/DDIS_RelRes_y_ESigma.png"
     ));
 
@@ -199,8 +200,8 @@ int main(int argc, char** argv) {
         "Q^{2}_{EM}",
         "",
         {
-         {-0.0, 0.0}, {-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},
-         {-0.0, 0.0},{-0.0, 0.0},{-0.02, 0.02},{-0.02, 0.025},{-0.022, 0.025},
+         {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},{-0.02, 0.02},{-0.02, 0.02},
+         {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{-0.014, 0.015},{-0.025, 0.025},{-0.01, 0.012},
          {-0.027, 0.028},{-0.018, 0.02},{-0.022, 0.02},{-0.02, 0.015},{-0.018, 0.02},
          {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
          {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
@@ -213,20 +214,28 @@ int main(int argc, char** argv) {
         "Relative bin by bin resolution (DA);Q^{2}_{MC};#frac{Q^{2}_{DA} - Q^{2}_{MC}}{Q^{2}_{MC}}", // title, x label, y label
         "Q^{2}_{DA}",
         "",
-        {{-0.0, 0.0}, {-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},{-0.0, 0.0},
-            {-0.0, 0.0},{-0.0, 0.0},{-0.01, 0.03},{-0.01, 0.025},{-0.01, 0.025},
-            {-0.015, 0.035},{-0.01, 0.025},{-0.01, 0.025},{-0.019, 0.029},{-0.01, 0.02},
-            {-0.015, 0.03},{-0.01, 0.0275},{-0.017, 0.027},{-0.025, 0.03},{-0.08, 0.08},
-            {-0.05, 0.06},{-0.05, 0.065},{-0.05, 0.06}},
+        {
+          {-0.0, 0.0}, {-0.005, 0.025},{-0.01, 0.025},/*4*/{-0.006, 0.02},{-0.01, 0.02},
+          {-0.009, 0.02},/*7*/{-0.008, 0.02},{-0.01, 0.025},{-0.04, 0.04},{-0.03, 0.05},
+          {-0.015, 0.03},{-0.009, 0.02},{-0.01, 0.02},/*14*/{-0.01, 0.02},{-0.01, 0.02},
+          {-0.01, 0.02},/*17*/{-0.004, 0.02},{-0.017, 0.027},{-0.025, 0.03},{-0.08, 0.08},
+          {-0.05, 0.06},{-0.05, 0.065},{-0.05, 0.06}
+        },
         "figs/DDIS_Q2RelRes_binned_DA.png",
         "DDIS_Q2RelRes_binned_DA"
     ));
     plots.push_back(new PlotOptionsBinnedRelRes(
         "Q2_RelRes_binned_ESigma",
-        ";Q^{2}_{MC};#frac{Q^{2}_{ESigma} - Q^{2}_{MC}}{Q^{2}_{MC}}",
-        "Q^{2}_{ESigma}",
+        ";Q^{2}_{MC};#frac{Q^{2}_{E#Sigma} - Q^{2}_{MC}}{Q^{2}_{MC}}",
+        "Q^{2}_{E#Sigma}",
         "",
-        {},
+        {
+         {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},{-0.02, 0.02},{-0.02, 0.02},
+         {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{-0.014, 0.015},{-0.025, 0.025},{-0.01, 0.012},
+         {-0.027, 0.028},{-0.018, 0.02},{-0.022, 0.02},{-0.02, 0.015},{-0.018, 0.02},
+         {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
+         {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
+        },
         "figs/DDIS_Q2RelRes_binned_ESigma.png",
         "DDIS_Q2RelRes_binned_ESigma"
     ));
@@ -236,7 +245,13 @@ int main(int argc, char** argv) {
         ";x_{MC};#frac{x_{EM} - x_{MC}}{x_{MC}}",
         "x_{EM}",
         "",
-        {},
+        {
+         {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},{-0.02, 0.02},{-0.02, 0.02},
+         {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{-0.014, 0.015},{-0.025, 0.025},{-0.01, 0.012},
+         {-0.027, 0.028},{-0.018, 0.02},{-0.022, 0.02},{-0.02, 0.015},{-0.018, 0.02},
+         {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
+         {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
+        },
         "figs/DDIS_RelRes_binned_x_EM.png",
         "DDIS_RelRes_binned_x_EM"
     ));
@@ -292,6 +307,8 @@ int main(int argc, char** argv) {
 
     // Create an instance of the new plotting class
     // Parameters: histName, xLabel, yLabel, saveName
+
+
     plots.push_back(new PlotOptionsResponseMatrix (
         "Corr_Q2_EM",       // name of 2D histogram
         "Q^{2} (true) [GeV]",   // X-axis label
@@ -321,7 +338,9 @@ int main(int argc, char** argv) {
         "x_{Bj} (EM)",
         "figs/response_matrix_x_EM.png",
         true,  // isLogX
-        true   // isLogY
+        true,   // isLogY
+        {1e-4,0.5},
+        {1e-4,0.5}
     ));
     plots.push_back(new PlotOptionsResponseMatrix(
         "x_Corr_DA",
@@ -329,7 +348,9 @@ int main(int argc, char** argv) {
         "x_{Bj} (DA)",
         "figs/response_matrix_x_DA.png",
         true,  // isLogX
-        true   // isLogY
+        true,   // isLogY
+        {1e-4,0.5},
+        {1e-4,0.5}
     ));
     plots.push_back(new PlotOptionsResponseMatrix(
         "x_Corr_ESigma",
@@ -337,10 +358,12 @@ int main(int argc, char** argv) {
         "x_{Bj} (ESigma)",
         "figs/response_matrix_x_ESigma.png",
         true,  // isLogX
-        true   // isLogY
+        true,   // isLogY
+        {1e-4,0.5},
+        {1e-4,0.5}
     ));
 
-    // ---- Response Matrices for y (linear-linear) ----
+    // // ---- Response Matrices for y (linear-linear) ----
     plots.push_back(new PlotOptionsResponseMatrix(
         "y_Corr_EM",
         "y (true)",
@@ -349,9 +372,9 @@ int main(int argc, char** argv) {
         false, // isLogX
         false,  // isLogY
         {0.,1.}, // x range {0.,1.}
-        {0.,1.} // y range {0.,1.}
-
+        {0.,1.}  // y range {0.,1.}
     ));
+
     plots.push_back(new PlotOptionsResponseMatrix(
         "y_Corr_DA",
         "y (true)",
@@ -362,6 +385,7 @@ int main(int argc, char** argv) {
         {0.,1.}, // x range {0.,1.}
         {0.,1.} // y range {0.,1.}
     ));
+
     plots.push_back(new PlotOptionsResponseMatrix(
         "y_Corr_ESigma",
         "y (true)",

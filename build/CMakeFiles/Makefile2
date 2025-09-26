@@ -68,7 +68,8 @@ all: CMakeFiles/ddis_skim_q2.dir/all
 all: CMakeFiles/ddis_plots_q2.dir/all
 all: CMakeFiles/ddis_skim_q2_xy.dir/all
 all: CMakeFiles/ddis_plots_q2_xy.dir/all
-all: CMakeFiles/ddis_plots_all.dir/all
+all: CMakeFiles/ddis_plots_t.dir/all
+all: CMakeFiles/skim_t.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -81,7 +82,8 @@ clean: CMakeFiles/ddis_skim_q2.dir/clean
 clean: CMakeFiles/ddis_plots_q2.dir/clean
 clean: CMakeFiles/ddis_skim_q2_xy.dir/clean
 clean: CMakeFiles/ddis_plots_q2_xy.dir/clean
-clean: CMakeFiles/ddis_plots_all.dir/clean
+clean: CMakeFiles/ddis_plots_t.dir/clean
+clean: CMakeFiles/skim_t.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -143,7 +145,7 @@ CMakeFiles/ddis_skim_q2.dir/clean:
 CMakeFiles/ddis_plots_q2.dir/all: CMakeFiles/eicplot.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2.dir/build.make CMakeFiles/ddis_plots_q2.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2.dir/build.make CMakeFiles/ddis_plots_q2.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=3,4 "Built target ddis_plots_q2"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=1,2 "Built target ddis_plots_q2"
 .PHONY : CMakeFiles/ddis_plots_q2.dir/all
 
 # Build rule for subdir invocation for target.
@@ -195,7 +197,7 @@ CMakeFiles/ddis_skim_q2_xy.dir/clean:
 CMakeFiles/ddis_plots_q2_xy.dir/all: CMakeFiles/eicplot.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=5,6 "Built target ddis_plots_q2_xy"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=3,4 "Built target ddis_plots_q2_xy"
 .PHONY : CMakeFiles/ddis_plots_q2_xy.dir/all
 
 # Build rule for subdir invocation for target.
@@ -215,30 +217,56 @@ CMakeFiles/ddis_plots_q2_xy.dir/clean:
 .PHONY : CMakeFiles/ddis_plots_q2_xy.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/ddis_plots_all.dir
+# Target rules for target CMakeFiles/ddis_plots_t.dir
 
 # All Build rule for target.
-CMakeFiles/ddis_plots_all.dir/all: CMakeFiles/eicplot.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_all.dir/build.make CMakeFiles/ddis_plots_all.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_all.dir/build.make CMakeFiles/ddis_plots_all.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=1,2 "Built target ddis_plots_all"
-.PHONY : CMakeFiles/ddis_plots_all.dir/all
+CMakeFiles/ddis_plots_t.dir/all: CMakeFiles/eicplot.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=5,6 "Built target ddis_plots_t"
+.PHONY : CMakeFiles/ddis_plots_t.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/ddis_plots_all.dir/rule: cmake_check_build_system
+CMakeFiles/ddis_plots_t.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles 5
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ddis_plots_all.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ddis_plots_t.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles 0
-.PHONY : CMakeFiles/ddis_plots_all.dir/rule
+.PHONY : CMakeFiles/ddis_plots_t.dir/rule
 
 # Convenience name for target.
-ddis_plots_all: CMakeFiles/ddis_plots_all.dir/rule
-.PHONY : ddis_plots_all
+ddis_plots_t: CMakeFiles/ddis_plots_t.dir/rule
+.PHONY : ddis_plots_t
 
 # clean rule for target.
-CMakeFiles/ddis_plots_all.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_all.dir/build.make CMakeFiles/ddis_plots_all.dir/clean
-.PHONY : CMakeFiles/ddis_plots_all.dir/clean
+CMakeFiles/ddis_plots_t.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/clean
+.PHONY : CMakeFiles/ddis_plots_t.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/skim_t.dir
+
+# All Build rule for target.
+CMakeFiles/skim_t.dir/all: CMakeFiles/eicplot.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/skim_t.dir/build.make CMakeFiles/skim_t.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/skim_t.dir/build.make CMakeFiles/skim_t.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=14,15 "Built target skim_t"
+.PHONY : CMakeFiles/skim_t.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/skim_t.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles 5
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/skim_t.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles 0
+.PHONY : CMakeFiles/skim_t.dir/rule
+
+# Convenience name for target.
+skim_t: CMakeFiles/skim_t.dir/rule
+.PHONY : skim_t
+
+# clean rule for target.
+CMakeFiles/skim_t.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/skim_t.dir/build.make CMakeFiles/skim_t.dir/clean
+.PHONY : CMakeFiles/skim_t.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

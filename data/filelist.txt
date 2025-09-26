@@ -1,2 +1,1 @@
 /home/hh/ePIC_TDR_DDIS/rapgap_100K_e10_p100/rapgap_100K_e10_p100_status_corrected.hepmcout.AB.hepmc.edm4hep.eicrecon.root
-#/home/hh/eic_shell/paul_100k_e10_p130_diff_norad_AB.edm4hep.root.eicrecon_out.root

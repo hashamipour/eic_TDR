@@ -27,7 +27,19 @@ target_link_libraries(ddis_skim_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
 add_executable(ddis_plots_q2_xy analysis/DDIS_Plots_Q2_OOP_with_xy.cpp)
 target_link_libraries(ddis_plots_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
 
-add_executable(ddis_plots_all analysis/DDIS_Plots_Q2_OOP_allvars.cpp)
-target_link_libraries(ddis_plots_all PRIVATE eicplot ${ROOT_LIBRARIES})
+#add_executable(ddis_plots_all analysis/DDIS_Plots_Q2_OOP_allvars.cpp)
+#target_link_libraries(ddis_plots_all PRIVATE eicplot ${ROOT_LIBRARIES})
+
+#add_executable(ddis_skim_t_xp analysis/DDIS_Skim_t_xP.cpp)
+#target_link_libraries(ddis_skim_t_xp PRIVATE eicplot ${ROOT_LIBRARIES})
+
+add_executable(ddis_plots_t analysis/DDIS_Plot_t.cpp)
+target_link_libraries(ddis_plots_t PRIVATE eicplot ${ROOT_LIBRARIES})
+
+add_executable(skim_t analysis/DDIS_Skim_t.cpp)
+target_link_libraries(skim_t PRIVATE eicplot ${ROOT_LIBRARIES})
+
+#add_executable(inspect_tree analysis/inspect_tree.cpp)
+#target_link_libraries(inspect_tree PRIVATE eicplot ${ROOT_LIBRARIES})
 
 install(TARGETS ddis_plots_q2 ddis_skim_q2 RUNTIME DESTINATION bin)

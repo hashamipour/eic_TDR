@@ -289,9 +289,9 @@ int main(int argc, char** argv) {
     // DECLARE OUTPUT HISTOGRAMS
     //---------------------------------------------------------
 
-    int n_bins = 23;
+    int n_bins = 10;
     // std::vector<Double_t> bin_edges_Q2 = GetLogBins(1.0, 200.0, n_bins); // 20 bins from 0.5 to 200 GeV^2
-    std::vector<Double_t> bin_edges_Q2 = GetRoundedLogBins(1.0, 200.0, n_bins); // 20 bins from 0.5 to 200 GeV^2
+    std::vector<Double_t> bin_edges_Q2 = GetRoundedLogBins(3.4, 150.0, n_bins); // 20 bins from 0.5 to 200 GeV^2
     // std::vector<Double_t> bin_edges_Q2 = GetManualQ2Bins(); // manually defined Q2 bins
     n_bins = bin_edges_Q2.size()-1; // update n_bins in case of rounding adjustments
     std::cout << "Number of Q2 bins: " << n_bins << std::endl;
@@ -306,7 +306,12 @@ int main(int argc, char** argv) {
 
     // === New histograms for Bjorken-x and inelasticity y ===
     // x histograms (0..1)
-    std::vector<Double_t> x_bins = GetLogBins(1e-4, 1.0, 50);
+    std::vector<Double_t> x_bins = GetLogBins(1.0e-4, 1.0, 25);
+    std::cout << "bin edges for x: ";
+    for (const auto& edge : x_bins) {
+        std::cout << edge << " ";
+    }
+    std::cout << std::endl;
     TH1D* h_x_EM     = new TH1D("x_EM",     "electron method;x_{Bj}", x_bins.size()-1, x_bins.data());
     TH1D* h_x_DA     = new TH1D("x_DA",     "DA method;x_{Bj}",       x_bins.size()-1, x_bins.data());
     TH1D* h_x_ESigma = new TH1D("x_ESigma", "ESigma method;x_{Bj}",   x_bins.size()-1, x_bins.data());
@@ -320,31 +325,32 @@ int main(int argc, char** argv) {
     TH1D* h_y_truth  = new TH1D("y_truth",  "truth;y",           n_y_bins, 0.0, 1.0);
 
     // Relative resolution for x and y
-    TH1D* h_RelRes_x_EM     = new TH1D("x_RelRes_EM",     "electron method;#frac{x(Reco)-x(MC)}{x(MC)}", 101, -0.5, 0.5);
-    TH1D* h_RelRes_x_DA     = new TH1D("x_RelRes_DA",     "DA method;#frac{x(Reco)-x(MC)}{x(MC)}",       101, -0.5, 0.5);
-    TH1D* h_RelRes_x_ESigma = new TH1D("x_RelRes_ESigma", "ESigma method;#frac{x(Reco)-x(MC)}{x(MC)}",   101, -0.5, 0.5);
+    TH1D* h_RelRes_x_EM     = new TH1D("x_RelRes_EM",     "electron method;#frac{x(Reco)-x(MC)}{x(MC)}", 101, -0.15, 0.15);
+    TH1D* h_RelRes_x_DA     = new TH1D("x_RelRes_DA",     "DA method;#frac{x(Reco)-x(MC)}{x(MC)}",       101, -0.15, 0.15);
+    TH1D* h_RelRes_x_ESigma = new TH1D("x_RelRes_ESigma", "ESigma method;#frac{x(Reco)-x(MC)}{x(MC)}",   101, -0.15, 0.15);
 
-    TH1D* h_RelRes_y_EM     = new TH1D("y_RelRes_EM",     "electron method;#frac{y(Reco)-y(MC)}{y(MC)}", 101, -0.5, 0.5);
-    TH1D* h_RelRes_y_DA     = new TH1D("y_RelRes_DA",     "DA method;#frac{y(Reco)-y(MC)}{y(MC)}",       101, -0.5, 0.5);
-    TH1D* h_RelRes_y_ESigma = new TH1D("y_RelRes_ESigma", "ESigma method;#frac{y(Reco)-y(MC)}{y(MC)}",   101, -0.5, 0.5);
+    TH1D* h_RelRes_y_EM     = new TH1D("y_RelRes_EM",     "electron method;#frac{y(Reco)-y(MC)}{y(MC)}", 101, -0.15, 0.15);
+    TH1D* h_RelRes_y_DA     = new TH1D("y_RelRes_DA",     "DA method;#frac{y(Reco)-y(MC)}{y(MC)}",       101, -0.15, 0.15);
+    TH1D* h_RelRes_y_ESigma = new TH1D("y_RelRes_ESigma", "ESigma method;#frac{y(Reco)-y(MC)}{y(MC)}",   101, -0.15, 0.15);
 
     // 2D binned relres vs truth
     // Use linear bins for x and y truth (0..1)
+    int n_binned = 51;
     TH2D* h_RelRes_x_binned_EM     = new TH2D("x_RelRes_binned_EM",     "x: truth vs rel. res (EM);x_{truth};#frac{x(Reco)-x(MC)}{x(MC)}",       
-        x_bins.size()-1, x_bins.data(), 101, -0.5, 0.5);
+        x_bins.size()-1, x_bins.data(), n_binned, -0.15, 0.15);
     TH2D* h_RelRes_x_binned_DA     = new TH2D("x_RelRes_binned_DA",     "x: truth vs rel. res (DA);x_{truth};#frac{x(Reco)-x(MC)}{x(MC)}",       
-        x_bins.size()-1, x_bins.data(), 101, -0.5, 0.5);
+        x_bins.size()-1, x_bins.data(), n_binned, -0.15, 0.15);
     TH2D* h_RelRes_x_binned_ESigma = new TH2D("x_RelRes_binned_ESigma", "x: truth vs rel. res (ESigma);x_{truth};#frac{x(Reco)-x(MC)}{x(MC)}",   
-        x_bins.size()-1, x_bins.data(), 101, -0.5, 0.5);
+        x_bins.size()-1, x_bins.data(), n_binned, -0.15, 0.15);
 
-    TH2D* h_RelRes_y_binned_EM     = new TH2D("y_RelRes_binned_EM",     "y: truth vs rel. res (EM);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",       n_y_bins, 0.0, 1.0, 101, -0.5, 0.5);
-    TH2D* h_RelRes_y_binned_DA     = new TH2D("y_RelRes_binned_DA",     "y: truth vs rel. res (DA);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",       n_y_bins, 0.0, 1.0, 101, -0.5, 0.5);
-    TH2D* h_RelRes_y_binned_ESigma = new TH2D("y_RelRes_binned_ESigma", "y: truth vs rel. res (ESigma);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",   n_y_bins, 0.0, 1.0, 101, -0.5, 0.5);
+    TH2D* h_RelRes_y_binned_EM     = new TH2D("y_RelRes_binned_EM",     "y: truth vs rel. res (EM);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",       n_y_bins, 0.0, 1.0, n_binned, -0.15, 0.15);
+    TH2D* h_RelRes_y_binned_DA     = new TH2D("y_RelRes_binned_DA",     "y: truth vs rel. res (DA);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",       n_y_bins, 0.0, 1.0, n_binned, -0.15, 0.15);
+    TH2D* h_RelRes_y_binned_ESigma = new TH2D("y_RelRes_binned_ESigma", "y: truth vs rel. res (ESigma);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",   n_y_bins, 0.0, 1.0, n_binned, -0.15, 0.15);
 
     // Correlation plots (truth vs reco)
-    TH2D* h_Corr_x_EM     = new TH2D("x_Corr_EM",     "x correlation (EM);x_{truth};x_{EM}",           50, 0.0, 1.0, 50, 0.0, 1.0);
-    TH2D* h_Corr_x_DA     = new TH2D("x_Corr_DA",     "x correlation (DA);x_{truth};x_{DA}",           50, 0.0, 1.0, 50, 0.0, 1.0);
-    TH2D* h_Corr_x_ESigma = new TH2D("x_Corr_ESigma", "x correlation (ESigma);x_{truth};x_{ESigma}",   50, 0.0, 1.0, 50, 0.0, 1.0);
+    TH2D* h_Corr_x_EM     = new TH2D("x_Corr_EM",     "x correlation (EM);x_{truth};x_{EM}",           x_bins.size()-1, x_bins.data(), x_bins.size()-1, x_bins.data());
+    TH2D* h_Corr_x_DA     = new TH2D("x_Corr_DA",     "x correlation (DA);x_{truth};x_{DA}",           x_bins.size()-1, x_bins.data(), x_bins.size()-1, x_bins.data());
+    TH2D* h_Corr_x_ESigma = new TH2D("x_Corr_ESigma", "x correlation (ESigma);x_{truth};x_{ESigma}",   x_bins.size()-1, x_bins.data(), x_bins.size()-1, x_bins.data());
 
     TH2D* h_Corr_y_EM     = new TH2D("y_Corr_EM",     "y correlation (EM);y_{truth};y_{EM}",           n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
     TH2D* h_Corr_y_DA     = new TH2D("y_Corr_DA",     "y correlation (DA);y_{truth};y_{DA}",           n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
@@ -352,9 +358,12 @@ int main(int argc, char** argv) {
     TH1D* h_RelRes_Q2_DA = new TH1D("Q2_RelRes_DA","DA method;#frac{Q^{2}(DA)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
     TH1D* h_RelRes_Q2_ESigma = new TH1D("Q2_RelRes_ESigma","ESigma method;#frac{Q^{2}(ESigma)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
     
-    TH2D* h_RelRes_Q2_binned_EM = new TH2D("Q2_RelRes_binned_EM",";Q^{2} [GeV^{2}];#frac{Q^{2}(EM)-Q^{2}(MC)}{Q^{2}(MC)}",n_bins, bin_edges_Q2.data(), 31,-0.15,0.15);
-    TH2D* h_RelRes_Q2_binned_DA = new TH2D("Q2_RelRes_binned_DA",";Q^{2} [GeV^{2}];#frac{Q^{2}(DA)-Q^{2}(MC)}{Q^{2}(MC)}",n_bins, bin_edges_Q2.data(), 31,-0.15,0.15);
-    TH2D* h_RelRes_Q2_binned_ESigma = new TH2D("Q2_RelRes_binned_ESigma",";Q^{2} [GeV^{2}];#frac{Q^{2}(ESigma)-Q^{2}(MC)}{Q^{2}(MC)}",n_bins, bin_edges_Q2.data(), 31,-0.15,0.15);
+    TH2D* h_RelRes_Q2_binned_EM = new TH2D("Q2_RelRes_binned_EM",";Q^{2} [GeV^{2}];#frac{Q^{2}(EM)-Q^{2}(MC)}{Q^{2}(MC)}",
+        n_bins, bin_edges_Q2.data(), n_binned,-0.15,0.15);
+    TH2D* h_RelRes_Q2_binned_DA = new TH2D("Q2_RelRes_binned_DA",";Q^{2} [GeV^{2}];#frac{Q^{2}(DA)-Q^{2}(MC)}{Q^{2}(MC)}",
+        n_bins, bin_edges_Q2.data(), n_binned,-0.15,0.15);
+    TH2D* h_RelRes_Q2_binned_ESigma = new TH2D("Q2_RelRes_binned_ESigma",";Q^{2} [GeV^{2}];#frac{Q^{2}(ESigma)-Q^{2}(MC)}{Q^{2}(MC)}",
+        n_bins, bin_edges_Q2.data(), n_binned,-0.15,0.15);
 
     
     TH2D* h_Corr_Q2_EM = new TH2D("Corr_Q2_EM", ";Q^{2}_{MC};Q^{2}_{EM}",

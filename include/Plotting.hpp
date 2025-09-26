@@ -65,9 +65,9 @@ public:
     PlotOptionsRelRes(const TString& histName,
                       const char* xLabel,
                       const char* yLabel,
-                      double xMinFit,
-                      double xMaxFit,
-                      const char* saveName);
+                      double xMinFit=-999.,
+                      double xMaxFit=-999.,
+                      const char* saveName="relres.png");
     void SetFitRangeByBins(TH1D* hist);
     void Plot(TFile* inputFile) override;
     double GetBestSymmetryValue() const { return m_bestSymmetryValue; };
@@ -132,8 +132,8 @@ private:
     const char* m_xLabel;
     const char* m_yLabel;
     const char* m_saveName;
-    bool m_isLogX;
-    bool m_isLogY;
+    // bool m_isLogX;
+    // bool m_isLogY;
 };
 
 #endif // PLOTTING_HPP
