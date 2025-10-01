@@ -85,51 +85,6 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-.PHONY : list_install_components/fast
-
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/opt/software/linux-x86_64_v2/cmake-3.31.8-qzcpqhbvyf66utny2in34bz3fzkr456h/bin/cmake -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/opt/software/linux-x86_64_v2/cmake-3.31.8-qzcpqhbvyf66utny2in34bz3fzkr456h/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/opt/software/linux-x86_64_v2/cmake-3.31.8-qzcpqhbvyf66utny2in34bz3fzkr456h/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/opt/software/linux-x86_64_v2/cmake-3.31.8-qzcpqhbvyf66utny2in34bz3fzkr456h/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/opt/software/linux-x86_64_v2/cmake-3.31.8-qzcpqhbvyf66utny2in34bz3fzkr456h/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/opt/software/linux-x86_64_v2/cmake-3.31.8-qzcpqhbvyf66utny2in34bz3fzkr456h/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip/fast
-
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/hh/Downloads/eic_TDR/build/CMakeFiles /home/hh/Downloads/eic_TDR/build//CMakeFiles/progress.marks
@@ -173,32 +128,6 @@ eicplot: cmake_check_build_system
 eicplot/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/eicplot.dir/build.make CMakeFiles/eicplot.dir/build
 .PHONY : eicplot/fast
-
-#=============================================================================
-# Target rules for targets named ddis_skim_q2
-
-# Build rule for target.
-ddis_skim_q2: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_skim_q2
-.PHONY : ddis_skim_q2
-
-# fast build rule for target.
-ddis_skim_q2/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2.dir/build.make CMakeFiles/ddis_skim_q2.dir/build
-.PHONY : ddis_skim_q2/fast
-
-#=============================================================================
-# Target rules for targets named ddis_plots_q2
-
-# Build rule for target.
-ddis_plots_q2: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_plots_q2
-.PHONY : ddis_plots_q2
-
-# fast build rule for target.
-ddis_plots_q2/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2.dir/build.make CMakeFiles/ddis_plots_q2.dir/build
-.PHONY : ddis_plots_q2/fast
 
 #=============================================================================
 # Target rules for targets named ddis_skim_q2_xy
@@ -276,77 +205,29 @@ analysis/DDIS_Plot_t.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/analysis/DDIS_Plot_t.cpp.s
 .PHONY : analysis/DDIS_Plot_t.cpp.s
 
-analysis/DDIS_Plots_Q2_OOP.o: analysis/DDIS_Plots_Q2_OOP.cpp.o
-.PHONY : analysis/DDIS_Plots_Q2_OOP.o
+analysis/DDIS_Plots_Q2_with_xy.o: analysis/DDIS_Plots_Q2_with_xy.cpp.o
+.PHONY : analysis/DDIS_Plots_Q2_with_xy.o
 
 # target to build an object file
-analysis/DDIS_Plots_Q2_OOP.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2.dir/build.make CMakeFiles/ddis_plots_q2.dir/analysis/DDIS_Plots_Q2_OOP.cpp.o
-.PHONY : analysis/DDIS_Plots_Q2_OOP.cpp.o
+analysis/DDIS_Plots_Q2_with_xy.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o
+.PHONY : analysis/DDIS_Plots_Q2_with_xy.cpp.o
 
-analysis/DDIS_Plots_Q2_OOP.i: analysis/DDIS_Plots_Q2_OOP.cpp.i
-.PHONY : analysis/DDIS_Plots_Q2_OOP.i
-
-# target to preprocess a source file
-analysis/DDIS_Plots_Q2_OOP.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2.dir/build.make CMakeFiles/ddis_plots_q2.dir/analysis/DDIS_Plots_Q2_OOP.cpp.i
-.PHONY : analysis/DDIS_Plots_Q2_OOP.cpp.i
-
-analysis/DDIS_Plots_Q2_OOP.s: analysis/DDIS_Plots_Q2_OOP.cpp.s
-.PHONY : analysis/DDIS_Plots_Q2_OOP.s
-
-# target to generate assembly for a file
-analysis/DDIS_Plots_Q2_OOP.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2.dir/build.make CMakeFiles/ddis_plots_q2.dir/analysis/DDIS_Plots_Q2_OOP.cpp.s
-.PHONY : analysis/DDIS_Plots_Q2_OOP.cpp.s
-
-analysis/DDIS_Plots_Q2_OOP_with_xy.o: analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o
-.PHONY : analysis/DDIS_Plots_Q2_OOP_with_xy.o
-
-# target to build an object file
-analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o
-.PHONY : analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o
-
-analysis/DDIS_Plots_Q2_OOP_with_xy.i: analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.i
-.PHONY : analysis/DDIS_Plots_Q2_OOP_with_xy.i
+analysis/DDIS_Plots_Q2_with_xy.i: analysis/DDIS_Plots_Q2_with_xy.cpp.i
+.PHONY : analysis/DDIS_Plots_Q2_with_xy.i
 
 # target to preprocess a source file
-analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.i
-.PHONY : analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.i
+analysis/DDIS_Plots_Q2_with_xy.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.i
+.PHONY : analysis/DDIS_Plots_Q2_with_xy.cpp.i
 
-analysis/DDIS_Plots_Q2_OOP_with_xy.s: analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.s
-.PHONY : analysis/DDIS_Plots_Q2_OOP_with_xy.s
-
-# target to generate assembly for a file
-analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.s
-.PHONY : analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.s
-
-analysis/DDIS_Skim_Q2.o: analysis/DDIS_Skim_Q2.cpp.o
-.PHONY : analysis/DDIS_Skim_Q2.o
-
-# target to build an object file
-analysis/DDIS_Skim_Q2.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2.dir/build.make CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.o
-.PHONY : analysis/DDIS_Skim_Q2.cpp.o
-
-analysis/DDIS_Skim_Q2.i: analysis/DDIS_Skim_Q2.cpp.i
-.PHONY : analysis/DDIS_Skim_Q2.i
-
-# target to preprocess a source file
-analysis/DDIS_Skim_Q2.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2.dir/build.make CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.i
-.PHONY : analysis/DDIS_Skim_Q2.cpp.i
-
-analysis/DDIS_Skim_Q2.s: analysis/DDIS_Skim_Q2.cpp.s
-.PHONY : analysis/DDIS_Skim_Q2.s
+analysis/DDIS_Plots_Q2_with_xy.s: analysis/DDIS_Plots_Q2_with_xy.cpp.s
+.PHONY : analysis/DDIS_Plots_Q2_with_xy.s
 
 # target to generate assembly for a file
-analysis/DDIS_Skim_Q2.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_q2.dir/build.make CMakeFiles/ddis_skim_q2.dir/analysis/DDIS_Skim_Q2.cpp.s
-.PHONY : analysis/DDIS_Skim_Q2.cpp.s
+analysis/DDIS_Plots_Q2_with_xy.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.s
+.PHONY : analysis/DDIS_Plots_Q2_with_xy.cpp.s
 
 analysis/DDIS_Skim_Q2_with_xy.o: analysis/DDIS_Skim_Q2_with_xy.cpp.o
 .PHONY : analysis/DDIS_Skim_Q2_with_xy.o
@@ -595,30 +476,18 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
-	@echo "... install"
-	@echo "... install/local"
-	@echo "... install/strip"
-	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... ddis_plots_q2"
 	@echo "... ddis_plots_q2_xy"
 	@echo "... ddis_plots_t"
-	@echo "... ddis_skim_q2"
 	@echo "... ddis_skim_q2_xy"
 	@echo "... eicplot"
 	@echo "... skim_t"
 	@echo "... analysis/DDIS_Plot_t.o"
 	@echo "... analysis/DDIS_Plot_t.i"
 	@echo "... analysis/DDIS_Plot_t.s"
-	@echo "... analysis/DDIS_Plots_Q2_OOP.o"
-	@echo "... analysis/DDIS_Plots_Q2_OOP.i"
-	@echo "... analysis/DDIS_Plots_Q2_OOP.s"
-	@echo "... analysis/DDIS_Plots_Q2_OOP_with_xy.o"
-	@echo "... analysis/DDIS_Plots_Q2_OOP_with_xy.i"
-	@echo "... analysis/DDIS_Plots_Q2_OOP_with_xy.s"
-	@echo "... analysis/DDIS_Skim_Q2.o"
-	@echo "... analysis/DDIS_Skim_Q2.i"
-	@echo "... analysis/DDIS_Skim_Q2.s"
+	@echo "... analysis/DDIS_Plots_Q2_with_xy.o"
+	@echo "... analysis/DDIS_Plots_Q2_with_xy.i"
+	@echo "... analysis/DDIS_Plots_Q2_with_xy.s"
 	@echo "... analysis/DDIS_Skim_Q2_with_xy.o"
 	@echo "... analysis/DDIS_Skim_Q2_with_xy.i"
 	@echo "... analysis/DDIS_Skim_Q2_with_xy.s"

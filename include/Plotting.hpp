@@ -72,7 +72,8 @@ public:
                       const char* yLabel,
                       double xMinFit,
                       double xMaxFit,
-                      const char* saveName);
+                      const char* saveName
+                    );
     
     void Plot(TFile* inputFile) override;
 };
@@ -89,6 +90,7 @@ private:
     double m_xMaxFit;
     const char* m_saveName;
     const char* m_binSavePrefix;
+    std::pair<double, double> m_xAxisRange;
 
     void SetFitRangeByBins(TH1D* hist);
 
@@ -99,7 +101,9 @@ public:
                             const char* yLabel,
                             const std::vector<std::pair<double, double>>& fitRanges,
                             const char* saveName,
-                            const char* binSavePrefix);
+                            const char* binSavePrefix,
+                            const std::pair<double, double>& x_axis_range = {-999., -999.}
+                        );
     
     void Plot(TFile* inputFile) override;
 };

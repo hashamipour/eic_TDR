@@ -224,26 +224,10 @@ int main(int argc, char** argv) {
     //     "figs/DDIS_Q2RelRes_binned_DA.png",
     //     "DDIS_Q2RelRes_binned_DA"
     // ));
-    // plots.push_back(new PlotOptionsBinnedRelRes(
-    //     "Q2_RelRes_binned_ESigma",
-    //     ";Q^{2}_{MC};#frac{Q^{2}_{E#Sigma} - Q^{2}_{MC}}{Q^{2}_{MC}}",
-    //     "Q^{2}_{E#Sigma}",
-    //     "",
-    //     {
-    //      {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},{-0.02, 0.02},{-0.02, 0.02},
-    //      {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{-0.014, 0.015},{-0.025, 0.025},{-0.01, 0.012},
-    //      {-0.027, 0.028},{-0.018, 0.02},{-0.022, 0.02},{-0.02, 0.015},{-0.018, 0.02},
-    //      {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
-    //      {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
-    //     },
-    //     "figs/DDIS_Q2RelRes_binned_ESigma.png",
-    //     "DDIS_Q2RelRes_binned_ESigma"
-    // ));
-
     plots.push_back(new PlotOptionsBinnedRelRes(
-        "x_RelRes_binned_EM",
-        ";x_{MC};#frac{x_{EM} - x_{MC}}{x_{MC}}",
-        "x_{EM}",
+        "Q2_RelRes_binned_ESigma",
+        ";Q^{2}_{MC};#frac{Q^{2}_{E#Sigma} - Q^{2}_{MC}}{Q^{2}_{MC}}",
+        "Q^{2}_{E#Sigma}",
         "",
         {
          {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},{-0.02, 0.02},{-0.02, 0.02},
@@ -252,8 +236,26 @@ int main(int argc, char** argv) {
          {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
          {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
         },
+        "figs/DDIS_Q2RelRes_binned_ESigma.png",
+        "DDIS_Q2RelRes_binned_ESigma",
+        std::make_pair(5.0, 200) // x axis range for summary plot (optional)
+    ));
+
+    plots.push_back(new PlotOptionsBinnedRelRes(
+        "x_RelRes_binned_EM",
+        ";x_{MC};#frac{x_{EM} - x_{MC}}{x_{MC}}",
+        "x_{EM}",
+        "",
+        {
+         {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},/*4*/{-0.02, 0.02},{-0.02, 0.02},
+         {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{0,0},{-0.025, 0.025},{-0.025, 0.02},
+         {-0.027, 0.028},/*12*/{0, 0},{0, 0},{0, 0},{0, 0},
+         {0, 0},{0, 0},{0, 0},{0, 0},{0, 0},
+         {0, 0},{0, 0},{0, 0}
+        },
         "figs/DDIS_RelRes_binned_x_EM.png",
-        "DDIS_RelRes_binned_x_EM"
+        "DDIS_RelRes_binned_x_EM",
+        std::make_pair(1e-3, 0.3) // x axis range for summary plot (optional)
     ));
     // plots.push_back(new PlotOptionsBinnedRelRes(
     //     "x_RelRes_binned_DA",

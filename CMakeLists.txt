@@ -24,28 +24,21 @@ add_library(eicplot STATIC
     plotting/PlotOptionsCombinedCorrelation.cpp
     plotting/PlotOptionsRelRes.cpp
     plotting/PlotOptionsResponseMatrix.cpp
-    
+
     utility/Utility.cpp
     utility/RecoMethods.cpp
 )
 target_link_libraries(eicplot PUBLIC ${ROOT_LIBRARIES})
 target_include_directories(eicplot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(ddis_skim_q2 analysis/DDIS_Skim_Q2.cpp)
-target_link_libraries(ddis_skim_q2 PRIVATE eicplot ${ROOT_LIBRARIES})
-
-add_executable(ddis_plots_q2 analysis/DDIS_Plots_Q2_OOP.cpp)
-target_link_libraries(ddis_plots_q2 PRIVATE eicplot ${ROOT_LIBRARIES})
 
 
 
 add_executable(ddis_skim_q2_xy analysis/DDIS_Skim_Q2_with_xy.cpp)
 target_link_libraries(ddis_skim_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
 
-add_executable(ddis_plots_q2_xy analysis/DDIS_Plots_Q2_OOP_with_xy.cpp)
+add_executable(ddis_plots_q2_xy analysis/DDIS_Plots_Q2_with_xy.cpp)
 target_link_libraries(ddis_plots_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
-
-
 
 add_executable(ddis_plots_t analysis/DDIS_Plot_t.cpp)
 target_link_libraries(ddis_plots_t PRIVATE eicplot ${ROOT_LIBRARIES})
@@ -53,4 +46,6 @@ target_link_libraries(ddis_plots_t PRIVATE eicplot ${ROOT_LIBRARIES})
 add_executable(skim_t analysis/DDIS_Skim_t.cpp)
 target_link_libraries(skim_t PRIVATE eicplot ${ROOT_LIBRARIES})
 
-install(TARGETS ddis_plots_q2 ddis_skim_q2 RUNTIME DESTINATION bin)
+
+
+#install(TARGETS ddis_plots_q2 ddis_skim_q2 RUNTIME DESTINATION bin)

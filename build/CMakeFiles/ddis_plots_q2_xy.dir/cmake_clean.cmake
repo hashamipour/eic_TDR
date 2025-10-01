@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/ddis_plots_q2_xy.dir/link.d"
-  "CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o"
-  "CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o.d"
+  "CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o"
+  "CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o.d"
   "ddis_plots_q2_xy"
   "ddis_plots_q2_xy.pdb"
 )

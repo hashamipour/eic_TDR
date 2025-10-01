@@ -1,13 +1,7 @@
 /home/hh/Downloads/eic_TDR/build/CMakeFiles/eicplot.dir
-/home/hh/Downloads/eic_TDR/build/CMakeFiles/ddis_skim_q2.dir
-/home/hh/Downloads/eic_TDR/build/CMakeFiles/ddis_plots_q2.dir
 /home/hh/Downloads/eic_TDR/build/CMakeFiles/ddis_skim_q2_xy.dir
 /home/hh/Downloads/eic_TDR/build/CMakeFiles/ddis_plots_q2_xy.dir
 /home/hh/Downloads/eic_TDR/build/CMakeFiles/ddis_plots_t.dir
 /home/hh/Downloads/eic_TDR/build/CMakeFiles/skim_t.dir
 /home/hh/Downloads/eic_TDR/build/CMakeFiles/edit_cache.dir
 /home/hh/Downloads/eic_TDR/build/CMakeFiles/rebuild_cache.dir
-/home/hh/Downloads/eic_TDR/build/CMakeFiles/list_install_components.dir
-/home/hh/Downloads/eic_TDR/build/CMakeFiles/install.dir
-/home/hh/Downloads/eic_TDR/build/CMakeFiles/install/local.dir
-/home/hh/Downloads/eic_TDR/build/CMakeFiles/install/strip.dir

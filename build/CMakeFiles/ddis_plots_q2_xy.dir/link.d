@@ -2,7 +2,7 @@ ddis_plots_q2_xy: \
   /lib/x86_64-linux-gnu/Scrt1.o \
   /lib/x86_64-linux-gnu/crti.o \
   /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o \
-  CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o \
+  CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o \
   libeicplot.a \
   /opt/local/lib/root/libCore.so \
   /opt/local/lib/root/libImt.so \
@@ -70,7 +70,7 @@ ddis_plots_q2_xy: \
 
 /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o:
 
-CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o:
+CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o:
 
 libeicplot.a:
 

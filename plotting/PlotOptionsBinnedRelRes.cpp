@@ -10,7 +10,9 @@ PlotOptionsBinnedRelRes::PlotOptionsBinnedRelRes(const TString& histName,
                                                  const char* yLabel,
                                                  const std::vector<std::pair<double, double>>& fitRanges,
                                                  const char* saveName,
-                                                 const char* binSavePrefix)
+                                                 const char* binSavePrefix,
+                                                 const std::pair<double, double>& x_axis_range
+                                                )
     : m_histName(histName),
       m_title(title),
       m_xLabel(xLabel),
@@ -19,7 +21,8 @@ PlotOptionsBinnedRelRes::PlotOptionsBinnedRelRes(const TString& histName,
       m_xMinFit(0.0),
       m_xMaxFit(0.0),
       m_saveName(saveName),
-      m_binSavePrefix(binSavePrefix) {}
+      m_binSavePrefix(binSavePrefix),
+      m_xAxisRange(x_axis_range) {}
 
 void PlotOptionsBinnedRelRes::SetFitRangeByBins(TH1D* hist) {
     int peakBin = hist->GetMaximumBin();
@@ -175,6 +178,7 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
 
     TCanvas* c = new TCanvas("c_binned", "", 1200, 800);
     c->SetLeftMargin(0.15);
+    c->SetLogx();
 
     int nbinsX = h_RelRes_binned->GetNbinsX();
     TGraphErrors* g = new TGraphErrors(nbinsX);
@@ -199,6 +203,10 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
             }
         }
         
+        TF1* gaus = nullptr;
+        double mean = 0.0;
+        double sigma = 0.0;
+        
         if (!skipFit) {
             // Determine fit range: use provided ranges or automatic detection
             if (m_fitRanges.empty()) {
@@ -214,68 +222,82 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
                 }
             }
             
-            TF1* gaus = new TF1("gaus", "gaus", m_xMinFit, m_xMaxFit);
+            gaus = new TF1("gaus", "gaus", m_xMinFit, m_xMaxFit);
             gaus->SetParameters(projY->GetMaximum(), projY->GetMean(), projY->GetRMS());
             projY->Fit(gaus, "RQ");
             
-            double mean = gaus->GetParameter(1);
-            double sigma = gaus->GetParameter(2);
-
-            TCanvas* c_proj = new TCanvas(Form("c_proj_%s_%d", m_binSavePrefix, j),
-                                          Form("Bin Projection %d", j), 800, 600);
-            projY->SetTitle(Form("%s Bin: %.1e-%.1e", m_xLabel, 
-                         h_RelRes_binned->GetXaxis()->GetBinLowEdge(j), 
-                         h_RelRes_binned->GetXaxis()->GetBinUpEdge(j)));
-            
-            projY->SetStats(0);
-            projY->Draw();
-            
-            double ymax = 1.1 * std::fmax(projY->GetMaximum(), gaus->GetMaximum());
-            projY->GetYaxis()->SetRangeUser(0, ymax);
+            mean = gaus->GetParameter(1);
+            sigma = gaus->GetParameter(2);
+        }
+        
+        // Always create and save the projection plot
+        TCanvas* c_proj = new TCanvas(Form("c_proj_%s_%d", m_binSavePrefix, j),
+                                      Form("Bin Projection %d", j), 800, 600);
+        projY->SetTitle(Form("%s Bin: %.1e-%.1e", m_xLabel, 
+                     h_RelRes_binned->GetXaxis()->GetBinLowEdge(j), 
+                     h_RelRes_binned->GetXaxis()->GetBinUpEdge(j)));
+        
+        projY->SetStats(0);
+        projY->Draw();
+        
+        double ymax = 1.1 * projY->GetMaximum();
+        if (gaus) {
+            ymax = 1.1 * std::fmax(projY->GetMaximum(), gaus->GetMaximum());
             gaus->SetLineColor(kRed);
             gaus->Draw("same");
-            
-            TPaveText* statsBox = new TPaveText(0.6, 0.6, 0.9, 0.9, "NDC");
-            statsBox->SetFillColor(kWhite);
-            statsBox->SetBorderSize(1);
-            statsBox->SetTextAlign(12);
-            statsBox->SetTextSize(0.035);
-            statsBox->SetTextFont(42);
+        }
+        projY->GetYaxis()->SetRangeUser(0, ymax);
+        
+        // Create stats box
+        TPaveText* statsBox = new TPaveText(0.6, 0.6, 0.9, 0.9, "NDC");
+        statsBox->SetFillColor(kWhite);
+        statsBox->SetBorderSize(1);
+        statsBox->SetTextAlign(12);
+        statsBox->SetTextSize(0.035);
+        statsBox->SetTextFont(42);
 
-            statsBox->AddText(Form("Entries: %d", (int)projY->GetEntries()));
-            statsBox->AddText(Form("Mean: %.5f", projY->GetMean()));
-            statsBox->AddText(Form("RMS: %.5f", projY->GetRMS()));
+        statsBox->AddText(Form("Entries: %d", (int)projY->GetEntries()));
+        statsBox->AddText(Form("Mean: %.5f", projY->GetMean()));
+        statsBox->AddText(Form("RMS: %.5f", projY->GetRMS()));
+        
+        if (gaus) {
             statsBox->AddText(Form("#chi^{2} / ndf: %.1f / %d", gaus->GetChisquare(), gaus->GetNDF()));
-            statsBox->AddText(Form("Mean: %.5f #pm %.5f", mean, gaus->GetParError(1)));
-            statsBox->AddText(Form("Sigma: %.4f #pm %.5f", sigma, gaus->GetParError(2)));
+            statsBox->AddText(Form("Fit Mean: %.5f #pm %.5f", mean, gaus->GetParError(1)));
+            statsBox->AddText(Form("Fit Sigma: %.4f #pm %.5f", sigma, gaus->GetParError(2)));
             statsBox->AddText(Form("Fit range: [%.3f, %.3f]", m_xMinFit, m_xMaxFit));
-            statsBox->Draw();
-            
-            c_proj->Update();
-            c_proj->SaveAs(Form("figs/%s_bin_%d.png", m_binSavePrefix, j));
-            
-            c->SetLogx();
+        } else {
+            statsBox->AddText("(Fit skipped)");
+        }
+        statsBox->Draw();
+        
+        c_proj->Update();
+        c_proj->SaveAs(Form("figs/%s_bin_%d.png", m_binSavePrefix, j));
+        
+        // Add to fit graph only if fit was performed
+        if (!skipFit) {
             g->SetPoint(j - 1, _center, mean);
             g->SetPointError(j - 1, 0.0, sigma);
-            
-            delete c_proj;
-            delete gaus;
-            delete statsBox;
         }
         
         // Always add RMS points
         g_RMS->SetPoint(j - 1, _center * 1.05, projY->GetMean());
         g_RMS->SetPointError(j - 1, 0.0, projY->GetRMS());
 
+        delete c_proj;
+        delete statsBox;
+        if (gaus) delete gaus;
         delete projY;
     }
     
+    // Rest of the plotting code remains the same...
     g_RMS->SetTitle(m_title);
     g_RMS->SetMarkerStyle(20);
     g_RMS->SetMarkerColor(kBlack);
     g_RMS->SetLineColor(kBlack);
     g_RMS->SetLineWidth(2);
-    g_RMS->GetXaxis()->SetLimits(5.0, 200);
+    if (m_xAxisRange.first != -999. && m_xAxisRange.second != -999.) {
+        g_RMS->GetXaxis()->SetLimits(m_xAxisRange.first, m_xAxisRange.second);
+    }
     g_RMS->Draw("AP");
 
     g->SetTitle(m_title);

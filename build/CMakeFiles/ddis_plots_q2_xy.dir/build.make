@@ -72,28 +72,28 @@ include CMakeFiles/ddis_plots_q2_xy.dir/flags.make
 CMakeFiles/ddis_plots_q2_xy.dir/codegen:
 .PHONY : CMakeFiles/ddis_plots_q2_xy.dir/codegen
 
-CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o: CMakeFiles/ddis_plots_q2_xy.dir/flags.make
-CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o: /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp
-CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o: CMakeFiles/ddis_plots_q2_xy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o -MF CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o.d -o CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o -c /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp
+CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o: CMakeFiles/ddis_plots_q2_xy.dir/flags.make
+CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o: /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_with_xy.cpp
+CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o: CMakeFiles/ddis_plots_q2_xy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hh/Downloads/eic_TDR/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o -MF CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o.d -o CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o -c /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_with_xy.cpp
 
-CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.i"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp > CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.i
+CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_with_xy.cpp > CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.i
 
-CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.s"
-	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp -o CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.s
+CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hh/Downloads/eic_TDR/analysis/DDIS_Plots_Q2_with_xy.cpp -o CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.s
 
 # Object files for target ddis_plots_q2_xy
 ddis_plots_q2_xy_OBJECTS = \
-"CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o"
+"CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o"
 
 # External object files for target ddis_plots_q2_xy
 ddis_plots_q2_xy_EXTERNAL_OBJECTS =
 
-ddis_plots_q2_xy: CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_OOP_with_xy.cpp.o
+ddis_plots_q2_xy: CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o
 ddis_plots_q2_xy: CMakeFiles/ddis_plots_q2_xy.dir/build.make
 ddis_plots_q2_xy: CMakeFiles/ddis_plots_q2_xy.dir/compiler_depend.ts
 ddis_plots_q2_xy: libeicplot.a
