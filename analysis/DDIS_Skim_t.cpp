@@ -3,6 +3,8 @@
 #include <cmath>
 #include <memory>
 #include <string>
+#include <vector>
+#include <map>
 
 #include "TFile.h"
 #include "TChain.h"
@@ -17,375 +19,373 @@
 #include "TMath.h"
 #include "TVector3.h"
 #include "Math/Vector4D.h"
-#include "Math/Vector3D.h"
 #include "Math/RotationX.h"
 #include "Math/RotationY.h"
 #include "Math/GenVector/Boost.h"
 #include "Math/VectorUtil.h"
-#include <TLine.h>
-#include <TLatex.h>
+#include "TLine.h"
+
+#include "Utility.hpp"
+#include "RecoMethods.hpp"
 
 using std::cout; using std::endl;
 using ROOT::Math::VectorUtil::boost;
 using ROOT::Math::RotationX;
 using ROOT::Math::RotationY;
-using P3MVector = ROOT::Math::LorentzVector<ROOT::Math::PxPyPzMVector>;
 using P3EVector = ROOT::Math::LorentzVector<ROOT::Math::PxPyPzEVector>;
 using MomVector = ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<Double_t>, ROOT::Math::DefaultCoordinateSystemTag>;
-using ROOT::Math::PxPyPzEVector;
 
-// FIX 1: Add missing coordinate transformation functions from DDIS_TDR.cpp
-// Objects for undoing afterburn boost
-Float_t fXAngle{-0.025}; // Crossing angle in radians
-Float_t fRotX{};
+// Global afterburner correction parameters
+Float_t fXAngle{-0.025};
 RotationX rotAboutX;
-Float_t fRotY{};
 RotationY rotAboutY;
 MomVector vBoostToCoM;
 MomVector vBoostToHoF;
 
-// Undo AB and calculate boost vectors - DO THIS FIRST FOR EACH EVENT
 void undoAfterburnAndCalc(P3MVector& p, P3MVector& k){
-  // Holding vectors for beam - undoing crossing angle ONLY
-  P3MVector p_beam(fXAngle*p.E(), 0., p.E(), p.M());
-  P3MVector e_beam(0., 0., -k.E(), k.M());
-  
-  // Define boost vector to CoM frame
-  P3MVector CoM_boost = p_beam+e_beam;
-  vBoostToCoM.SetXYZ(-CoM_boost.X()/CoM_boost.E(), -CoM_boost.Y()/CoM_boost.E(), -CoM_boost.Z()/CoM_boost.E());
-  
-  // Apply boost to beam vectors
-  p_beam = boost(p_beam, vBoostToCoM);
-  e_beam = boost(e_beam, vBoostToCoM);
-  
-  // Calculate rotation angles and create rotation objects
-  fRotY = -1.0*TMath::ATan2(p_beam.X(), p_beam.Z());
-  fRotX = 1.0*TMath::ATan2(p_beam.Y(), p_beam.Z());
-
-  rotAboutY = RotationY(fRotY);
-  rotAboutX = RotationX(fRotX);
-
-  // Apply rotation to beam vectors
-  p_beam = rotAboutY(p_beam);
-  p_beam = rotAboutX(p_beam);
-  e_beam = rotAboutY(e_beam);
-  e_beam = rotAboutX(e_beam);
-
-  // Define boost vector back to head-on frame
-  P3EVector HoF_boost(0., 0., CoM_boost.Z(), CoM_boost.E());
-  vBoostToHoF.SetXYZ(HoF_boost.X()/HoF_boost.E(), HoF_boost.Y()/HoF_boost.E(), HoF_boost.Z()/HoF_boost.E());
-
-  // Apply boost back to head on frame to beam vectors
-  p_beam = boost(p_beam, vBoostToHoF);
-  e_beam = boost(e_beam, vBoostToHoF);
-
-  // Make changes to input vectors
-  p.SetPxPyPzE(p_beam.X(), p_beam.Y(), p_beam.Z(), p_beam.E());
-  k.SetPxPyPzE(e_beam.X(), e_beam.Y(), e_beam.Z(), e_beam.E());
+    P3MVector p_beam(fXAngle*p.E(), 0., p.E(), p.M());
+    P3MVector e_beam(0., 0., -k.E(), k.M());
+    
+    P3MVector CoM_boost = p_beam + e_beam;
+    vBoostToCoM.SetXYZ(-CoM_boost.X()/CoM_boost.E(), -CoM_boost.Y()/CoM_boost.E(), -CoM_boost.Z()/CoM_boost.E());
+    
+    p_beam = boost(p_beam, vBoostToCoM);
+    e_beam = boost(e_beam, vBoostToCoM);
+    
+    Float_t fRotY = -1.0*TMath::ATan2(p_beam.X(), p_beam.Z());
+    Float_t fRotX = 1.0*TMath::ATan2(p_beam.Y(), p_beam.Z());
+    
+    rotAboutY = RotationY(fRotY);
+    rotAboutX = RotationX(fRotX);
+    
+    p_beam = rotAboutY(p_beam);
+    p_beam = rotAboutX(p_beam);
+    e_beam = rotAboutY(e_beam);
+    e_beam = rotAboutX(e_beam);
+    
+    P3EVector HoF_boost(0., 0., CoM_boost.Z(), CoM_boost.E());
+    vBoostToHoF.SetXYZ(HoF_boost.X()/HoF_boost.E(), HoF_boost.Y()/HoF_boost.E(), HoF_boost.Z()/HoF_boost.E());
+    
+    p_beam = boost(p_beam, vBoostToHoF);
+    e_beam = boost(e_beam, vBoostToHoF);
+    
+    p.SetPxPyPzE(p_beam.X(), p_beam.Y(), p_beam.Z(), p_beam.E());
+    k.SetPxPyPzE(e_beam.X(), e_beam.Y(), e_beam.Z(), e_beam.E());
 }
 
-// Undo afterburn procedure only
 void undoAfterburn(P3MVector& a){
-  // Undo AB procedure for single vector, a^{mu}
-  a = boost(a, vBoostToCoM); // BOOST TO COM FRAME
-  a = rotAboutY(a);          // ROTATE TO Z-AXIS
-  a = rotAboutX(a);          // ROTATE TO Z-AXIS
-  a = boost(a, vBoostToHoF); // BOOST BACK TO HEAD ON FRAME
+    a = boost(a, vBoostToCoM);
+    a = rotAboutY(a);
+    a = rotAboutX(a);
+    a = boost(a, vBoostToHoF);
+}
+
+// Process truth protons from MC
+std::vector<P3MVector> ProcessTruthProtons(
+    TTreeReaderArray<double>& mc_px, TTreeReaderArray<double>& mc_py, TTreeReaderArray<double>& mc_pz,
+    TTreeReaderArray<double>& mc_mass, TTreeReaderArray<int>& mc_gen_status, TTreeReaderArray<int>& mc_pdg,
+    const BeamInfo& beams, TH1D* h_theta, TH1D* h_t
+) {
+    std::vector<P3MVector> truth_protons;
+    
+    for(int i = 0; i < mc_px.GetSize(); i++){
+        if(mc_gen_status[i] == 1 && mc_pdg[i] == 2212){
+            P3MVector p(mc_px[i], mc_py[i], mc_pz[i], mc_mass[i]);
+            undoAfterburn(p);
+            
+            truth_protons.push_back(p);
+            h_theta->Fill(p.Theta() * 1000.0);
+            h_t->Fill(TMath::Abs(CalcT(beams.p_beam, p)));
+        }
+    }
+    
+    return truth_protons;
+}
+
+// Process B0 (truth-seeded) protons
+void ProcessB0Protons(
+    TTreeReaderArray<unsigned int>& tsassoc_rec_id, TTreeReaderArray<unsigned int>& tsassoc_sim_id,
+    TTreeReaderArray<float>& tsre_px, TTreeReaderArray<float>& tsre_py, TTreeReaderArray<float>& tsre_pz,
+    TTreeReaderArray<double>& mc_px, TTreeReaderArray<double>& mc_py, TTreeReaderArray<double>& mc_pz,
+    TTreeReaderArray<double>& mc_mass, TTreeReaderArray<int>& mc_gen_status, TTreeReaderArray<int>& mc_pdg,
+    const BeamInfo& beams, MethodHistograms& hist, int& n_matches
+) {
+    for(unsigned int i = 0; i < tsassoc_rec_id.GetSize(); i++){
+        auto mc_idx = tsassoc_sim_id[i];
+        
+        if(mc_idx >= (unsigned)mc_pdg.GetSize() || mc_gen_status[mc_idx] != 1 || mc_pdg[mc_idx] != 2212)
+            continue;
+            
+        P3MVector p_reco(tsre_px[i], tsre_py[i], tsre_pz[i], mc_mass[mc_idx]);
+        undoAfterburn(p_reco);
+        
+        // B0 angular acceptance
+        if(p_reco.Theta() <= 0.0055 || p_reco.Theta() >= 0.02) continue;
+        
+        hist.h_theta->Fill(p_reco.Theta() * 1000.0);
+        
+        // Get truth for correlation
+        P3MVector p_truth(mc_px[mc_idx], mc_py[mc_idx], mc_pz[mc_idx], mc_mass[mc_idx]);
+        undoAfterburn(p_truth);
+        
+        double t_reco = CalcT(beams.p_beam, p_reco);
+        double t_truth = CalcT(beams.p_beam, p_truth);
+        
+        hist.FillCorrelation(t_truth, t_reco);
+        n_matches++;
+    }
+}
+
+// Process Roman Pot protons
+void ProcessRPProtons(
+    TTreeReaderArray<float>& rp_px, TTreeReaderArray<float>& rp_py, TTreeReaderArray<float>& rp_pz,
+    TTreeReaderArray<float>& rp_mass, TTreeReaderArray<int>& rp_pdg,
+    const std::vector<P3MVector>& truth_protons, const BeamInfo& beams,
+    MethodHistograms& hist, int& n_matches
+) {
+    for(int i = 0; i < rp_px.GetSize(); i++){
+        if(rp_pdg[i] != 2212) continue;
+        
+        P3MVector p_rp(rp_px[i], rp_py[i], rp_pz[i], rp_mass[i]);
+        
+        // RP angular acceptance
+        if(p_rp.Theta() >= 0.005) continue;
+        
+        hist.h_theta->Fill(p_rp.Theta() * 1000.0);
+        
+        // Match to truth by angular proximity
+        double min_dtheta = 1e9;
+        int best_match = -1;
+        
+        for(size_t j = 0; j < truth_protons.size(); j++){
+            if(truth_protons[j].Theta() >= 0.006) continue;
+            
+            double dtheta = TMath::Abs(p_rp.Theta() - truth_protons[j].Theta());
+            if(dtheta < min_dtheta){
+                min_dtheta = dtheta;
+                best_match = j;
+            }
+        }
+        
+        if(best_match >= 0 && min_dtheta < 0.001){
+            double t_reco = CalcT(beams.p_beam, p_rp);
+            double t_truth = CalcT(beams.p_beam, truth_protons[best_match]);
+            
+            hist.FillCorrelation(t_truth, t_reco);
+            n_matches++;
+        }
+    }
 }
 
 void analyzeProtonsMandelstamT(TString fileList){
-    cout<<"----------------------------"<<endl;
-    cout<<"                            "<<endl;
-    cout<<"   Proton Mandelstam t Analysis   "<<endl;
-    cout<<"                            "<<endl;
-    cout<<"----------------------------"<<endl;
-    cout<<"\nInput filelist: "<<fileList<<endl;
+    cout << "----------------------------" << endl;
+    cout << "  Proton Mandelstam t Analysis" << endl;
+    cout << "----------------------------" << endl;
+    cout << "\nInput filelist: " << fileList << endl;
 
-    // Constants
-    const Double_t fMass_proton   = 0.938272;
-    const Double_t fMass_electron = 0.000511;
-
-    //---------------------------------------------------------
-    // CREATE TCHAIN FROM INPUT ROOT FILES
-    //---------------------------------------------------------
+    BeamInfo beams;
+    
+    // Setup input chain
     TChain* events = new TChain("events");
     Int_t nFiles = 0;
-
-    std::ifstream fileListStream;
-    fileListStream.open(fileList);
+    
+    std::ifstream fileListStream(fileList.Data());
     std::string fileName;
-
     while(getline(fileListStream, fileName)){
         events->Add((TString)fileName);
         nFiles++;
     }
-    cout<<"\nNo. of files: "<<nFiles<<"; no. of events: "<<events->GetEntries()<<endl;
-
-    //---------------------------------------------------------
-    // DECLARE OUTPUT HISTOGRAMS
-    //---------------------------------------------------------
-    // 2D correlation plots (Truth vs Reco Mandelstam t)
-    TH2D* h_t_corr_B0 = new TH2D("t_corr_B0", "B0 Protons: Truth vs Reco Mandelstam t;Truth |t| [GeV^{2}];Reco |t| [GeV^{2}]", 
-                                  100, 0.0, 2.0, 100, 0.0, 2.0);
-    TH2D* h_t_corr_RP = new TH2D("t_corr_RP", "Roman Pot Protons: Truth vs Reco Mandelstam t;Truth |t| [GeV^{2}];Reco |t| [GeV^{2}]", 
-                                  100, 0.0, 0.5, 100, 0.0, 0.5);
-
-    // 1D histograms for superimposed comparison
-    TH1D* h_t_MC      = new TH1D("t_MC",      "Truth Mandelstam t;|t| [GeV^{2}];Counts", 100, 0.0, 2.0);
-    TH1D* h_t_B0      = new TH1D("t_B0",      "B0 Reco Mandelstam t;|t| [GeV^{2}];Counts", 100, 0.0, 2.0);
-    TH1D* h_t_RP_histo= new TH1D("t_RP_histo","Roman Pot Reco Mandelstam t;|t| [GeV^{2}];Counts", 100, 0.0, 2.0);
-
-    // Resolution plots
-    TH1D* h_t_res_B0 = new TH1D("t_res_B0", "B0 Mandelstam t Resolution;(|t|_{reco} - |t|_{truth})/|t|_{truth}", 100, -2.0, 2.0);
-    TH1D* h_t_res_RP = new TH1D("t_res_RP", "RP Mandelstam t Resolution;(|t|_{reco} - |t|_{truth})/|t|_{truth}", 100, -2.0, 2.0);
-
-    // Angular distributions for verification
-    TH1D* h_theta_MC = new TH1D("theta_MC", "MC Proton Scattering Angle;#theta [mrad];Counts", 100, 0.0, 25.0);
-    TH1D* h_theta_B0 = new TH1D("theta_B0", "B0 Proton Scattering Angle;#theta [mrad];Counts", 100, 0.0, 25.0);
-    TH1D* h_theta_RP = new TH1D("theta_RP", "RP Proton Scattering Angle;#theta [mrad];Counts", 100, 0.0, 25.0);
-
-    //---------------------------------------------------------
-    // DECLARE TTREEREADER AND BRANCHES TO USE
-    //---------------------------------------------------------
+    
+    cout << "\nNo. of files: " << nFiles << "; no. of events: " << events->GetEntries() << endl;
+    
+    // Setup binning
+    std::vector<Double_t> t_bins = GetLinBins(0.0, 1.6, 10);
+    cout << "bin edges for t: ";
+    for(const auto& edge : t_bins) cout << edge << " ";
+    cout << endl;
+    
+    // Create histograms for each method
+    TH1D* h_t_MC = new TH1D("t_MC", "Truth Mandelstam t;|t| [GeV^{2}];Counts", 
+                            t_bins.size()-1, t_bins.data());
+    TH1D* h_theta_MC = new TH1D("theta_MC", "MC Proton Scattering Angle;#theta [mrad];Counts", 
+                                100, 0.0, 25.0);
+    
+    // Q² comparison histograms
+    TH1D* h_Q2_EICRecon = new TH1D("Q2_EICRecon", "EICRecon Q^{2};Q^{2} [GeV^{2}];Counts", 100, 0, 20);
+    TH1D* h_Q2_calc = new TH1D("Q2_calc", "Calculated Q^{2} from e^{-};Q^{2} [GeV^{2}];Counts", 100, 0, 20);
+    TH2D* h_Q2_corr = new TH2D("Q2_corr", "Q^{2} Correlation;EICRecon Q^{2} [GeV^{2}];Calc Q^{2} [GeV^{2}]", 
+                               100, 0, 20, 100, 0, 20);
+    
+    MethodHistograms hist_B0("B0", t_bins);
+    MethodHistograms hist_RP("RP", t_bins);
+    MethodHistograms hist_eX("eX", t_bins);
+    
+    // Setup tree reader
     TTreeReader tree_reader(events);
+    
+    TTreeReaderArray<double> mc_px_array(tree_reader, "MCParticles.momentum.x");
+    TTreeReaderArray<double> mc_py_array(tree_reader, "MCParticles.momentum.y");
+    TTreeReaderArray<double> mc_pz_array(tree_reader, "MCParticles.momentum.z");
+    TTreeReaderArray<double> mc_mass_array(tree_reader, "MCParticles.mass");
+    TTreeReaderArray<int> mc_genStatus_array(tree_reader, "MCParticles.generatorStatus");
+    TTreeReaderArray<int> mc_pdg_array(tree_reader, "MCParticles.PDG");
+    
+    TTreeReaderArray<unsigned int> tsassoc_rec_id(tree_reader, "ReconstructedTruthSeededChargedParticleAssociations.recID");
+    TTreeReaderArray<unsigned int> tsassoc_sim_id(tree_reader, "ReconstructedTruthSeededChargedParticleAssociations.simID");
+    
+    TTreeReaderArray<float> tsre_px_array(tree_reader, "ReconstructedTruthSeededChargedParticles.momentum.x");
+    TTreeReaderArray<float> tsre_py_array(tree_reader, "ReconstructedTruthSeededChargedParticles.momentum.y");
+    TTreeReaderArray<float> tsre_pz_array(tree_reader, "ReconstructedTruthSeededChargedParticles.momentum.z");
+    
+    TTreeReaderArray<float> rp_px_array(tree_reader, "ForwardRomanPotRecParticles.momentum.x");
+    TTreeReaderArray<float> rp_py_array(tree_reader, "ForwardRomanPotRecParticles.momentum.y");
+    TTreeReaderArray<float> rp_pz_array(tree_reader, "ForwardRomanPotRecParticles.momentum.z");
+    TTreeReaderArray<float> rp_mass_array(tree_reader, "ForwardRomanPotRecParticles.mass");
+    TTreeReaderArray<int> rp_pdg_array(tree_reader, "ForwardRomanPotRecParticles.PDG");
 
-    // --- MC particles (edm4hep/podio split branches) ---
-    // Use Double_t because the file reports Double_t leaves for momentum.*
-    TTreeReaderArray<double> mc_px_array        = {tree_reader, "MCParticles.momentum.x"};
-    TTreeReaderArray<double> mc_py_array        = {tree_reader, "MCParticles.momentum.y"};
-    TTreeReaderArray<double> mc_pz_array        = {tree_reader, "MCParticles.momentum.z"};
-    TTreeReaderArray<double> mc_mass_array      = {tree_reader, "MCParticles.mass"};
-    TTreeReaderArray<int>    mc_genStatus_array = {tree_reader, "MCParticles.generatorStatus"};
-    TTreeReaderArray<int>    mc_pdg_array       = {tree_reader, "MCParticles.PDG"};
+    // Particle Flow collection (includes charged + neutral)
+    TTreeReaderArray<float> rpf_px_array(tree_reader, "ReconstructedParticles.momentum.x");
+    TTreeReaderArray<float> rpf_py_array(tree_reader, "ReconstructedParticles.momentum.y");
+    TTreeReaderArray<float> rpf_pz_array(tree_reader, "ReconstructedParticles.momentum.z");
+    TTreeReaderArray<float> rpf_e_array(tree_reader, "ReconstructedParticles.energy");
+    TTreeReaderArray<int>   rpf_pdg_array(tree_reader, "ReconstructedParticles.PDG");
+    
+    // Q² from EICRecon
+    TTreeReaderArray<float> q2_electron_array(tree_reader, "InclusiveKinematicsElectron.Q2");
 
-    // --- Truth-seeded charged RECO (B0 acceptance window later by angle) ---
-    TTreeReaderArray<unsigned int> tsassoc_rec_id = {tree_reader, "ReconstructedTruthSeededChargedParticleAssociations.recID"};
-    TTreeReaderArray<unsigned int> tsassoc_sim_id = {tree_reader, "ReconstructedTruthSeededChargedParticleAssociations.simID"};
+    TTreeReaderArray<int> electron_scat_index(tree_reader, "_InclusiveKinematicsElectron_scat.index");
 
-    TTreeReaderArray<float> tsre_px_array     = {tree_reader, "ReconstructedTruthSeededChargedParticles.momentum.x"};
-    TTreeReaderArray<float> tsre_py_array     = {tree_reader, "ReconstructedTruthSeededChargedParticles.momentum.y"};
-    TTreeReaderArray<float> tsre_pz_array     = {tree_reader, "ReconstructedTruthSeededChargedParticles.momentum.z"};
-    TTreeReaderArray<float> tsre_e_array      = {tree_reader, "ReconstructedTruthSeededChargedParticles.energy"};
-
-    // --- Roman Pot RECO (very small angles) ---
-    TTreeReaderArray<float> rp_px_array     = {tree_reader, "ForwardRomanPotRecParticles.momentum.x"};
-    TTreeReaderArray<float> rp_py_array     = {tree_reader, "ForwardRomanPotRecParticles.momentum.y"};
-    TTreeReaderArray<float> rp_pz_array     = {tree_reader, "ForwardRomanPotRecParticles.momentum.z"};
-    TTreeReaderArray<float> rp_mass_array   = {tree_reader, "ForwardRomanPotRecParticles.mass"};
-    TTreeReaderArray<int>    rp_pdg_array    = {tree_reader, "ForwardRomanPotRecParticles.PDG"};
-
-    //---------------------------------------------------------
-    // FIX 2: PROPER TWO-PASS APPROACH - FIRST PASS: FIND BEAM PARTICLES
-    //---------------------------------------------------------
+    
+    // Find beam particles
     cout << "Finding beam particles." << endl;
-
-    P3MVector beame4(0,0,0,-1), beamp4(0,0,0,-1);
-    P3MVector beame4_acc(0,0,0,-1), beamp4_acc(0,0,0,-1);
-
-    while (tree_reader.Next()){
-        P3MVector beame4_evt(0,0,0,-1), beamp4_evt(0,0,0,-1);
-        TVector3 mctrk;
-
-        for(int imc=0; imc<mc_px_array.GetSize(); imc++){
-            mctrk.SetXYZ(mc_px_array[imc], mc_py_array[imc], mc_pz_array[imc]);
-            if(mc_genStatus_array[imc] == 4 && mc_pdg_array[imc] == 2212) {
-                beamp4_evt.SetCoordinates(mctrk.X(), mctrk.Y(), mctrk.Z(), fMass_proton);
+    
+    P3MVector beame4_acc(0,0,0,0), beamp4_acc(0,0,0,0);
+    
+    while(tree_reader.Next()){
+        for(int i = 0; i < mc_px_array.GetSize(); i++){
+            if(mc_genStatus_array[i] != 4) continue;
+            
+            if(mc_pdg_array[i] == 2212){
+                P3MVector p(mc_px_array[i], mc_py_array[i], mc_pz_array[i], beams.fMass_proton);
+                beamp4_acc += p;
             }
-            if(mc_genStatus_array[imc] == 4 && mc_pdg_array[imc] == 11) {
-                beame4_evt.SetCoordinates(mctrk.X(), mctrk.Y(), mctrk.Z(), fMass_electron);
+            else if(mc_pdg_array[i] == 11){
+                P3MVector p(mc_px_array[i], mc_py_array[i], mc_pz_array[i], beams.fMass_electron);
+                beame4_acc += p;
             }
         }
-        beame4_acc += beame4_evt;
-        beamp4_acc += beamp4_evt;
     }
-
-    // Average beam momenta over entries
+    
     auto nEntries = std::max<Long64_t>(1, events->GetEntries());
-    beame4.SetCoordinates(beame4_acc.X()/nEntries, beame4_acc.Y()/nEntries, beame4_acc.Z()/nEntries, beame4_acc.M()/nEntries);
-    beamp4.SetCoordinates(beamp4_acc.X()/nEntries, beamp4_acc.Y()/nEntries, beamp4_acc.Z()/nEntries, beamp4_acc.M()/nEntries);
-
-    cout << "[DEBUG] Found beam energies " << beame4.E() << "x" << beamp4.E() << " GeV" << endl;
-
-    // FIX 3: Apply coordinate transformation setup
-    undoAfterburnAndCalc(beamp4, beame4);
-
-    //---------------------------------------------------------
-    // SECOND PASS: CALCULATE |t| FOR TRUTH, B0, AND RP
-    //---------------------------------------------------------
+    beams.e_beam.SetCoordinates(
+        beame4_acc.X()/nEntries, 
+        beame4_acc.Y()/nEntries, 
+        beame4_acc.Z()/nEntries, 
+        beams.fMass_electron
+    );
+    beams.p_beam.SetCoordinates(
+        beamp4_acc.X()/nEntries, 
+        beamp4_acc.Y()/nEntries, 
+        beamp4_acc.Z()/nEntries, 
+        beams.fMass_proton
+    );
+    
+    cout << "[DEBUG] Found beam energies " << beams.e_beam.E() << "x" << beams.p_beam.E() << " GeV" << endl;
+    
+    undoAfterburnAndCalc(beams.p_beam, beams.e_beam);
+    
     tree_reader.Restart();
+    
+    // Event loop
+    int n_truth_protons = 0, n_b0_matches = 0, n_rp_matches = 0;
+    
+    while(tree_reader.Next()){
+        // Process truth protons
+        auto truth_protons = ProcessTruthProtons(
+            mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
+            mc_genStatus_array, mc_pdg_array, beams, h_theta_MC, h_t_MC
+        );
+        n_truth_protons += truth_protons.size();
+        
+        // Process B0 protons
+        ProcessB0Protons(
+            tsassoc_rec_id, tsassoc_sim_id,
+            tsre_px_array, tsre_py_array, tsre_pz_array,
+            mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
+            mc_genStatus_array, mc_pdg_array,
+            beams, hist_B0, n_b0_matches
+        );
+        
+        // Process RP protons
+        ProcessRPProtons(
+            rp_px_array, rp_py_array, rp_pz_array, rp_mass_array, rp_pdg_array,
+            truth_protons, beams, hist_RP, n_rp_matches
+        );
 
-    int n_truth_protons = 0;
-    int n_b0_matches = 0;
-    int n_rp_matches = 0;
+        // Process eX method with Q² diagnostic
+        auto elec_info = GetScatteredElectron(electron_scat_index, rpf_px_array, 
+                                      rpf_py_array, rpf_pz_array, beams.fMass_electron);
 
-    while (tree_reader.Next()){
-        std::vector<P3MVector> scatp4_gen; // truth
-        std::vector<P3MVector> scatp4_b0;  // reco B0
-        std::vector<P3MVector> scatp4_rp;  // reco RP
-
-        TVector3 mctrk, recotrk;
-
-        // FIX 4: Process truth particles FIRST to fill scatp4_gen
-        for(int imc=0; imc<mc_px_array.GetSize(); imc++){
-            if(mc_genStatus_array[imc] == 1 && mc_pdg_array[imc] == 2212){
-                mctrk.SetXYZ(mc_px_array[imc], mc_py_array[imc], mc_pz_array[imc]);
-                P3MVector q_truth(mctrk.X(), mctrk.Y(), mctrk.Z(), mc_mass_array[imc]);
+        if(elec_info.found && truth_protons.size() > 0){
+            P3MVector e_scattered = elec_info.p4;
+            undoAfterburn(e_scattered);
+            
+            P3MVector q_gamma = beams.e_beam - e_scattered;
+            double Q2_calc = -q_gamma.M2();
+            
+            // Fill Q² histograms...
+            
+            // Build X excluding electron and protons
+            P3MVector X_system(0,0,0,0);
+            for(int i = 0; i < rpf_px_array.GetSize(); i++){
+                if(i == (int)elec_info.index) continue;  // Use stored index
+                if(rpf_pdg_array[i] == 2212) continue;
                 
-                // FIX 5: Apply coordinate transformation
-                undoAfterburn(q_truth);
-                
-                scatp4_gen.push_back(q_truth);
-                h_theta_MC->Fill(q_truth.Theta()*1000.0);
-                auto t_truth = (q_truth - beamp4).M2();
-                h_t_MC->Fill(TMath::Abs(t_truth));
+                P3MVector p(rpf_px_array[i], rpf_py_array[i], rpf_pz_array[i], rpf_e_array[i]);
+                undoAfterburn(p);
+                X_system += p;
             }
-        }
-        n_truth_protons += (int)scatp4_gen.size();
+            
+            double t_eX = CalcT_eX(q_gamma, X_system);
+            double t_truth = CalcT(beams.p_beam, truth_protons[0]);
+            hist_eX.FillCorrelation(t_truth, t_eX);
 
-        // 2) reco B0 via truth-seeded association (5.5-20 mrad)
-        for(unsigned int i=0; i<tsassoc_rec_id.GetSize(); i++){
-            auto mc_idx = tsassoc_sim_id[i];
-            if(mc_idx < (unsigned)mc_pdg_array.GetSize() && mc_genStatus_array[mc_idx]==1 && mc_pdg_array[mc_idx]==2212){
-                recotrk.SetXYZ(tsre_px_array[i], tsre_py_array[i], tsre_pz_array[i]);
-                P3MVector q_reco(recotrk.X(), recotrk.Y(), recotrk.Z(), mc_mass_array[mc_idx]);
-                
-                // FIX 6: Apply coordinate transformation
-                undoAfterburn(q_reco);
-                
-                if(q_reco.Theta()>0.0055 && q_reco.Theta()<0.02){
-                    scatp4_b0.push_back(q_reco);
-                    h_theta_B0->Fill(q_reco.Theta()*1000.0);
-                    auto t_reco = (q_reco - beamp4).M2();
-                    h_t_B0->Fill(TMath::Abs(t_reco));
-                    
-                    // truth partner
-                    mctrk.SetXYZ(mc_px_array[mc_idx], mc_py_array[mc_idx], mc_pz_array[mc_idx]);
-                    P3MVector q_truth(mctrk.X(), mctrk.Y(), mctrk.Z(), mc_mass_array[mc_idx]);
-                    
-                    // FIX 7: Apply coordinate transformation to truth partner
-                    undoAfterburn(q_truth);
-                    
-                    auto t_truth = (q_truth - beamp4).M2();
-                    h_t_corr_B0->Fill(TMath::Abs(t_truth), TMath::Abs(t_reco));
-                    if(TMath::Abs(t_truth)>1e-6) h_t_res_B0->Fill( (TMath::Abs(t_reco)-TMath::Abs(t_truth))/TMath::Abs(t_truth) );
-                    n_b0_matches++;
-                }
-            }
-        }
-
-        // FIX 8: 3) reco RP - NO COORDINATE TRANSFORMATION (as per DDIS_TDR.cpp comment)
-        for(int ir=0; ir<rp_px_array.GetSize(); ir++){
-            if(rp_pdg_array[ir]==2212){
-                recotrk.SetXYZ(rp_px_array[ir], rp_py_array[ir], rp_pz_array[ir]);
-                P3MVector q_rp(recotrk.X(), recotrk.Y(), recotrk.Z(), rp_mass_array[ir]);
-                // Note: NO undoAfterburn for RP as per DDIS_TDR.cpp: "NO NEED TO UNDO AFTERBURNER FOR FF DETECTORS"
-                
-                if(q_rp.Theta()<0.005){
-                    scatp4_rp.push_back(q_rp);
-                    h_theta_RP->Fill(q_rp.Theta()*1000.0);
-                    auto t_reco = (q_rp - beamp4).M2();
-                    h_t_RP_histo->Fill(TMath::Abs(t_reco));
-                    
-                    // FIX 9: match to truth by angle - now scatp4_gen is properly filled
-                    double min_dtheta=1e9; int best=-1;
-                    for(size_t it=0; it<scatp4_gen.size(); ++it){
-                        double dth = TMath::Abs(q_rp.Theta()-scatp4_gen[it].Theta());
-                        if(dth < min_dtheta && scatp4_gen[it].Theta()<0.006){
-                            min_dtheta=dth; best=(int)it;
-                        }
-                    }
-                    if(best>=0 && min_dtheta<0.001){
-                        auto t_truth = (scatp4_gen[best] - beamp4).M2();
-                        h_t_corr_RP->Fill(TMath::Abs(t_truth), TMath::Abs(t_reco));
-                        if(TMath::Abs(t_truth)>1e-6) h_t_res_RP->Fill( (TMath::Abs(t_reco)-TMath::Abs(t_truth))/TMath::Abs(t_truth) );
-                        n_rp_matches++;
-                    }
-                }
-            }
         }
     }
-
-    //---------------------------------------------------------
-    // PRINT STATS
-    //---------------------------------------------------------
+    
+    // Print results
     cout << "\n=== ANALYSIS RESULTS ===" << endl;
     cout << "Truth protons found: " << n_truth_protons << endl;
     cout << "B0 matched protons: " << n_b0_matches << endl;
     cout << "RP matched protons: " << n_rp_matches << endl;
-    if(n_truth_protons>0){
+    if(n_truth_protons > 0){
         cout << "B0 matching efficiency: " << (double)n_b0_matches/n_truth_protons*100 << "%" << endl;
         cout << "RP matching efficiency: " << (double)n_rp_matches/n_truth_protons*100 << "%" << endl;
     }
-
-    //---------------------------------------------------------
-    // DRAW
-    //---------------------------------------------------------
+    
+    // Save to file
     gStyle->SetOptStat(0);
-
-    // Correlations
-    TCanvas* c1 = new TCanvas("c1","Mandelstam t Correlations",1400,600);
-    c1->Divide(2,1);
-    c1->cd(1);
-    h_t_corr_B0->Draw("COLZ");
-    h_t_corr_B0->SetTitle("B0 Protons: Truth vs Reco |t|;Truth |t| [GeV^{2}];Reco |t| [GeV^{2}]");
-    { TLine* l=new TLine(0,0,2,2); l->SetLineColor(kRed); l->SetLineWidth(2); l->SetLineStyle(2); l->Draw("same"); }
-    c1->cd(2);
-    h_t_corr_RP->Draw("COLZ");
-    h_t_corr_RP->SetTitle("Roman Pot Protons: Truth vs Reco |t|;Truth |t| [GeV^{2}];Reco |t| [GeV^{2}]");
-    { TLine* l=new TLine(0,0,0.5,0.5); l->SetLineColor(kRed); l->SetLineWidth(2); l->SetLineStyle(2); l->Draw("same"); }
-
-    // Distributions
-    TCanvas* c2 = new TCanvas("c2","Mandelstam t Distributions",1200,800);
-    gPad->SetLogy(1);
-    h_t_MC->SetMinimum(1);
-    h_t_MC->SetLineColor(kBlack); h_t_MC->SetLineWidth(2); h_t_MC->GetXaxis()->SetTitle("|t| [GeV^{2}]"); h_t_MC->GetYaxis()->SetTitle("Counts");
-    h_t_MC->Draw("HIST");
-    h_t_B0->SetLineColor(kBlue); h_t_B0->SetMarkerColor(kBlue); h_t_B0->SetMarkerStyle(20); h_t_B0->Draw("PE SAME");
-    h_t_RP_histo->SetLineColor(kCyan+1); h_t_RP_histo->SetMarkerColor(kCyan+1); h_t_RP_histo->SetMarkerStyle(20); h_t_RP_histo->Draw("PE SAME");
-    { TLegend* leg = new TLegend(0.6,0.7,0.89,0.89); leg->SetLineColorAlpha(kWhite,0); leg->SetFillColorAlpha(kWhite,0);
-      leg->AddEntry(h_t_MC, "Truth MC", "l");
-      leg->AddEntry(h_t_B0, "Reco B0 (5.5-20 mrad)", "lp");
-      leg->AddEntry(h_t_RP_histo, "Reco RP (<5 mrad)", "lp");
-      leg->Draw(); }
-
-    // Resolution
-    TCanvas* c4 = new TCanvas("c4","Mandelstam t Resolution",1200,600);
-    c4->Divide(2,1);
-    c4->cd(1); h_t_res_B0->SetLineColor(kBlue); h_t_res_B0->SetLineWidth(2); h_t_res_B0->Draw("HIST"); h_t_res_B0->SetTitle("B0 |t| Resolution;(|t|_{reco} - |t|_{truth})/|t|_{truth};Counts");
-    c4->cd(2); h_t_res_RP->SetLineColor(kCyan+1); h_t_res_RP->SetLineWidth(2); h_t_res_RP->Draw("HIST"); h_t_res_RP->SetTitle("RP |t| Resolution;(|t|_{reco} - |t|_{truth})/|t|_{truth};Counts");
-
-    //---------------------------------------------------------
-    // SAVE RESULTS
-    //---------------------------------------------------------
+    
     TFile* outfile = new TFile("proton_mandelstam_analysis.root", "RECREATE");
-    h_t_corr_B0->Write(); h_t_corr_RP->Write(); h_t_MC->Write(); h_t_B0->Write(); h_t_RP_histo->Write();
-    h_theta_MC->Write(); h_theta_B0->Write(); h_theta_RP->Write(); h_t_res_B0->Write(); h_t_res_RP->Write();
+    h_t_MC->Write();
+    h_theta_MC->Write();
+    h_Q2_EICRecon->Write();
+    h_Q2_calc->Write();
+    h_Q2_corr->Write();
+    hist_B0.Write();
+    hist_RP.Write();
+    hist_eX.Write();
     outfile->Close();
-    c1->SaveAs("mandelstam_t_correlations.png");
-    c2->SaveAs("mandelstam_t_distributions.png");
-    c4->SaveAs("mandelstam_t_resolution.png");
-
-    cout << "\nAnalysis complete! Files saved:" << endl;
-    cout << "- proton_mandelstam_analysis.root (histograms)" << endl;
-    cout << "- mandelstam_t_correlations.png" << endl;
-    cout << "- mandelstam_t_distributions.png" << endl;
-    cout << "- mandelstam_t_resolution.png" << endl;
-
-    return;
+    
+    cout << "\nAnalysis complete! Output saved to proton_mandelstam_analysis.root" << endl;
 }
 
-// -------------------------
-// Entry point
-// -------------------------
-int main(int argc, char** argv) {
-  if (argc < 2) {
-    std::cerr << "Usage: skim_t <filelist.txt>\n";
-    return 1;
-  }
-
-  cout << "AFTERBURNER_FIX_APPLIED" << endl;
-  TString fileList = argv[1];
-  analyzeProtonsMandelstamT(fileList);
-
-  return 0;
+int main(int argc, char** argv){
+    if(argc < 2){
+        std::cerr << "Usage: skim_t <filelist.txt>\n";
+        return 1;
+    }
+    
+    analyzeProtonsMandelstamT(argv[1]);
+    return 0;
 }

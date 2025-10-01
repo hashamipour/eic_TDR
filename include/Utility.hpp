@@ -14,6 +14,8 @@ void SetCustomPalette(const int& paletteID);
 
 std::vector<Double_t> GetRoundedLogBins(double min_val, double max_val, int n_bins);
 std::vector<Double_t> GetManualQ2Bins();
+std::vector<Double_t> GetLogBins(double min_val, double max_val, int n_bins);
+std::vector<Double_t> GetLinBins(double min_val, double max_val, int n_bins);
 
 class Logger {
 public:

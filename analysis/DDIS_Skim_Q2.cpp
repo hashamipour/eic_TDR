@@ -59,43 +59,6 @@ static inline void SetNiceStyle(){
   gStyle->SetPadGridX(1); gStyle->SetPadGridY(1);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @brief Generates logarithmically spaced bin edges.
- *
- * @param min_val The overall minimum value for the histogram range. Must be > 0.
- * @param max_val The overall maximum value for the histogram range.
- * @param n_bins The desired number of bins.
- * @return A vector of doubles containing the correctly ordered bin edges.
- */
-std::vector<Double_t> GetLogBins(double min_val, double max_val, int n_bins) {
-
-    // Ensure that min_val is positive and non-zero for logarithmic binning.
-    if (min_val <= 0) {
-        std::cerr << "Error: The minimum value for logarithmic binning must be greater than zero." << std::endl;
-        return std::vector<Double_t>();
-    }
-
-    std::vector<Double_t> bin_edges;
-    bin_edges.reserve(n_bins + 1);
-
-    // Calculate the logarithmic step
-    double log_min = TMath::Log10(min_val);
-    double log_max = TMath::Log10(max_val);
-    double log_step = (log_max - log_min) / n_bins;
-
-    // Populate the vector with bin edges
-    for (int i = 0; i <= n_bins; ++i) {
-        double current_log_val = log_min + i * log_step;
-        bin_edges.push_back(TMath::Power(10, current_log_val));
-    }
-    
-    return bin_edges;
-}
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Function to generate the logarithmic-reflected bin edges
 std::vector<Double_t> GetLogReflectedBins(int n_log_bins, double min_range, double max_range) {
     
