@@ -16,9 +16,20 @@
 
 // Base class for plot options
 class PlotOptions {
-public:
-    virtual ~PlotOptions();
-    virtual void Plot(TFile* inputFile) = 0;
+    protected:
+        // std::pair<double, double> m_legendLB;// = {0.75, 0.8}; // Legend lower-left  corner
+        // std::pair<double, double> m_legendRT;// = {1.05, 1.0}; // Legend upper-right corner
+        // Now they are optional pairs
+        std::optional<std::pair<double, double>> m_legendLB;
+        std::optional<std::pair<double, double>> m_legendRT;
+    public:
+        virtual ~PlotOptions();
+        virtual void Plot(TFile* inputFile) = 0;
+        void SetLegendPosition(double xlb, double ylb, double xrt, double yrt) {
+            m_legendLB = {xlb, ylb};
+            m_legendRT = {xrt, yrt};
+            // Logger::debug("Legend position set to: (" + std::to_string(xlb) + ", " + std::to_string(ylb) + ") - (" + std::to_string(xrt) + ", " + std::to_string(yrt) + ")");
+        }
 };
 
 // 1D histogram plot options
@@ -91,6 +102,7 @@ private:
     const char* m_saveName;
     const char* m_binSavePrefix;
     std::pair<double, double> m_xAxisRange;
+    const bool m_isLogX;
 
     void SetFitRangeByBins(TH1D* hist);
 
@@ -102,7 +114,8 @@ public:
                             const std::vector<std::pair<double, double>>& fitRanges,
                             const char* saveName,
                             const char* binSavePrefix,
-                            const std::pair<double, double>& x_axis_range = {-999., -999.}
+                            const std::pair<double, double>& x_axis_range = {-999., -999.},
+                            const bool  isLogX = false
                         );
     
     void Plot(TFile* inputFile) override;

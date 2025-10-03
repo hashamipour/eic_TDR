@@ -281,7 +281,7 @@ int main(int argc, char** argv) {
     TH1D* h_x_truth  = new TH1D("x_truth",  "truth;x_{Bj}",           x_bins.size()-1, x_bins.data());
 
     // y histograms (0..1)
-    int n_y_bins = 10;
+    int n_y_bins = 20;
     TH1D* h_y_EM     = new TH1D("y_EM",     "electron method;y", n_y_bins, 0.0, 1.0);
     TH1D* h_y_DA     = new TH1D("y_DA",     "DA method;y",       n_y_bins, 0.0, 1.0);
     TH1D* h_y_ESigma = new TH1D("y_ESigma", "ESigma method;y",   n_y_bins, 0.0, 1.0);

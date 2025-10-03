@@ -11,7 +11,8 @@ PlotOptionsBinnedRelRes::PlotOptionsBinnedRelRes(const TString& histName,
                                                  const std::vector<std::pair<double, double>>& fitRanges,
                                                  const char* saveName,
                                                  const char* binSavePrefix,
-                                                 const std::pair<double, double>& x_axis_range
+                                                 const std::pair<double, double>& x_axis_range,
+                                                 const bool isLogX
                                                 )
     : m_histName(histName),
       m_title(title),
@@ -22,7 +23,8 @@ PlotOptionsBinnedRelRes::PlotOptionsBinnedRelRes(const TString& histName,
       m_xMaxFit(0.0),
       m_saveName(saveName),
       m_binSavePrefix(binSavePrefix),
-      m_xAxisRange(x_axis_range) {}
+      m_xAxisRange(x_axis_range),
+      m_isLogX(isLogX) {}
 
 void PlotOptionsBinnedRelRes::SetFitRangeByBins(TH1D* hist) {
     int peakBin = hist->GetMaximumBin();
@@ -178,7 +180,8 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
 
     TCanvas* c = new TCanvas("c_binned", "", 1200, 800);
     c->SetLeftMargin(0.15);
-    c->SetLogx();
+
+    if (m_isLogX){c->SetLogx();}
 
     int nbinsX = h_RelRes_binned->GetNbinsX();
     TGraphErrors* g = new TGraphErrors(nbinsX);
@@ -280,7 +283,11 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
         }
         
         // Always add RMS points
-        g_RMS->SetPoint(j - 1, _center * 1.05, projY->GetMean());
+        if (m_isLogX){
+            g_RMS->SetPoint(j - 1, _center * 1.05, projY->GetMean());
+        } else {
+            g_RMS->SetPoint(j - 1, _center + 0.005, projY->GetMean());
+        }
         g_RMS->SetPointError(j - 1, 0.0, projY->GetRMS());
 
         delete c_proj;
@@ -309,7 +316,7 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
 
     g_RMS->SetTitle(m_title);
 
-    TLine* line = new TLine(0, 0, g->GetXaxis()->GetXmax(), 0);
+    TLine* line = new TLine(0, 0, g_RMS->GetXaxis()->GetXmax(), 0);
     line->SetLineColor(kRed);
     line->SetLineStyle(2);
     line->SetLineWidth(2);

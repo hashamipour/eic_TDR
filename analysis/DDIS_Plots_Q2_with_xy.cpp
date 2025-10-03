@@ -6,6 +6,7 @@
 #include <TSystem.h>
 #include <iostream>
 #include <vector>
+#include "TError.h"
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -13,6 +14,8 @@ int main(int argc, char** argv) {
         return 1;
     }
     
+    gErrorIgnoreLevel = kWarning; // Suppress ROOT infos
+
     TString inputFileName = argv[1];
 
     gStyle->SetOptStat(0);
@@ -35,92 +38,105 @@ int main(int argc, char** argv) {
 
     std::vector<PlotOptions*> plots;
 
-    // Q2 1D histogram plot configuration
-    // plots.push_back(new PlotOptions1D(
-    //     {"h_Q2_truth", "h_Q2_EM", "h_Q2_DA","h_Q2_ESigma"},    // hist names
-    //     {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"}, // legend entries
-    //     {"hist", "pe", "pe","pe"},                             // draw options
-    //     "Q^{2} Reconstruction Methods",                        // canvas title
-    //     "Q^{2}",                                               // x label
-    //     "# of events",                                         // y label
-    //     "figs/Q2_hist.png",                                    // save name
-    //     true,                                                  // isLogX (default is false)
-    //     true                                                   // isLogY (default is false)
-    // ));
+//    Q2 1D histogram plot configuration
+    PlotOptions1D* plot_ptr = new PlotOptions1D(
+        {"h_Q2_truth", "h_Q2_EM", "h_Q2_DA","h_Q2_ESigma"},    // hist names
+        {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"}, // legend entries
+        {"hist", "pe", "pe","pe"},                             // draw options
+        "Q^{2} Reconstruction Methods",                        // canvas title
+        "Q^{2}",                                               // x label
+        "# of events",                                         // y label
+        "figs/Q2_hist.png",                                    // save name
+        true,                                                  // isLogX (default is false)
+        true                                                   // isLogY (default is false)
+    );
+    plot_ptr->SetLegendPosition(0.7, 0.7, 0.9, 0.9);
+    plots.push_back(plot_ptr);
 
 
-    // // Q2 normalized to PDF plot 
-    // plots.push_back(new PlotOptions1D( 
-    //     {"h_Q2_truth", "h_Q2_EM", "h_Q2_DA","h_Q2_ESigma"},
-    //     {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
-    //     {"hist", "pe", "pe","pe"},
-    //     "Q^{2} PDF Comparison",
-    //     "Q^{2}",
-    //     "PDF",
-    //     "figs/Q2_pdf.png",
-    //     true,  // logX
-    //     true,  // logY
-    //     true   // normalize to PDF (default is false)
-    // ));
+    // Q2 normalized to PDF plot 
+    plot_ptr = new PlotOptions1D( 
+        {"h_Q2_truth", "h_Q2_EM", "h_Q2_DA","h_Q2_ESigma"},
+        {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
+        {"hist", "pe", "pe","pe"},
+        "Q^{2} PDF Comparison",
+        "Q^{2}",
+        "PDF",
+        "figs/Q2_pdf.png",
+        true,  // logX
+        true,  // logY
+        true   // normalize to PDF (default is false)
+    );
+    plot_ptr->SetLegendPosition(0.7, 0.7, 0.9, 0.9);
+    plots.push_back(plot_ptr);
 
     
-    // // ---- x_Bj: 1D distributions (counts) ----
-    // plots.push_back(new PlotOptions1D(
-    //     {"x_truth", "x_EM", "x_DA", "x_ESigma"},
-    //     {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
-    //     {"hist", "pe", "pe", "pe"},
-    //     "x_{Bj} Reconstruction Methods",
-    //     "x_{Bj}",
-    //     "# of events",
-    //     "figs/x_hist.png",
-    //     true,   // isLogX
-    //     true    // isLogY
-    // ));
+    // ---- x_Bj: 1D distributions (counts) ----
+    plot_ptr = new PlotOptions1D(
+        {"x_truth", "x_EM", "x_DA", "x_ESigma"},
+        {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
+        {"hist", "pe", "pe", "pe"},
+        "x_{Bj} Reconstruction Methods",
+        "x_{Bj}",
+        "# of events",
+        "figs/x_hist.png",
+        true,   // isLogX
+        true    // isLogY
+    );
+    plot_ptr->SetLegendPosition(0.7, 0.7, 0.9, 0.9);
+    plots.push_back(plot_ptr);
 
-    // // ---- x_Bj: normalized to PDF ----
-    // plots.push_back(new PlotOptions1D(
-    //     {"x_truth", "x_EM", "x_DA", "x_ESigma"},
-    //     {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
-    //     {"hist", "pe", "pe", "pe"},
-    //     "x_{Bj} PDF Comparison",
-    //     "x_{Bj}",
-    //     "PDF",
-    //     "figs/x_pdf.png",
-    //     true,  // logX
-    //     true,  // logY
-    //     true   // normalize to PDF
-    // ));
+    // ---- x_Bj: normalized to PDF ----
+    plot_ptr = new PlotOptions1D(
+        {"x_truth", "x_EM", "x_DA", "x_ESigma"},
+        {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
+        {"hist", "pe", "pe", "pe"},
+        "x_{Bj} PDF Comparison",
+        "x_{Bj}",
+        "PDF",
+        "figs/x_pdf.png",
+        true,  // logX
+        true,  // logY
+        true   // normalize to PDF
+    );
+    plot_ptr->SetLegendPosition(0.7, 0.7, 0.9, 0.9);
+    plots.push_back(plot_ptr);
 
-    // // ---- y (inelasticity): 1D distributions (counts) ----
-    // plots.push_back(new PlotOptions1D(
-    //     {"y_truth", "y_EM", "y_DA", "y_ESigma"},
-    //     {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
-    //     {"hist", "pe", "pe", "pe"},
-    //     "y (inelasticity) Reconstruction Methods",
-    //     "y",
-    //     "# of events",
-    //     "figs/y_hist.png",
-    //     false,  // isLogX -> linear in [0,1]
-    //     true    // isLogY (optional; keep for dynamic range)
-    // ));
+    // ---- y (inelasticity): 1D distributions (counts) ----
+    plot_ptr = new PlotOptions1D(
+        {"y_truth", "y_EM", "y_DA", "y_ESigma"},
+        {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
+        {"hist", "pe", "pe", "pe"},
+        "y (inelasticity) Reconstruction Methods",
+        "y",
+        "# of events",
+        "figs/y_hist.png",
+        false,  // isLogX -> linear in [0,1]
+        true    // isLogY (optional; keep for dynamic range)
+    );
+    plot_ptr->SetLegendPosition(0.7, 0.7, 0.9, 0.9);
+    plots.push_back(plot_ptr);
 
-    // // ---- y (inelasticity): normalized to PDF ----
-    // plots.push_back(new PlotOptions1D(
-    //     {"y_truth", "y_EM", "y_DA", "y_ESigma"},
-    //     {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
-    //     {"hist", "pe", "pe", "pe"},
-    //     "y (inelasticity) PDF Comparison",
-    //     "y",
-    //     "PDF",
-    //     "figs/y_pdf.png",
-    //     false, // logX
-    //     false, // logY
-    //     true   // normalize to PDF
-    // ));
+    // ---- y (inelasticity): normalized to PDF ----
+    plot_ptr = new PlotOptions1D(
+        {"y_truth", "y_EM", "y_DA", "y_ESigma"},
+        {"MC: truth", "Reco. EM", "Reco. DA", "Reco. ESigma"},
+        {"hist", "pe", "pe", "pe"},
+        "y (inelasticity) PDF Comparison",
+        "y",
+        "PDF",
+        "figs/y_pdf.png",
+        false, // logX
+        false, // logY
+        true   // normalize to PDF
+    );
+    plot_ptr->SetLegendPosition(0.7, 0.7, 0.9, 0.9);
+    plots.push_back(plot_ptr);
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 // Relative resolution plot configurations
+
     // plots.push_back(new PlotOptionsRelRes(
     //     "Q2_RelRes_EM",// histogram name
     //     "#frac{Q^{2}_{EM} - Q^{2}_{MC}}{ Q^{2}_{MC}}",// x label
@@ -128,6 +144,7 @@ int main(int argc, char** argv) {
     //     -0.01, 0.01,// fit range
     //     "figs/DDIS_Q2RelRes_EM.png"// save name
     // ));
+
     // plots.push_back(new PlotOptionsRelRes(
     //     "Q2_RelRes_DA",
     //     "Q^{2}_{DA} - Q^{2}_{MC} / Q^{2}_{MC}",
@@ -135,6 +152,7 @@ int main(int argc, char** argv) {
     //     -0.005, 0.02,
     //     "figs/DDIS_Q2RelRes_DA.png"
     // ));
+
     // plots.push_back(new PlotOptionsRelRes(
     //     "Q2_RelRes_ESigma",
     //     "Q^{2}_{reco} - Q^{2}_{MC} / Q^{2}_{MC}",
@@ -224,54 +242,68 @@ int main(int argc, char** argv) {
     //     "figs/DDIS_Q2RelRes_binned_DA.png",
     //     "DDIS_Q2RelRes_binned_DA"
     // ));
-    plots.push_back(new PlotOptionsBinnedRelRes(
-        "Q2_RelRes_binned_ESigma",
-        ";Q^{2}_{MC};#frac{Q^{2}_{E#Sigma} - Q^{2}_{MC}}{Q^{2}_{MC}}",
-        "Q^{2}_{E#Sigma}",
-        "",
-        {
-         {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},{-0.02, 0.02},{-0.02, 0.02},
-         {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{-0.014, 0.015},{-0.025, 0.025},{-0.01, 0.012},
-         {-0.027, 0.028},{-0.018, 0.02},{-0.022, 0.02},{-0.02, 0.015},{-0.018, 0.02},
-         {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
-         {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
-        },
-        "figs/DDIS_Q2RelRes_binned_ESigma.png",
-        "DDIS_Q2RelRes_binned_ESigma",
-        std::make_pair(5.0, 200) // x axis range for summary plot (optional)
-    ));
+    // plots.push_back(new PlotOptionsBinnedRelRes(
+    //     "Q2_RelRes_binned_ESigma",
+    //     ";Q^{2}_{MC};#frac{Q^{2}_{E#Sigma} - Q^{2}_{MC}}{Q^{2}_{MC}}",
+    //     "Q^{2}_{E#Sigma}",
+    //     "",
+    //     {
+    //      {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},{-0.02, 0.02},{-0.02, 0.02},
+    //      {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{-0.014, 0.015},{-0.025, 0.025},{-0.01, 0.012},
+    //      {-0.027, 0.028},{-0.018, 0.02},{-0.022, 0.02},{-0.02, 0.015},{-0.018, 0.02},
+    //      {-0.02, 0.015},{-0.02, 0.017},{-0.017, 0.02},{-0.02, 0.02},{-0.04, 0.04},
+    //      {-0.025, 0.03},{-0.015, 0.025},{-0.05, 0.06}
+    //     },
+    //     "figs/DDIS_Q2RelRes_binned_ESigma.png",
+    //     "DDIS_Q2RelRes_binned_ESigma",
+    //     std::make_pair(5.0, 200) // x axis range for summary plot (optional)
+    // ));
 
-    plots.push_back(new PlotOptionsBinnedRelRes(
-        "x_RelRes_binned_EM",
-        ";x_{MC};#frac{x_{EM} - x_{MC}}{x_{MC}}",
-        "x_{EM}",
-        "",
-        {
-         {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},/*4*/{-0.02, 0.02},{-0.02, 0.02},
-         {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{0,0},{-0.025, 0.025},{-0.025, 0.02},
-         {-0.027, 0.028},/*12*/{0, 0},{0, 0},{0, 0},{0, 0},
-         {0, 0},{0, 0},{0, 0},{0, 0},{0, 0},
-         {0, 0},{0, 0},{0, 0}
-        },
-        "figs/DDIS_RelRes_binned_x_EM.png",
-        "DDIS_RelRes_binned_x_EM",
-        std::make_pair(1e-3, 0.3) // x axis range for summary plot (optional)
-    ));
+    // plots.push_back(new PlotOptionsBinnedRelRes(
+    //     "x_RelRes_binned_EM",
+    //     ";x_{MC};#frac{x_{EM} - x_{MC}}{x_{MC}}",
+    //     "x_{EM}",
+    //     "",
+    //     {
+    //      {-0.0, 0.0},/*2*/ {-0.022, 0.02},{-0.02, 0.02},/*4*/{-0.02, 0.02},{-0.02, 0.02},
+    //      {-0.015, 0.015},/*7*/{-0.015, 0.015},/*8*/{0,0},{-0.025, 0.025},{-0.025, 0.02},
+    //      {-0.027, 0.028},/*12*/{0, 0},{0, 0},{0, 0},{0, 0},
+    //      {0, 0},{0, 0},{0, 0},{0, 0},{0, 0},
+    //      {0, 0},{0, 0},{0, 0}
+    //     },
+    //     "figs/DDIS_RelRes_binned_x_EM.png",
+    //     "DDIS_RelRes_binned_x_EM",
+    //     std::make_pair(1e-3, 0.3) // x axis range for summary plot (optional)
+    // ));
+
     // plots.push_back(new PlotOptionsBinnedRelRes(
     //     "x_RelRes_binned_DA",
     //     ";x_{MC};#frac{x_{DA} - x_{MC}}{x_{MC}}",
     //     "x_{DA}",
     //     "",
-    //     {},
+    //     {
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0}
+    //     },
     //     "figs/DDIS_RelRes_binned_x_DA.png",
     //     "DDIS_RelRes_binned_x_DA"
     // ));
+
     // plots.push_back(new PlotOptionsBinnedRelRes(
     //     "x_RelRes_binned_ESigma",
     //     ";x_{MC};#frac{x_{E#Sigma} - x_{MC}}{x_{MC}}",
     //     "x_{ESigma}",
     //     "",
-    //     {},
+    //     {
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0},{0,0},{0,0},
+    //         {0,0},{0,0},{0,0}
+    //     },
     //     "figs/DDIS_RelRes_binned_x_ESigma.png",
     //     "DDIS_RelRes_binned_x_ESigma"
     // ));
@@ -281,28 +313,41 @@ int main(int argc, char** argv) {
     //     ";y_{MC};#frac{y_{EM} - y_{MC}}{y_{MC}}",
     //     "y_{EM}",
     //     "",
-    //     {},
+    //     {
+    //         {0,0},{0,0},{-0.04,0.04},{-0.04,0.04},
+    //         {-0.025,0.025},/*5*/{-0.015,0.015},/*7*/{-0.015,0.015},{-0.,0}
+    //     },
     //     "figs/DDIS_RelRes_binned_y_EM.png",
-    //     "DDIS_RelRes_binned_y_EM"
+    //     "DDIS_RelRes_binned_y_EM",
+    //     std::make_pair(0.0, 1.0)
     // ));
+
     // plots.push_back(new PlotOptionsBinnedRelRes(
     //     "y_RelRes_binned_DA",
     //     ";y_{MC};#frac{y_{DA} - y_{MC}}{y_{MC}}",
     //     "y_{DA}",
     //     "",
-    //     {},
+    //     {
+    //         {0,0},{0,0},{0,0},{0,0},
+    //         {0,0},/*5*/{0,0},/*7*/{0,0},{0,0}// zero means No fitting, just save the histogram
+    //     },
     //     "figs/DDIS_RelRes_binned_y_DA.png",
     //     "DDIS_RelRes_binned_y_DA"
     // ));
+
     // plots.push_back(new PlotOptionsBinnedRelRes(
     //     "y_RelRes_binned_ESigma",
     //     ";y_{MC};#frac{y_{E#Sigma} - y_{MC}}{y_{MC}}",
     //     "y_{ESigma}",
     //     "",
-    //     {},
+    //     {
+    //         {0,0},{0,0},{-0,0.},{-0,0},
+    //         {-0.,0.},/*5*/{-0.,0.},/*7*/{-0.,0.},{-0.,0}
+    //     },
     //     "figs/DDIS_RelRes_binned_y_ESigma.png",
     //     "DDIS_RelRes_binned_y_ESigma"
     // ));
+
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 ///////// Response Matrix plot configurations
@@ -315,21 +360,33 @@ int main(int argc, char** argv) {
     //     "Corr_Q2_EM",       // name of 2D histogram
     //     "Q^{2} (true) [GeV]",   // X-axis label
     //     "Q^{2} (EM) [GeV]",   // Y-axis label
-    //     "figs/response_matrix_EM.png" // Output file name
+    //     "figs/response_matrix_Q2_EM.png", // Output file name
+    //     true,  // isLogX
+    //     true,  // isLogY
+    //     std::make_pair(1.0, 300), // x range
+    //     std::make_pair(1.0, 300)  // y range
     // ));
 
     // plots.push_back(new PlotOptionsResponseMatrix (
     //     "Corr_Q2_DA",       // name of 2D histogram
     //     "Q^{2} (true) [GeV]",   // X-axis label
     //     "Q^{2} (DA) [GeV]",   // Y-axis label
-    //     "figs/response_matrix_DA.png" // Output file name
+    //     "figs/response_matrix_Q2_DA.png", // Output file name
+    //     true,  // isLogX
+    //     true,  // isLogY
+    //     std::make_pair(1.0, 300), // x range
+    //     std::make_pair(1.0, 300)  // y range
     // ));
 
     // plots.push_back(new PlotOptionsResponseMatrix (
     //     "Corr_Q2_ESigma",       // name of 2D histogram
     //     "Q^{2} (true) [GeV]",   // X-axis label
     //     "Q^{2} (ESigma) [GeV]",   // Y-axis label
-    //     "figs/response_matrix_Esigma.png" // Output file name
+    //     "figs/response_matrix_Q2_Esigma.png", // Output file name
+    //     true,  // isLogX
+    //     true,  // isLogY
+    //     std::make_pair(1.0, 300), // x range
+    //     std::make_pair(1.0, 300)  // y range
     // ));
 
     
@@ -341,9 +398,10 @@ int main(int argc, char** argv) {
     //     "figs/response_matrix_x_EM.png",
     //     true,  // isLogX
     //     true,   // isLogY
-    //     {1e-4,0.5},
-    //     {1e-4,0.5}
+    //     {1e-3,0.3},
+    //     {1e-3,0.3}
     // ));
+
     // plots.push_back(new PlotOptionsResponseMatrix(
     //     "x_Corr_DA",
     //     "x_{Bj} (true)",
@@ -351,9 +409,10 @@ int main(int argc, char** argv) {
     //     "figs/response_matrix_x_DA.png",
     //     true,  // isLogX
     //     true,   // isLogY
-    //     {1e-4,0.5},
-    //     {1e-4,0.5}
+    //     {1e-3,0.3},
+    //     {1e-3,0.3}
     // ));
+
     // plots.push_back(new PlotOptionsResponseMatrix(
     //     "x_Corr_ESigma",
     //     "x_{Bj} (true)",
@@ -361,11 +420,11 @@ int main(int argc, char** argv) {
     //     "figs/response_matrix_x_ESigma.png",
     //     true,  // isLogX
     //     true,   // isLogY
-    //     {1e-4,0.5},
-    //     {1e-4,0.5}
+    //     {1e-3,0.3},
+    //     {1e-3,0.3}
     // ));
 
-    // // // ---- Response Matrices for y (linear-linear) ----
+    // ---- Response Matrices for y (linear-linear) ----
     // plots.push_back(new PlotOptionsResponseMatrix(
     //     "y_Corr_EM",
     //     "y (true)",

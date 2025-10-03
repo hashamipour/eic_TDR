@@ -45,12 +45,8 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     c->SetTopMargin(0.1);
     c->SetBottomMargin(0.1);
 
-    if (m_isLogX) {
-        c->SetLogx();
-    }
-    if (m_isLogY) {
-        c->SetLogy();
-    }
+    if (m_isLogX) {c->SetLogx();}
+    if (m_isLogY) {c->SetLogy();}
 
     int nbinsX = h_matrix_orig->GetNbinsX();
     int nbinsY = h_matrix_orig->GetNbinsY();
@@ -81,10 +77,13 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     h_matrix_perc->Draw("COLZ");
 
     if ((this->m_xRange.first != -999.) && (this->m_xRange.second != -999.)) {
-        h_matrix_perc->GetXaxis()->SetLimits(this->m_xRange.first, this->m_xRange.second);
+        // h_matrix_perc->GetXaxis()->SetLimits(this->m_xRange.first, this->m_xRange.second);
+        // Logger::debug(Form("Set X axis range to [%.2f, %.2f]", this->m_xRange.first, this->m_xRange.second));
+        h_matrix_perc->GetXaxis()->SetRangeUser(this->m_xRange.first, this->m_xRange.second);
     }
     if ((this->m_yRange.first != -999.) && (this->m_yRange.second != -999.)) {
-        h_matrix_perc->GetYaxis()->SetLimits(this->m_yRange.first, this->m_yRange.second);
+        // h_matrix_perc->GetYaxis()->SetLimits(this->m_yRange.first, this->m_yRange.second);
+        h_matrix_perc->GetYaxis()->SetRangeUser(this->m_yRange.first, this->m_yRange.second);
     }
 
     double xmin = h_matrix_perc->GetXaxis()->GetBinLowEdge(h_matrix_perc->GetXaxis()->GetFirst());
@@ -128,6 +127,7 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     latex.DrawLatex(0.65, 0.92, "#bf{Diff. DIS} #10x100 GeV");
 
     SetCustomPalette("SolarBloom");
+    TColor::InvertPalette(); // Invert the palette for better visibility
     c->Update();
     c->SaveAs(m_saveName);
 
