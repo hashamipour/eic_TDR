@@ -322,7 +322,7 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
     line->SetLineWidth(2);
     line->Draw();
 
-    TLegend* legend = new TLegend(0.75, 0.75, 0.9, 0.9);
+    TLegend* legend = new TLegend(m_legendLB->first, m_legendLB->second, m_legendRT->first, m_legendRT->second);
     legend->AddEntry(g_RMS, "Histograms", "ep");
     legend->AddEntry(g, "Gaussian Fit", "ep");
     legend->Draw();

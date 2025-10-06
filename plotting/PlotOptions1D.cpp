@@ -67,13 +67,13 @@ void PlotOptions1D::Plot(TFile* inputFile) {
 
         // simple styling by name convention (adapt as you like)
         hist->SetLineWidth((i == 0) ? 2 : 1);
-        if (m_histNames[i].Contains("truth")) {
+        if (m_histNames[i].Contains("truth")|| m_histNames[i].Contains("MC")) {
             hist->SetLineColor(kBlack);
-        } else if (m_histNames[i].Contains("EM")) {
+        } else if (m_histNames[i].Contains("EM")|| m_histNames[i].Contains("B0")) {
             hist->SetLineColor(kRed);
             hist->SetMarkerColor(kRed);
             hist->SetMarkerStyle(20);
-        } else if (m_histNames[i].Contains("DA")) {
+        } else if (m_histNames[i].Contains("DA")|| m_histNames[i].Contains("RP")) {
             hist->SetLineColor(kBlue);
             hist->SetMarkerColor(kBlue);
             hist->SetMarkerStyle(20);

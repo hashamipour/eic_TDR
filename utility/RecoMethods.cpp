@@ -32,6 +32,13 @@ MethodHistograms::MethodHistograms(const std::string& method_name, const std::ve
         (n + " Scattering Angle;#theta [mrad];Counts").Data(),
         100, 0.0, 25.0
     );
+
+    h_xL = new TH1D(Form("xL_%s", name.data()), 
+                Form("%s x_{L};x_{L};Counts", name.data()), 20, 0.92, 1.02);
+    
+    h_xL_corr = new TH2D(Form("xL_corr_%s", name.data()),
+                     Form("%s x_{L} Correlation;Truth x_{L};Reco x_{L}", name.data()),
+                     200, 0.92, 1.02, 20, 0.92, 1.02);
 }
 
 TGraph* MethodHistograms::MakeCorrelationGraph() {
@@ -64,7 +71,11 @@ void MethodHistograms::Write() {
     h_t_reco->Write();
     h_t_corr->Write();
     h_t_res->Write();
+    
     h_theta->Write();
+
+    h_xL->Write();
+    h_xL_corr->Write();
     
     TGraph* g = MakeCorrelationGraph();
     if(g) {

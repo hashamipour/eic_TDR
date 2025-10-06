@@ -91,8 +91,8 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     double ymin = h_matrix_perc->GetYaxis()->GetBinLowEdge(h_matrix_perc->GetYaxis()->GetFirst());
     double ymax = h_matrix_perc->GetYaxis()->GetBinUpEdge(h_matrix_perc->GetYaxis()->GetLast());
 
-    std::cout << "Drawing diagonal from (" << xmin << ", " << ymin 
-          << ") to (" << xmax << ", " << ymax << ")" << std::endl;
+    // std::cout << "Drawing diagonal from (" << xmin << ", " << ymin 
+        //   << ") to (" << xmax << ", " << ymax << ")" << std::endl;
     TLine* diagonal_line = new TLine(xmin, ymin, xmax, ymax);
 
     diagonal_line->SetLineColor(kBlue);

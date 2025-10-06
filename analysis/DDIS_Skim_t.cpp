@@ -84,7 +84,7 @@ void undoAfterburn(P3MVector& a){
 std::vector<P3MVector> ProcessTruthProtons(
     TTreeReaderArray<double>& mc_px, TTreeReaderArray<double>& mc_py, TTreeReaderArray<double>& mc_pz,
     TTreeReaderArray<double>& mc_mass, TTreeReaderArray<int>& mc_gen_status, TTreeReaderArray<int>& mc_pdg,
-    const BeamInfo& beams, TH1D* h_theta, TH1D* h_t
+    const BeamInfo& beams, TH1D* h_theta, TH1D* h_t, TH1D* h_xL
 ) {
     std::vector<P3MVector> truth_protons;
     
@@ -96,6 +96,7 @@ std::vector<P3MVector> ProcessTruthProtons(
             truth_protons.push_back(p);
             h_theta->Fill(p.Theta() * 1000.0);
             h_t->Fill(TMath::Abs(CalcT(beams.p_beam, p)));
+            h_xL->Fill(CalcXL(p));
         }
     }
     
@@ -132,6 +133,12 @@ void ProcessB0Protons(
         double t_truth = CalcT(beams.p_beam, p_truth);
         
         hist.FillCorrelation(t_truth, t_reco);
+        
+        double xL_reco = CalcXL(p_reco);
+        double xL_truth = CalcXL(p_truth);
+        hist.h_xL->Fill(xL_reco);
+        hist.h_xL_corr->Fill(xL_truth, xL_reco);
+        
         n_matches++;
     }
 }
@@ -172,6 +179,12 @@ void ProcessRPProtons(
             double t_truth = CalcT(beams.p_beam, truth_protons[best_match]);
             
             hist.FillCorrelation(t_truth, t_reco);
+            
+            double xL_reco = CalcXL(p_rp);
+            double xL_truth = CalcXL(truth_protons[best_match]);
+            hist.h_xL->Fill(xL_reco);
+            hist.h_xL_corr->Fill(xL_truth, xL_reco);
+            
             n_matches++;
         }
     }
@@ -209,6 +222,7 @@ void analyzeProtonsMandelstamT(TString fileList){
                             t_bins.size()-1, t_bins.data());
     TH1D* h_theta_MC = new TH1D("theta_MC", "MC Proton Scattering Angle;#theta [mrad];Counts", 
                                 100, 0.0, 25.0);
+    TH1D* h_xL_MC = new TH1D("xL_MC", "Truth x_{L};x_{L};Counts", 20, 0.92, 1.02);   
     
     // Q² comparison histograms
     TH1D* h_Q2_EICRecon = new TH1D("Q2_EICRecon", "EICRecon Q^{2};Q^{2} [GeV^{2}];Counts", 100, 0, 20);
@@ -303,7 +317,7 @@ void analyzeProtonsMandelstamT(TString fileList){
         // Process truth protons
         auto truth_protons = ProcessTruthProtons(
             mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
-            mc_genStatus_array, mc_pdg_array, beams, h_theta_MC, h_t_MC
+            mc_genStatus_array, mc_pdg_array, beams, h_theta_MC, h_t_MC, h_xL_MC
         );
         n_truth_protons += truth_protons.size();
         
@@ -349,7 +363,11 @@ void analyzeProtonsMandelstamT(TString fileList){
             double t_eX = CalcT_eX(q_gamma, X_system);
             double t_truth = CalcT(beams.p_beam, truth_protons[0]);
             hist_eX.FillCorrelation(t_truth, t_eX);
-
+            
+            double xL_truth = CalcXL(truth_protons[0]);
+            double xL_eX = CalcXL(beams.p_beam - q_gamma - X_system);
+            hist_eX.h_xL->Fill(xL_eX);
+            hist_eX.h_xL_corr->Fill(xL_truth, xL_eX);
         }
     }
     
@@ -369,6 +387,7 @@ void analyzeProtonsMandelstamT(TString fileList){
     TFile* outfile = new TFile("proton_mandelstam_analysis.root", "RECREATE");
     h_t_MC->Write();
     h_theta_MC->Write();
+    h_xL_MC->Write();
     h_Q2_EICRecon->Write();
     h_Q2_calc->Write();
     h_Q2_corr->Write();

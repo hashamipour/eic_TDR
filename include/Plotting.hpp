@@ -88,7 +88,7 @@ public:
     
     void Plot(TFile* inputFile) override;
 };
-
+//////////////////////////////////////////////////////////////////////////////////
 // Binned relative resolution plot options
 class PlotOptionsBinnedRelRes : public PlotOptions {
 private:
