@@ -34,11 +34,19 @@ MethodHistograms::MethodHistograms(const std::string& method_name, const std::ve
     );
 
     h_xL = new TH1D(Form("xL_%s", name.data()), 
-                Form("%s x_{L};x_{L};Counts", name.data()), 20, 0.92, 1.02);
+                Form("%s x_{L};x_{L};Counts", name.data()), 100, 0.75, 1.05);
     
     h_xL_corr = new TH2D(Form("xL_corr_%s", name.data()),
                      Form("%s x_{L} Correlation;Truth x_{L};Reco x_{L}", name.data()),
-                     200, 0.92, 1.02, 20, 0.92, 1.02);
+                     10, 0.75, 1.05, 10, 0.75, 1.05);
+
+    h_MX2 = new TH1D(Form("MX2_%s", name.data()), 
+                 Form("%s M_{X}^{2};M_{X}^{2} [GeV^{2}];Counts", name.data()), 
+                 100, 0, 200);
+
+    h_MX2_corr = new TH2D(Form("MX2_corr_%s", name.data()),
+                      Form("%s M_{X}^{2} Correlation;Truth M_{X}^{2} [GeV^{2}];LPS M_{X}^{2} [GeV^{2}]", name.data()),
+                      100, 0, 100, 100, 0, 100);
 }
 
 TGraph* MethodHistograms::MakeCorrelationGraph() {
@@ -76,6 +84,8 @@ void MethodHistograms::Write() {
 
     h_xL->Write();
     h_xL_corr->Write();
+    h_MX2->Write();
+    h_MX2_corr->Write();
     
     TGraph* g = MakeCorrelationGraph();
     if(g) {

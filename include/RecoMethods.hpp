@@ -21,6 +21,8 @@ struct MethodHistograms {
     TH1D* h_theta;
     TH1D* h_xL;
     TH2D* h_xL_corr;
+    TH1D* h_MX2;
+    TH2D* h_MX2_corr;
     std::vector<double> t_truth_vec;
     std::vector<double> t_reco_vec;
     
@@ -51,6 +53,14 @@ inline Double_t CalcT_eX(const P3MVector& q_gamma, const P3MVector& X_system) {
 // Calculate x_L = Pz_proton / E_proton
 inline double CalcXL(const P3MVector& proton){
     return proton.Pz() / proton.E();
+}
+
+inline double CalcMX2(const P3MVector& X_system){
+    return X_system.M2();
+}
+
+inline double CalcMX2_LPS(double xL, double xBj, double W){
+    return (1.0 - xL*(1.0 + xBj)) * W * W;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -37,19 +37,31 @@ int main(int argc, char** argv) {
     std::vector<PlotOptions*> plots;
 
     // 1D histogram plot configuration for Mandelstam t
-    plots.push_back(new PlotOptions1D(
+    // plots.push_back(new PlotOptions1D(
+    //     {"t_MC", "t_B0", "t_RP_histo"},
+    //     {"MC Truth", "Reco B0 (5.5-20 mrad)", "Reco RP (<5 mrad)"},
+    //     {"hist", "pe", "pe"},
+    //     "Mandelstam |t| Distributions",
+    //     "|t| [GeV^{2}]",
+    //     "Counts",
+    //     "figs/t_distributions.png",
+    //     false,
+    //     false
+    // ));
+
+        plots.push_back(new PlotOptions1D(
         {"t_MC", "t_B0", "t_RP_histo"},
         {"MC Truth", "Reco B0 (5.5-20 mrad)", "Reco RP (<5 mrad)"},
         {"hist", "pe", "pe"},
         "Mandelstam |t| Distributions",
         "|t| [GeV^{2}]",
         "Counts",
-        "figs/t_distributions.png",
+        "figs/t_distributions_logy.png",
         false,
-        false
+        true // logY
     ));
 
-    // // Normalized PDF comparison
+//    // Normalized PDF comparison
     // plots.push_back(new PlotOptions1D(
     //     {"t_MC", "t_B0", "t_RP_histo"},
     //     {"MC Truth", "Reco B0 (5.5-20 mrad)", "Reco RP (<5 mrad)"},
@@ -63,20 +75,20 @@ int main(int argc, char** argv) {
     //     true
     // ));
 
-    // // Angular distributions
-    // plots.push_back(new PlotOptions1D(
-    //     {"theta_MC", "theta_B0", "theta_RP"},
-    //     {"MC Truth", "Reco B0", "Reco RP"},
-    //     {"hist", "pe", "pe"},
-    //     "Proton Scattering Angles",
-    //     "#theta [mrad]",
-    //     "Counts",
-    //     "figs/theta_distributions.png",
-    //     false,
-    //     true
-    // ));
+  //  // Angular distributions
+    plots.push_back(new PlotOptions1D(
+        {"theta_MC", "theta_B0", "theta_RP"},
+        {"MC Truth", "Reco B0", "Reco RP"},
+        {"hist", "pe", "pe"},
+        "Proton Scattering Angles",
+        "#theta [mrad]",
+        "Counts",
+        "figs/theta_distributions.png",
+        false,
+        true
+    ));
 
-    // // Resolution plots
+    // Resolution plots
     // plots.push_back(new PlotOptionsRelRes(
     //     "t_res_B0",
     //     "(|t|_{reco} - |t|_{truth})/|t|_{truth}",
@@ -93,7 +105,7 @@ int main(int argc, char** argv) {
     //     "figs/t_resolution_RP.png"
     // ));
 
-    // // Combined correlation plot using TGraphs (no more blocky appearance!)
+    // Combined correlation plot using TGraphs (no more blocky appearance!)
     // plots.push_back(new PlotOptionsCombinedCorrelation(
     //     {"t_corr_B0_graph", "t_corr_RP_graph"},  // TGraph names
     //     {"B0 Protons (5.5-20 mrad)", "Roman Pot (<5 mrad)"},
@@ -107,7 +119,7 @@ int main(int argc, char** argv) {
     //     {0.0, 2.0}
     // ));
 
-    // // Response matrices (keep TH2D for these)
+    // Response matrices (keep TH2D for these)
     // plots.push_back(new PlotOptionsResponseMatrix(
     //     "t_corr_B0",
     //     "Truth |t| [GeV^{2}]",
@@ -130,9 +142,8 @@ int main(int argc, char** argv) {
     //     {0.0, 0.5}
     // ));
 
-    // // After the RP resolution plot (~line 70), add:
 
-    // // eX method plots
+    // eX method plots
     // plots.push_back(new PlotOptions1D(
     //     {"t_MC", "t_eX"},
     //     {"MC Truth", "eX Method"},
@@ -153,7 +164,7 @@ int main(int argc, char** argv) {
     //     "figs/t_resolution_eX.png"
     // ));
 
-    // // correlation eX:
+//    // correlation eX:
     // plots.push_back(new PlotOptionsCombinedCorrelation(
     //     {"t_corr_eX_graph"},  // Add eX
     //     {"eX Method"},
@@ -168,7 +179,7 @@ int main(int argc, char** argv) {
     // ));
 
 
-    // /// debug
+    // // debug
     // plots.push_back(new PlotOptions1D(
     //     {"Q2_EICRecon", "Q2_calc"},
     //     {"EICRecon", "Our Calculation"},
@@ -181,20 +192,76 @@ int main(int argc, char** argv) {
     // ));
 
     PlotOptions1D* plot_ptr = new PlotOptions1D(
-    {"xL_MC", "xL_B0", "xL_RP"},//, "xL_eX"},
-    {"Truth", "B0", "Roman Pot", "eX"},
-    {"hist", "hist", "hist", "hist"},
-    "x_{L}",
-    "x_{L}",
-    "Counts",
-    "figs/x_L_comparison.png",
-    false,  // isLogX
-    true,   // isLogY
-    false   // normalize
-);
-    plot_ptr->SetLegendPosition(0.75, 0.7, 0.95, 0.9);
+        {"xL_MC", "xL_B0", "xL_RP"},//, "xL_eX"},
+        {"Truth", "B0", "Roman Pot", "eX"},
+        {"hist", "hist", "hist", "hist"},
+        "x_{L}",
+        "x_{L}",
+        "Counts",
+        "figs/x_L_comparison_logy.png",
+        false,  // isLogX
+        true,   // isLogY
+        false   // normalize
+    );
+    plot_ptr->SetLegendPosition(0.15, 0.7, 0.35, 0.9);
     plots.push_back(plot_ptr);
 
+
+    plot_ptr = new PlotOptions1D(
+        {"xL_MC", "xL_B0", "xL_RP"},//, "xL_eX"},
+        {"Truth", "B0", "Roman Pot", "eX"},
+        {"hist", "hist", "hist", "hist"},
+        "x_{L}",
+        "x_{L}",
+        "Counts",
+        "figs/x_L_comparison.png",
+        false,  // isLogX
+        false,   // isLogY
+        false   // normalize
+    );
+    plot_ptr->SetLegendPosition(0.15, 0.7, 0.35, 0.9);
+    plots.push_back(plot_ptr);
+
+    plots.push_back(new PlotOptionsResponseMatrix(
+        "xL_corr_B0",
+        "Truth x_L",
+        "B0 Reco x_L",
+        "figs/response_matrix_xL_B0.png",
+        false,
+        false,
+        {0.0, 2.0},
+        {0.0, 2.0}
+    ));
+
+    plots.push_back(new PlotOptionsResponseMatrix(
+        "xL_corr_RP",
+        "Truth x_L",
+        "RP Reco x_L",
+        "figs/response_matrix_xL_RP.png",
+        false,
+        false,
+        {0.0, 0.5},
+        {0.0, 0.5}
+    ));
+
+//     plot_ptr = new PlotOptions1D(
+//     {"MX2_MC","MX2_eX"},//, "xL_eX"},
+//     {"Truth", "B0", "Roman Pot", "eX"},
+//     {"hist", "hist", "hist", "hist"},
+//     "M_{X}^{2}",
+//     "M_{X}^{2}",
+//     "Counts",
+//     "figs/MX2_comparison.png",
+//     false,  // isLogX
+//     true,   // isLogY
+//     false   // normalize
+// );
+//     plot_ptr->SetLegendPosition(0.75, 0.7, 0.95, 0.9);
+//     plots.push_back(plot_ptr);
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
     gSystem->mkdir("figs", kTRUE);
 
     for (const auto& plot : plots) {

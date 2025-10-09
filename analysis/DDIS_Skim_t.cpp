@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "TFile.h"
 #include "TChain.h"
@@ -12,21 +11,19 @@
 #include "TTreeReaderArray.h"
 #include "TH1D.h"
 #include "TH2D.h"
-#include "TCanvas.h"
-#include "TLegend.h"
 #include "TStyle.h"
 #include "TString.h"
 #include "TMath.h"
-#include "TVector3.h"
 #include "Math/Vector4D.h"
 #include "Math/RotationX.h"
 #include "Math/RotationY.h"
 #include "Math/GenVector/Boost.h"
-#include "Math/VectorUtil.h"
-#include "TLine.h"
 
 #include "Utility.hpp"
 #include "RecoMethods.hpp"
+#include "Math/VectorUtil.h"
+
+
 
 using std::cout; using std::endl;
 using ROOT::Math::VectorUtil::boost;
@@ -34,6 +31,7 @@ using ROOT::Math::RotationX;
 using ROOT::Math::RotationY;
 using P3EVector = ROOT::Math::LorentzVector<ROOT::Math::PxPyPzEVector>;
 using MomVector = ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<Double_t>, ROOT::Math::DefaultCoordinateSystemTag>;
+using ROOT::Math::VectorUtil::boost;
 
 // Global afterburner correction parameters
 Float_t fXAngle{-0.025};
@@ -96,7 +94,10 @@ std::vector<P3MVector> ProcessTruthProtons(
             truth_protons.push_back(p);
             h_theta->Fill(p.Theta() * 1000.0);
             h_t->Fill(TMath::Abs(CalcT(beams.p_beam, p)));
-            h_xL->Fill(CalcXL(p));
+            
+            // Calculate x_L = |P'|/|P|
+            double xL = p.P() / beams.p_beam.P();
+            h_xL->Fill(xL);
         }
     }
     
@@ -134,8 +135,9 @@ void ProcessB0Protons(
         
         hist.FillCorrelation(t_truth, t_reco);
         
-        double xL_reco = CalcXL(p_reco);
-        double xL_truth = CalcXL(p_truth);
+        // Calculate x_L = |P'|/|P|
+        double xL_reco = p_reco.P() / beams.p_beam.P();
+        double xL_truth = p_truth.P() / beams.p_beam.P();
         hist.h_xL->Fill(xL_reco);
         hist.h_xL_corr->Fill(xL_truth, xL_reco);
         
@@ -180,8 +182,9 @@ void ProcessRPProtons(
             
             hist.FillCorrelation(t_truth, t_reco);
             
-            double xL_reco = CalcXL(p_rp);
-            double xL_truth = CalcXL(truth_protons[best_match]);
+            // Calculate x_L = |P'|/|P|
+            double xL_reco = p_rp.P() / beams.p_beam.P();
+            double xL_truth = truth_protons[best_match].P() / beams.p_beam.P();
             hist.h_xL->Fill(xL_reco);
             hist.h_xL_corr->Fill(xL_truth, xL_reco);
             
@@ -217,22 +220,16 @@ void analyzeProtonsMandelstamT(TString fileList){
     for(const auto& edge : t_bins) cout << edge << " ";
     cout << endl;
     
-    // Create histograms for each method
+    // Create histograms for truth
     TH1D* h_t_MC = new TH1D("t_MC", "Truth Mandelstam t;|t| [GeV^{2}];Counts", 
                             t_bins.size()-1, t_bins.data());
     TH1D* h_theta_MC = new TH1D("theta_MC", "MC Proton Scattering Angle;#theta [mrad];Counts", 
                                 100, 0.0, 25.0);
-    TH1D* h_xL_MC = new TH1D("xL_MC", "Truth x_{L};x_{L};Counts", 20, 0.92, 1.02);   
+    TH1D* h_xL_MC = new TH1D("xL_MC", "Truth x_{L};x_{L};Counts", 100, 0.75, 1.05);
     
-    // Q² comparison histograms
-    TH1D* h_Q2_EICRecon = new TH1D("Q2_EICRecon", "EICRecon Q^{2};Q^{2} [GeV^{2}];Counts", 100, 0, 20);
-    TH1D* h_Q2_calc = new TH1D("Q2_calc", "Calculated Q^{2} from e^{-};Q^{2} [GeV^{2}];Counts", 100, 0, 20);
-    TH2D* h_Q2_corr = new TH2D("Q2_corr", "Q^{2} Correlation;EICRecon Q^{2} [GeV^{2}];Calc Q^{2} [GeV^{2}]", 
-                               100, 0, 20, 100, 0, 20);
-    
+    // Create histograms for each method
     MethodHistograms hist_B0("B0", t_bins);
     MethodHistograms hist_RP("RP", t_bins);
-    MethodHistograms hist_eX("eX", t_bins);
     
     // Setup tree reader
     TTreeReader tree_reader(events);
@@ -256,22 +253,9 @@ void analyzeProtonsMandelstamT(TString fileList){
     TTreeReaderArray<float> rp_pz_array(tree_reader, "ForwardRomanPotRecParticles.momentum.z");
     TTreeReaderArray<float> rp_mass_array(tree_reader, "ForwardRomanPotRecParticles.mass");
     TTreeReaderArray<int> rp_pdg_array(tree_reader, "ForwardRomanPotRecParticles.PDG");
-
-    // Particle Flow collection (includes charged + neutral)
-    TTreeReaderArray<float> rpf_px_array(tree_reader, "ReconstructedParticles.momentum.x");
-    TTreeReaderArray<float> rpf_py_array(tree_reader, "ReconstructedParticles.momentum.y");
-    TTreeReaderArray<float> rpf_pz_array(tree_reader, "ReconstructedParticles.momentum.z");
-    TTreeReaderArray<float> rpf_e_array(tree_reader, "ReconstructedParticles.energy");
-    TTreeReaderArray<int>   rpf_pdg_array(tree_reader, "ReconstructedParticles.PDG");
-    
-    // Q² from EICRecon
-    TTreeReaderArray<float> q2_electron_array(tree_reader, "InclusiveKinematicsElectron.Q2");
-
-    TTreeReaderArray<int> electron_scat_index(tree_reader, "_InclusiveKinematicsElectron_scat.index");
-
     
     // Find beam particles
-    cout << "Finding beam particles." << endl;
+    cout << "Finding beam particles..." << endl;
     
     P3MVector beame4_acc(0,0,0,0), beamp4_acc(0,0,0,0);
     
@@ -304,7 +288,7 @@ void analyzeProtonsMandelstamT(TString fileList){
         beams.fMass_proton
     );
     
-    cout << "[DEBUG] Found beam energies " << beams.e_beam.E() << "x" << beams.p_beam.E() << " GeV" << endl;
+    cout << "Found beam energies " << beams.e_beam.E() << "x" << beams.p_beam.E() << " GeV" << endl;
     
     undoAfterburnAndCalc(beams.p_beam, beams.e_beam);
     
@@ -335,40 +319,6 @@ void analyzeProtonsMandelstamT(TString fileList){
             rp_px_array, rp_py_array, rp_pz_array, rp_mass_array, rp_pdg_array,
             truth_protons, beams, hist_RP, n_rp_matches
         );
-
-        // Process eX method with Q² diagnostic
-        auto elec_info = GetScatteredElectron(electron_scat_index, rpf_px_array, 
-                                      rpf_py_array, rpf_pz_array, beams.fMass_electron);
-
-        if(elec_info.found && truth_protons.size() > 0){
-            P3MVector e_scattered = elec_info.p4;
-            undoAfterburn(e_scattered);
-            
-            P3MVector q_gamma = beams.e_beam - e_scattered;
-            double Q2_calc = -q_gamma.M2();
-            
-            // Fill Q² histograms...
-            
-            // Build X excluding electron and protons
-            P3MVector X_system(0,0,0,0);
-            for(int i = 0; i < rpf_px_array.GetSize(); i++){
-                if(i == (int)elec_info.index) continue;  // Use stored index
-                if(rpf_pdg_array[i] == 2212) continue;
-                
-                P3MVector p(rpf_px_array[i], rpf_py_array[i], rpf_pz_array[i], rpf_e_array[i]);
-                undoAfterburn(p);
-                X_system += p;
-            }
-            
-            double t_eX = CalcT_eX(q_gamma, X_system);
-            double t_truth = CalcT(beams.p_beam, truth_protons[0]);
-            hist_eX.FillCorrelation(t_truth, t_eX);
-            
-            double xL_truth = CalcXL(truth_protons[0]);
-            double xL_eX = CalcXL(beams.p_beam - q_gamma - X_system);
-            hist_eX.h_xL->Fill(xL_eX);
-            hist_eX.h_xL_corr->Fill(xL_truth, xL_eX);
-        }
     }
     
     // Print results
@@ -388,12 +338,8 @@ void analyzeProtonsMandelstamT(TString fileList){
     h_t_MC->Write();
     h_theta_MC->Write();
     h_xL_MC->Write();
-    h_Q2_EICRecon->Write();
-    h_Q2_calc->Write();
-    h_Q2_corr->Write();
     hist_B0.Write();
     hist_RP.Write();
-    hist_eX.Write();
     outfile->Close();
     
     cout << "\nAnalysis complete! Output saved to proton_mandelstam_analysis.root" << endl;
