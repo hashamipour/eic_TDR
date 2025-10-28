@@ -1,0 +1,29 @@
+========== only first time =================
+git clone https://github.com/eic/EICrecon
+cmake -S EICrecon -B build
+cmake --build build --target install -- -j8
+========== only first time =================
+
+abconv ./paul_100k_e10_p100_diff_norad_status_corrected.hepmc paul_100k_e10_p100_diff_norad_AB.hepmc
+export DETECTOR_PATH=/opt/detector/epic-main/share/epic
+source EICrecon/bin/eicrecon-this.sh
+source /opt/detector/epic-main/bin/thisepic.sh
+ls $DETECTOR_PATH
+npsim -h
+
+
+npsim --compactFile $DETECTOR_PATH/epic_craterlake_10x100.xml --numberOfEvents 100000\
+ --inputFiles ./paul_100k_e10_p100_diff_norad_AB.hepmc --outputFile ./paul_100k_e10_p100_diff_norad_AB.edm4hep.root
+
+
+eicrecon -Ppodio:output_file=./paul_100k_e10_p100_diff_norad_AB.edm4hep.root.eicrecon_out.root\
+ -Pjana:nevents=100000  -Pdd4hep:xml_files=$DETECTOR_PATH/epic_craterlake_10x100.xml\
+  ./paul_100k_e10_p100_diff_norad_AB.edm4hep.root
+
+
+
+
+
+RAPGAP stuff
+sudo apptainer shell --writable sandbox-hepmc3
+export HEPMCOUT=norad_100k_e10_p100_diff.hepmc
