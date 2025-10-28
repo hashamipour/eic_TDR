@@ -33,12 +33,38 @@ MethodHistograms::MethodHistograms(const std::string& method_name, const std::ve
         100, 0.0, 25.0
     );
 
-    h_xL = new TH1D(Form("xL_%s", name.data()), 
-                Form("%s x_{L};x_{L};Counts", name.data()), 100, 0.75, 1.05);
-    
+    h_xL = new TH1D(Form("xL_%s", name.data()),
+                Form("%s x_{L};x_{L};Counts", name.data()), 30, 0.75, 1.05);
+
     h_xL_corr = new TH2D(Form("xL_corr_%s", name.data()),
                      Form("%s x_{L} Correlation;Truth x_{L};Reco x_{L}", name.data()),
-                     10, 0.75, 1.05, 10, 0.75, 1.05);
+                     30, 0.75, 1.05, 30, 0.75, 1.05);
+
+    h_xL_res = new TH1D(Form("xL_res_%s", name.data()),
+                   Form("%s x_{L} Resolution;(x_{L,reco} - x_{L,truth})/x_{L,truth};Counts", name.data()),
+                   101, -0.5, 0.5);
+
+    // Create logarithmic binning for x_pom (1e-4 to 0.4)
+    const int n_xpom_bins = 20;
+    double xpom_bins[n_xpom_bins + 1];
+    double xpom_min = 1e-4;
+    double xpom_max = 0.4;
+    double log_min = TMath::Log10(xpom_min);
+    double log_max = TMath::Log10(xpom_max);
+    for(int i = 0; i <= n_xpom_bins; i++){
+        xpom_bins[i] = TMath::Power(10, log_min + i * (log_max - log_min) / n_xpom_bins);
+    }
+
+    h_xpom = new TH1D(Form("xpom_%s", name.data()),
+                 Form("%s x_{pom};x_{pom};Counts", name.data()), n_xpom_bins, xpom_bins);
+
+    h_xpom_corr = new TH2D(Form("xpom_corr_%s", name.data()),
+                      Form("%s x_{pom} Correlation;Truth x_{pom};Reco x_{pom}", name.data()),
+                      n_xpom_bins, xpom_bins, n_xpom_bins, xpom_bins);
+
+    h_xpom_res = new TH1D(Form("xpom_res_%s", name.data()),
+                     Form("%s x_{pom} Resolution;(x_{pom,reco} - x_{pom,truth})/x_{pom,truth};Counts", name.data()),
+                     101, -1.0, 1.0);
 
     h_MX2 = new TH1D(Form("MX2_%s", name.data()), 
                  Form("%s M_{X}^{2};M_{X}^{2} [GeV^{2}];Counts", name.data()), 
@@ -84,6 +110,10 @@ void MethodHistograms::Write() {
 
     h_xL->Write();
     h_xL_corr->Write();
+    h_xL_res->Write();
+    h_xpom->Write();
+    h_xpom_corr->Write();
+    h_xpom_res->Write();
     h_MX2->Write();
     h_MX2_corr->Write();
     

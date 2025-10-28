@@ -82,7 +82,7 @@ void undoAfterburn(P3MVector& a){
 std::vector<P3MVector> ProcessTruthProtons(
     TTreeReaderArray<double>& mc_px, TTreeReaderArray<double>& mc_py, TTreeReaderArray<double>& mc_pz,
     TTreeReaderArray<double>& mc_mass, TTreeReaderArray<int>& mc_gen_status, TTreeReaderArray<int>& mc_pdg,
-    const BeamInfo& beams, TH1D* h_theta, TH1D* h_t, TH1D* h_xL
+    const BeamInfo& beams, TH1D* h_theta, TH1D* h_t, TH1D* h_xL, TH1D* h_xpom
 ) {
     std::vector<P3MVector> truth_protons;
     
@@ -90,14 +90,24 @@ std::vector<P3MVector> ProcessTruthProtons(
         if(mc_gen_status[i] == 1 && mc_pdg[i] == 2212){
             P3MVector p(mc_px[i], mc_py[i], mc_pz[i], mc_mass[i]);
             undoAfterburn(p);
-            
+
+            // Calculate x_L - Method 1: |P'|/|P| (momentum magnitude ratio)
+            double xL_P = p.P() / beams.p_beam.P();
+            // Calculate x_L - Method 2: Pz/E (light-cone momentum fraction)
+            double xL_PzE = CalcXL(p);
+            // Calculate x_L - Method 3: p'z/pz (longitudinal momentum ratio)
+            double xL_pz = p.Pz() / beams.p_beam.Pz();
+
+            // Calculate x_pom = 1 - x_L (using p'z/pz method)
+            double xpom = 1.0 - xL_pz;
+
+            // if (xL_pz < 0.99) continue; // x_L cut to avoid the self imposed effects;
+
             truth_protons.push_back(p);
             h_theta->Fill(p.Theta() * 1000.0);
             h_t->Fill(TMath::Abs(CalcT(beams.p_beam, p)));
-            
-            // Calculate x_L = |P'|/|P|
-            double xL = p.P() / beams.p_beam.P();
-            h_xL->Fill(xL);
+            h_xL->Fill(xL_pz);
+            h_xpom->Fill(xpom);
         }
     }
     
@@ -110,7 +120,8 @@ void ProcessB0Protons(
     TTreeReaderArray<float>& tsre_px, TTreeReaderArray<float>& tsre_py, TTreeReaderArray<float>& tsre_pz,
     TTreeReaderArray<double>& mc_px, TTreeReaderArray<double>& mc_py, TTreeReaderArray<double>& mc_pz,
     TTreeReaderArray<double>& mc_mass, TTreeReaderArray<int>& mc_gen_status, TTreeReaderArray<int>& mc_pdg,
-    const BeamInfo& beams, MethodHistograms& hist, int& n_matches
+    const BeamInfo& beams, MethodHistograms& hist, MethodHistograms& hist_cutFirstBin,
+    int& n_matches, double t_first_bin_edge
 ) {
     for(unsigned int i = 0; i < tsassoc_rec_id.GetSize(); i++){
         auto mc_idx = tsassoc_sim_id[i];
@@ -132,15 +143,51 @@ void ProcessB0Protons(
         
         double t_reco = CalcT(beams.p_beam, p_reco);
         double t_truth = CalcT(beams.p_beam, p_truth);
-        
+
+        // Calculate x_L - Method 1: |P'|/|P| (momentum magnitude ratio)
+        double xL_reco_P = p_reco.P() / beams.p_beam.P();
+        double xL_truth_P = p_truth.P() / beams.p_beam.P();
+        // Calculate x_L - Method 2: Pz/E (light-cone momentum fraction)
+        double xL_reco_PzE = CalcXL(p_reco);
+        double xL_truth_PzE = CalcXL(p_truth);
+        // Calculate x_L - Method 3: p'z/pz (longitudinal momentum ratio)
+        double xL_reco_pz = p_reco.Pz() / beams.p_beam.Pz();
+        double xL_truth_pz = p_truth.Pz() / beams.p_beam.Pz();
+
+        // Calculate x_pom = 1 - x_L (using p'z/pz method)
+        double xpom_reco = 1.0 - xL_reco_pz;
+        double xpom_truth = 1.0 - xL_truth_pz;
+
+        // if (xL_reco_pz < 0.99) continue; // x_L cut to avoid the self imposed effects;
+
+        // Fill original histograms (all events)
         hist.FillCorrelation(t_truth, t_reco);
-        
-        // Calculate x_L = |P'|/|P|
-        double xL_reco = p_reco.P() / beams.p_beam.P();
-        double xL_truth = p_truth.P() / beams.p_beam.P();
-        hist.h_xL->Fill(xL_reco);
-        hist.h_xL_corr->Fill(xL_truth, xL_reco);
-        
+        hist.h_xL->Fill(xL_reco_pz);
+        hist.h_xL_corr->Fill(xL_truth_pz, xL_reco_pz);
+        if(xL_truth_pz > 1e-6) {
+            hist.h_xL_res->Fill((xL_reco_pz - xL_truth_pz) / xL_truth_pz);
+        }
+        hist.h_xpom->Fill(xpom_reco);
+        hist.h_xpom_corr->Fill(xpom_truth, xpom_reco);
+        if(xpom_truth > 1e-6) {
+            hist.h_xpom_res->Fill((xpom_reco - xpom_truth) / xpom_truth);
+        }
+
+        // Fill cut histograms (skip first |t| bin)
+        if(t_reco > t_first_bin_edge) {
+            hist_cutFirstBin.FillCorrelation(t_truth, t_reco);
+            hist_cutFirstBin.h_xL->Fill(xL_reco_pz);
+            hist_cutFirstBin.h_xL_corr->Fill(xL_truth_pz, xL_reco_pz);
+            if(xL_truth_pz > 1e-6) {
+                hist_cutFirstBin.h_xL_res->Fill((xL_reco_pz - xL_truth_pz) / xL_truth_pz);
+            }
+            hist_cutFirstBin.h_xpom->Fill(xpom_reco);
+            hist_cutFirstBin.h_xpom_corr->Fill(xpom_truth, xpom_reco);
+            if(xpom_truth > 1e-6) {
+                hist_cutFirstBin.h_xpom_res->Fill((xpom_reco - xpom_truth) / xpom_truth);
+            }
+        }
+
         n_matches++;
     }
 }
@@ -179,15 +226,35 @@ void ProcessRPProtons(
         if(best_match >= 0 && min_dtheta < 0.001){
             double t_reco = CalcT(beams.p_beam, p_rp);
             double t_truth = CalcT(beams.p_beam, truth_protons[best_match]);
-            
+
+            // Calculate x_L - Method 1: |P'|/|P| (momentum magnitude ratio)
+            double xL_reco_P = p_rp.P() / beams.p_beam.P();
+            double xL_truth_P = truth_protons[best_match].P() / beams.p_beam.P();
+            // Calculate x_L - Method 2: Pz/E (light-cone momentum fraction)
+            double xL_reco_PzE = CalcXL(p_rp);
+            double xL_truth_PzE = CalcXL(truth_protons[best_match]);
+            // Calculate x_L - Method 3: p'z/pz (longitudinal momentum ratio)
+            double xL_reco_pz = p_rp.Pz() / beams.p_beam.Pz();
+            double xL_truth_pz = truth_protons[best_match].Pz() / beams.p_beam.Pz();
+
+            // Calculate x_pom = 1 - x_L (using p'z/pz method)
+            double xpom_reco = 1.0 - xL_reco_pz;
+            double xpom_truth = 1.0 - xL_truth_pz;
+
+            // if (xL_reco_pz < 0.99) continue; // x_L cut to avoid the self imposed effects;
+
             hist.FillCorrelation(t_truth, t_reco);
-            
-            // Calculate x_L = |P'|/|P|
-            double xL_reco = p_rp.P() / beams.p_beam.P();
-            double xL_truth = truth_protons[best_match].P() / beams.p_beam.P();
-            hist.h_xL->Fill(xL_reco);
-            hist.h_xL_corr->Fill(xL_truth, xL_reco);
-            
+            hist.h_xL->Fill(xL_reco_pz);
+            hist.h_xL_corr->Fill(xL_truth_pz, xL_reco_pz);
+            if(xL_truth_pz > 1e-6) {
+                hist.h_xL_res->Fill((xL_reco_pz - xL_truth_pz) / xL_truth_pz);
+            }
+            hist.h_xpom->Fill(xpom_reco);
+            hist.h_xpom_corr->Fill(xpom_truth, xpom_reco);
+            if(xpom_truth > 1e-6) {
+                hist.h_xpom_res->Fill((xpom_reco - xpom_truth) / xpom_truth);
+            }
+
             n_matches++;
         }
     }
@@ -215,20 +282,42 @@ void analyzeProtonsMandelstamT(TString fileList){
     cout << "\nNo. of files: " << nFiles << "; no. of events: " << events->GetEntries() << endl;
     
     // Setup binning
-    std::vector<Double_t> t_bins = GetLinBins(0.0, 1.6, 10);
-    cout << "bin edges for t: ";
-    for(const auto& edge : t_bins) cout << edge << " ";
-    cout << endl;
+    // std::vector<Double_t> t_bins = GetLinBins(0.0, 1.6, 10);
+    std::vector<Double_t> t_bins_low = GetLogBins(1e-3, 0.5, 20);
+    std::vector<Double_t> t_bins_high = {0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.25, 1.6};
+
+    // Combine bins (skip first element of t_bins_high to avoid duplicate 0.5)
+    std::vector<Double_t> t_bins = t_bins_low;
+    for(size_t i = 1; i < t_bins_high.size(); i++){
+        t_bins.push_back(t_bins_high[i]);
+    }
+
+    // cout << "bin edges for t: ";
+    // for(const auto& edge : t_bins) cout << edge << " ";
+    // cout << endl;
     
     // Create histograms for truth
-    TH1D* h_t_MC = new TH1D("t_MC", "Truth Mandelstam t;|t| [GeV^{2}];Counts", 
+    TH1D* h_t_MC = new TH1D("t_MC", "Truth Mandelstam t;|t| [GeV^{2}];Counts",
                             t_bins.size()-1, t_bins.data());
-    TH1D* h_theta_MC = new TH1D("theta_MC", "MC Proton Scattering Angle;#theta [mrad];Counts", 
+    TH1D* h_theta_MC = new TH1D("theta_MC", "MC Proton Scattering Angle;#theta [mrad];Counts",
                                 100, 0.0, 25.0);
-    TH1D* h_xL_MC = new TH1D("xL_MC", "Truth x_{L};x_{L};Counts", 100, 0.75, 1.05);
-    
+    TH1D* h_xL_MC = new TH1D("xL_MC", "Truth x_{L};x_{L};Counts", 30, 0.75, 1.05);
+
+    // Create logarithmic binning for x_pom (1e-4 to 0.4)
+    const int n_xpom_bins = 20;
+    double xpom_bins[n_xpom_bins + 1];
+    double xpom_min = 1e-4;
+    double xpom_max = 0.4;
+    double log_min = TMath::Log10(xpom_min);
+    double log_max = TMath::Log10(xpom_max);
+    for(int i = 0; i <= n_xpom_bins; i++){
+        xpom_bins[i] = TMath::Power(10, log_min + i * (log_max - log_min) / n_xpom_bins);
+    }
+    TH1D* h_xpom_MC = new TH1D("xpom_MC", "Truth x_{pom};x_{pom};Counts", n_xpom_bins, xpom_bins);
+
     // Create histograms for each method
     MethodHistograms hist_B0("B0", t_bins);
+    MethodHistograms hist_B0_cutFirstBin("B0_cutFirstBin", t_bins);  // Duplicate with first |t| bin cut
     MethodHistograms hist_RP("RP", t_bins);
     
     // Setup tree reader
@@ -301,7 +390,7 @@ void analyzeProtonsMandelstamT(TString fileList){
         // Process truth protons
         auto truth_protons = ProcessTruthProtons(
             mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
-            mc_genStatus_array, mc_pdg_array, beams, h_theta_MC, h_t_MC, h_xL_MC
+            mc_genStatus_array, mc_pdg_array, beams, h_theta_MC, h_t_MC, h_xL_MC, h_xpom_MC
         );
         n_truth_protons += truth_protons.size();
         
@@ -311,7 +400,7 @@ void analyzeProtonsMandelstamT(TString fileList){
             tsre_px_array, tsre_py_array, tsre_pz_array,
             mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
             mc_genStatus_array, mc_pdg_array,
-            beams, hist_B0, n_b0_matches
+            beams, hist_B0, hist_B0_cutFirstBin, n_b0_matches, t_bins[1]
         );
         
         // Process RP protons
@@ -338,7 +427,9 @@ void analyzeProtonsMandelstamT(TString fileList){
     h_t_MC->Write();
     h_theta_MC->Write();
     h_xL_MC->Write();
+    h_xpom_MC->Write();
     hist_B0.Write();
+    hist_B0_cutFirstBin.Write();  // B0 histograms with first |t| bin cut
     hist_RP.Write();
     outfile->Close();
     

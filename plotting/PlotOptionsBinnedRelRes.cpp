@@ -1,6 +1,7 @@
 #include "Plotting.hpp"
 #include <TF1.h>
 #include <TLine.h>
+#include <TLatex.h>
 #include <TPaveText.h>
 #include <iostream>
 
@@ -260,19 +261,27 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
         statsBox->SetTextFont(42);
 
         statsBox->AddText(Form("Entries: %d", (int)projY->GetEntries()));
-        statsBox->AddText(Form("Mean: %.5f", projY->GetMean()));
+        statsBox->AddText(Form("#mu: %.5f", projY->GetMean()));
         statsBox->AddText(Form("RMS: %.5f", projY->GetRMS()));
-        
+
         if (gaus) {
-            statsBox->AddText(Form("#chi^{2} / ndf: %.1f / %d", gaus->GetChisquare(), gaus->GetNDF()));
-            statsBox->AddText(Form("Fit Mean: %.5f #pm %.5f", mean, gaus->GetParError(1)));
-            statsBox->AddText(Form("Fit Sigma: %.4f #pm %.5f", sigma, gaus->GetParError(2)));
+            statsBox->AddText(Form("#chi^{2}/ndf: %.1f/%d", gaus->GetChisquare(), gaus->GetNDF()));
+            statsBox->AddText(Form("Fit #mu: %.5f #pm %.5f", mean, gaus->GetParError(1)));
+            statsBox->AddText(Form("Fit #sigma: %.4f #pm %.5f", sigma, gaus->GetParError(2)));
             statsBox->AddText(Form("Fit range: [%.3f, %.3f]", m_xMinFit, m_xMaxFit));
         } else {
             statsBox->AddText("(Fit skipped)");
         }
         statsBox->Draw();
-        
+
+        // Add ePIC simulation labels
+        TLatex latex_proj;
+        latex_proj.SetTextSize(0.035);
+        latex_proj.SetNDC();
+        latex_proj.SetTextColor(kBlack);
+        latex_proj.DrawLatex(0.15, 0.85, "#bf{ePIC} Simulation");
+        latex_proj.DrawLatex(0.15, 0.80, "#bf{Diff. DIS} 10x100 GeV");
+
         c_proj->Update();
         c_proj->SaveAs(Form("figs/%s_bin_%d.png", m_binSavePrefix, j));
         
@@ -326,6 +335,14 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
     legend->AddEntry(g_RMS, "Histograms", "ep");
     legend->AddEntry(g, "Gaussian Fit", "ep");
     legend->Draw();
+
+    // Add ePIC simulation labels
+    TLatex latex;
+    latex.SetTextSize(0.035);
+    latex.SetNDC();
+    latex.SetTextColor(kBlack);
+    latex.DrawLatex(0.15, 0.85, "#bf{ePIC} Simulation (100k events)");
+    latex.DrawLatex(0.15, 0.80, "#bf{Diff. DIS} 10x100 GeV");
 
     c->Update();
     c->SaveAs(m_saveName);

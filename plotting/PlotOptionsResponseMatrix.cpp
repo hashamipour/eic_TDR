@@ -123,7 +123,7 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     latex.SetTextSize(0.04);
     latex.SetNDC();
     latex.SetTextColor(kBlack);
-    latex.DrawLatex(0.2, 0.92, "#bf{ePIC} Simulation");
+    latex.DrawLatex(0.2, 0.92, "#bf{ePIC} Simulation (100k events)");
     latex.DrawLatex(0.65, 0.92, "#bf{Diff. DIS} #10x100 GeV");
 
     SetCustomPalette("SolarBloom");

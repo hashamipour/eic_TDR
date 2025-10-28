@@ -192,6 +192,97 @@ Double_t* vectorToCArray(const std::vector<Double_t>& vec, Int_t& size) {
     // Return the pointer to the new array
     return cArray;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Calculate sum(E - pz) for MC truth particles excluding scattered electron and proton
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Calculate sum(E - pz) for all MC final state particles excluding scattered electron and proton
+ *
+ * For a standard DIS event, sum(E - pz) should be close to 2*E_electron.
+ * Expected peak around 20 GeV for 10x100 GeV beams.
+ *
+ * @param mc_px MC particle px array
+ * @param mc_py MC particle py array
+ * @param mc_pz MC particle pz array
+ * @param mc_mass MC particle mass array
+ * @param mc_genStatus MC particle generator status array
+ * @param mc_pdg MC particle PDG code array
+ * @return Sum of (E - pz) for hadronic final state
+ */
+double CalculateSumEPz_Truth(
+    TTreeReaderArray<double>& mc_px,
+    TTreeReaderArray<double>& mc_py,
+    TTreeReaderArray<double>& mc_pz,
+    TTreeReaderArray<double>& mc_mass,
+    TTreeReaderArray<int>& mc_genStatus,
+    TTreeReaderArray<int>& mc_pdg
+) {
+    double sumEPz = 0.0;
+
+    for(int i = 0; i < mc_px.GetSize(); i++){
+        // Only final state particles (generatorStatus == 1)
+        if(mc_genStatus[i] != 1) continue;
+
+        // Exclude scattered electron (PDG == 11) and scattered proton (PDG == 2212)
+        // if(mc_pdg[i] == 11 || mc_pdg[i] == 2212) continue;
+        if(mc_pdg[i] == 2212) continue;
+
+        // Calculate energy from 4-momentum
+        double px = mc_px[i];
+        double py = mc_py[i];
+        double pz = mc_pz[i];
+        double m = mc_mass[i];
+        double E = TMath::Sqrt(px*px + py*py + pz*pz + m*m);
+
+        sumEPz += (E - pz);
+    }
+
+    return sumEPz;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Calculate sum(E - pz) for all ReconstructedParticles excluding scattered electron
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Calculate sum(E - pz) for reconstructed particles excluding scattered electron
+ *
+ * @param re_px Reconstructed particle px array
+ * @param re_py Reconstructed particle py array
+ * @param re_pz Reconstructed particle pz array
+ * @param re_energy Reconstructed particle energy array
+ * @param electron_scat_index Index of the scattered electron in ReconstructedParticles
+ * @return Sum of (E - pz) for all particles excluding scattered electron
+ */
+double CalculateSumEPz(
+    TTreeReaderArray<float>& re_px,
+    TTreeReaderArray<float>& re_py,
+    TTreeReaderArray<float>& re_pz,
+    TTreeReaderArray<float>& re_energy,
+    TTreeReaderArray<int>& electron_scat_index
+) {
+    double sumEPz = 0.0;
+
+    // Get the index of the scattered electron (if available)
+    int scat_e_idx = -1;
+    if(electron_scat_index.GetSize() > 0) {
+        scat_e_idx = electron_scat_index[0];
+    }
+
+    // Loop over all reconstructed particles
+    for(int i = 0; i < re_energy.GetSize(); i++){
+        // Skip the scattered electron
+        // if(i == scat_e_idx) continue; // --- IGNORE --- to include scattered electron in sum for testing
+
+        double E = re_energy[i];
+        double pz = re_pz[i];
+
+        sumEPz += (E - pz);
+    }
+
+    return sumEPz;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char** argv) {
@@ -344,6 +435,10 @@ int main(int argc, char** argv) {
     TH1D* h_Q2_DA       = new TH1D("h_Q2_DA",";Q^{2}",n_bins, bin_edges_Q2.data());
     TH1D* h_Q2_ESigma   = new TH1D("h_Q2_ESigma",";Q^{2}",n_bins, bin_edges_Q2.data());
 
+    // E-pz histograms (expect peak around 2*E_electron for 10x100 GeV beams ~ 20 GeV)
+    TH1D* h_EPz_truth = new TH1D("h_EPz_truth", "Sum(E-p_{z});#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
+    TH1D* h_EPz = new TH1D("h_EPz", "Reco Sum(E-p_{z});#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
+
     //---------------------------------------------------------
     // DECLARE TTREEREADER AND BRANCHES TO USE
     //---------------------------------------------------------
@@ -359,7 +454,9 @@ int main(int argc, char** argv) {
     TTreeReaderArray<float>  re_px_array          = {tree_reader, "ReconstructedParticles.momentum.x"};
     TTreeReaderArray<float>  re_py_array          = {tree_reader, "ReconstructedParticles.momentum.y"};
     TTreeReaderArray<float>  re_pz_array          = {tree_reader, "ReconstructedParticles.momentum.z"};
+    TTreeReaderArray<float>  re_energy_array      = {tree_reader, "ReconstructedParticles.energy"};
     TTreeReaderArray<int>    re_pdg_array         = {tree_reader, "ReconstructedParticles.PDG"};
+    TTreeReaderArray<int>    electron_scat_index  = {tree_reader, "ScatteredElectronsTruth_objIdx.index"};
     TTreeReaderArray<unsigned int> tsassoc_rec_id = {tree_reader, "ReconstructedTruthSeededChargedParticleAssociations.recID"};
     TTreeReaderArray<unsigned int> tsassoc_sim_id = {tree_reader, "ReconstructedTruthSeededChargedParticleAssociations.simID"};
     TTreeReaderArray<float>  tsre_px_array        = {tree_reader, "ReconstructedTruthSeededChargedParticles.momentum.x"};
@@ -493,6 +590,13 @@ int main(int argc, char** argv) {
         h_Corr_Q2_EM->Fill(electron_Q2_truth, electron_Q2_EM);
         h_Corr_Q2_DA->Fill(electron_Q2_truth, electron_Q2_DA);
         h_Corr_Q2_ESigma->Fill(electron_Q2_truth, electron_Q2_ESigma);
+
+        // Calculate and fill E-pz histograms
+        double sumEPz_truth = CalculateSumEPz_Truth(mc_px_array, mc_py_array, mc_pz_array, mc_mass_array, mc_genStatus_array, mc_pdg_array);
+        h_EPz_truth->Fill(sumEPz_truth);
+
+        double sumEPz = CalculateSumEPz(re_px_array, re_py_array, re_pz_array, re_energy_array, electron_scat_index);
+        h_EPz->Fill(sumEPz);
     }
     std::cout<<"\nDone looping over events.\n"<<std::endl;
 
@@ -545,6 +649,9 @@ int main(int argc, char** argv) {
     h_Corr_y_DA->Write();
     h_Corr_y_ESigma->Write();
 
+    // Write E-pz histograms
+    h_EPz_truth->Write();
+    h_EPz->Write();
 
     outputFile->Close();
     delete events;

@@ -204,16 +204,25 @@ void PlotOptionsRelRes::Plot(TFile* inputFile) {
     hist->SetMarkerStyle(20);
     hist->Draw("pe");
 
-    bool skipFit = 
+    bool skipFit =
         (TMath::AreEqualRel(m_xMinFit, 0., 1e-6) && TMath::AreEqualRel(m_xMaxFit, 0., 1e-6));
     if (skipFit) {
         Logger::info("Skipping fitting as per user request: [" + std::string(m_saveName) + "]");
+
+        // Add ePIC simulation labels
+        TLatex latex;
+        latex.SetTextSize(0.04);
+        latex.SetNDC();
+        latex.SetTextColor(kBlack);
+        latex.DrawLatex(0.15, 0.92, "#bf{ePIC} Simulation");
+        latex.DrawLatex(0.15, 0.86, "#bf{Diff. DIS} 10x100 GeV");
+
         c->SaveAs(m_saveName);
         delete c;
         return;
     }
     
-    bool autoFitRange = 
+    bool autoFitRange =
         (TMath::AreEqualRel(m_xMinFit, -999., 1e-6) && TMath::AreEqualRel(m_xMaxFit, -999., 1e-6));
     if (autoFitRange) {
         SetFitRangeByBins(hist);
@@ -221,6 +230,15 @@ void PlotOptionsRelRes::Plot(TFile* inputFile) {
 
         if (autoFitRange) {
             Logger::warning("Skipping fitting as no fit range found. If you want a fit please provide fit range: [" + std::string(m_saveName) + "]");
+
+            // Add ePIC simulation labels
+            TLatex latex;
+            latex.SetTextSize(0.04);
+            latex.SetNDC();
+            latex.SetTextColor(kBlack);
+            latex.DrawLatex(0.15, 0.92, "#bf{ePIC} Simulation");
+            latex.DrawLatex(0.15, 0.86, "#bf{Diff. DIS} 10x100 GeV");
+
             c->SaveAs(m_saveName);
             delete c;
             return;
@@ -248,6 +266,11 @@ void PlotOptionsRelRes::Plot(TFile* inputFile) {
     latex->SetTextSize(0.04);
     latex->SetTextColor(kRed);
     latex->DrawLatex(0.2, 0.8, Form("RMS = %.2f", hist->GetRMS()));
+
+    // Add ePIC simulation labels
+    latex->SetTextColor(kBlack);
+    latex->DrawLatex(0.15, 0.92, "#bf{ePIC} Simulation");
+    latex->DrawLatex(0.15, 0.86, "#bf{Diff. DIS} 10x100 GeV");
 
     c->SaveAs(m_saveName);
     delete c;

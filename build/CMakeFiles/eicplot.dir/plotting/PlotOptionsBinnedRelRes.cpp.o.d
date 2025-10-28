@@ -419,5 +419,5 @@ CMakeFiles/eicplot.dir/plotting/PlotOptionsBinnedRelRes.cpp.o: \
   /opt/local/include/root/TF1AbsComposition.h \
   /opt/local/include/root/TMatrixDSymfwd.h \
   /opt/local/include/root/Math/ParamFunctor.h \
-  /opt/local/include/root/TLine.h /opt/local/include/root/TPaveText.h \
-  /opt/local/include/root/TText.h
+  /opt/local/include/root/TLine.h /opt/local/include/root/TLatex.h \
+  /opt/local/include/root/TText.h /opt/local/include/root/TPaveText.h

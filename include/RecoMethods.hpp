@@ -21,6 +21,10 @@ struct MethodHistograms {
     TH1D* h_theta;
     TH1D* h_xL;
     TH2D* h_xL_corr;
+    TH1D* h_xL_res;
+    TH1D* h_xpom;
+    TH2D* h_xpom_corr;
+    TH1D* h_xpom_res;
     TH1D* h_MX2;
     TH2D* h_MX2_corr;
     std::vector<double> t_truth_vec;
