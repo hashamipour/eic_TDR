@@ -194,10 +194,10 @@ Double_t* vectorToCArray(const std::vector<Double_t>& vec, Int_t& size) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Calculate sum(E - pz) for MC truth particles excluding scattered electron and proton
+// Calculate sum(E - pz) for MC truth particles
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * @brief Calculate sum(E - pz) for all MC final state particles excluding scattered electron and proton
+ * @brief Calculate sum(E - pz) for all MC final
  *
  * For a standard DIS event, sum(E - pz) should be close to 2*E_electron.
  * Expected peak around 20 GeV for 10x100 GeV beams.
@@ -226,7 +226,7 @@ double CalculateSumEPz_Truth(
 
         // Exclude scattered electron (PDG == 11) and scattered proton (PDG == 2212)
         // if(mc_pdg[i] == 11 || mc_pdg[i] == 2212) continue;
-        if(mc_pdg[i] == 2212) continue;
+        // if(mc_pdg[i] == 2212) continue;
 
         // Calculate energy from 4-momentum
         double px = mc_px[i];

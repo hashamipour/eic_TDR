@@ -1,0 +1,19 @@
+Accessing files with xrootd:  
+[https://eic.github.io/tutorial-analysis/01-introduction/index.html](https://eic.github.io/tutorial-analysis/01-introduction/index.html)
+Accessing files with Rucio:  
+[https://eic.github.io/resources/production\_file.html](https://eic.github.io/resources/production_file.html)
+Simulation campaign history and list of available simulation:  
+[https://eic.github.io/epic-prod/campaigns/campaigns\_reco.html](https://eic.github.io/epic-prod/campaigns/campaigns_reco.html)
+Electron Finder code:  
+[https://github.com/eic/snippets/tree/main/ElectronID](https://github.com/eic/snippets/tree/main/ElectronID)
+Tyler's slides on electron finder:  
+[https://indico.bnl.gov/event/27434/contributions/105278/attachments/60946/104704/electron\_finder\_2025April1.pdf](https://indico.bnl.gov/event/27434/contributions/105278/attachments/60946/104704/electron_finder_2025April1.pdf)
+Stephen's slides on kinematic reconstruction:  
+[https://indico.bnl.gov/event/27319/contributions/105014/attachments/61017/104849/EIC\_KinematicReconstruction.pdf](https://indico.bnl.gov/event/27319/contributions/105014/attachments/61017/104849/EIC_KinematicReconstruction.pdf)
+Recording of Stephen's tutorials:  
+[https://indico.bnl.gov/event/23598/contributions/92158/attachments/55526/94970/inclusive\_joint\_physics\_sw\_2024June26.pdf](https://indico.bnl.gov/event/23598/contributions/92158/attachments/55526/94970/inclusive_joint_physics_sw_2024June26.pdf)  
+Passcode: Z09g&#6A
+Tyler's slides on electron id and NC DIS cross sections:  
+[https://indico.bnl.gov/event/23598/contributions/92158/attachments/55526/94970/inclusive\_joint\_physics\_sw\_2024June26.pdf](https://indico.bnl.gov/event/23598/contributions/92158/attachments/55526/94970/inclusive_joint_physics_sw_2024June26.pdf)
+**Suggested QA plot list:**  
+[https://docs.google.com/presentation/d/1bqz9\_GPvPoW4oz1m8KvzuUhPJZBe\_CfU5APMt0LjfaU/edit?slide=id.g3338e3f4b69\_0\_51#slide=id.g3338e3f4b69\_0\_51](https://docs.google.com/presentation/d/1bqz9_GPvPoW4oz1m8KvzuUhPJZBe_CfU5APMt0LjfaU/edit?slide=id.g3338e3f4b69_0_51#slide=id.g3338e3f4b69_0_51)

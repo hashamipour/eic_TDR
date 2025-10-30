@@ -468,69 +468,69 @@ int main(int argc, char** argv) {
 
     // ---- Response Matrices for y (linear-linear) ----
 
-    plots.push_back(new PlotOptionsResponseMatrix(
-        "y_Corr_EM",
-        "y (true)",
-        "y (EM)",
-        "figs/response_matrix_y_EM.png",
-        false, // isLogX
-        false,  // isLogY
-        {0.,1.}, // x range {0.,1.}
-        {0.,1.}  // y range {0.,1.}
-    ));
+    // plots.push_back(new PlotOptionsResponseMatrix(
+    //     "y_Corr_EM",
+    //     "y (true)",
+    //     "y (EM)",
+    //     "figs/response_matrix_y_EM.png",
+    //     false, // isLogX
+    //     false,  // isLogY
+    //     {0.,1.}, // x range {0.,1.}
+    //     {0.,1.}  // y range {0.,1.}
+    // ));
 
-    plots.push_back(new PlotOptionsResponseMatrix(
-        "y_Corr_DA",
-        "y (true)",
-        "y (DA)",
-        "figs/response_matrix_y_DA.png",
-        false, // isLogX
-        false,  // isLogY
-        {0.,1.}, // x range {0.,1.}
-        {0.,1.} // y range {0.,1.}
-    ));
+    // plots.push_back(new PlotOptionsResponseMatrix(
+    //     "y_Corr_DA",
+    //     "y (true)",
+    //     "y (DA)",
+    //     "figs/response_matrix_y_DA.png",
+    //     false, // isLogX
+    //     false,  // isLogY
+    //     {0.,1.}, // x range {0.,1.}
+    //     {0.,1.} // y range {0.,1.}
+    // ));
 
-    plots.push_back(new PlotOptionsResponseMatrix(
-        "y_Corr_ESigma",
-        "y (true)",
-        "y (ESigma)",
-        "figs/response_matrix_y_ESigma.png",
-        false, // isLogX
-        false,  // isLogY
-        {0.,1.}, // x range {0.,1.}
-        {0.,1.} // y range {0.,1.}
-    ));
+    // plots.push_back(new PlotOptionsResponseMatrix(
+    //     "y_Corr_ESigma",
+    //     "y (true)",
+    //     "y (ESigma)",
+    //     "figs/response_matrix_y_ESigma.png",
+    //     false, // isLogX
+    //     false,  // isLogY
+    //     {0.,1.}, // x range {0.,1.}
+    //     {0.,1.} // y range {0.,1.}
+    // ));
 
-    // // E-pz distribution plot comparing truth and reconstruction
-    // plot_ptr = new PlotOptions1D(
-    //     {"h_EPz_truth", "h_EPz"},                      // histogram names (reco first so y-axis scales properly)
-    //     {"MC Truth"   , "Reconstruction"},                // legend entries
-    //     {"hist"       , "pe"},                                // draw options
-    //     "Hadronic Final State E-p_{z}",               // canvas title
-    //     "#Sigma(E-p_{z}) [GeV]",                       // x label
-    //     "Counts",                                       // y label
-    //     "figs/EPz_distribution.png",                   // save name
-    //     false,                                          // isLogX
-    //     false                                           // isLogY
-    // );
+    // E-pz distribution plot comparing truth and reconstruction
+    plot_ptr = new PlotOptions1D(
+        {"h_EPz_truth", "h_EPz"},                      // histogram names (reco first so y-axis scales properly)
+        {"MC Truth"   , "Reconstruction"},                // legend entries
+        {"hist"       , "pe"},                                // draw options
+        "Hadronic Final State E-p_{z}",               // canvas title
+        "#Sigma(E-p_{z}) [GeV]",                       // x label
+        "Counts",                                       // y label
+        "figs/EPz_distribution.png",                   // save name
+        false,                                          // isLogX
+        false                                           // isLogY
+    );
 
-    // // same but log y-axis
-    // plot_ptr->SetLegendPosition(0.2, 0.7, 0.4, 0.9);
-    // plots.push_back(plot_ptr);
+    // same but log y-axis
+    plot_ptr->SetLegendPosition(0.2, 0.7, 0.4, 0.9);
+    plots.push_back(plot_ptr);
 
-    // plot_ptr = new PlotOptions1D(
-    //     {"h_EPz_truth", "h_EPz"},                      // histogram names (reco first so y-axis scales properly)
-    //     {"MC Truth"   , "Reconstruction"},                // legend entries
-    //     {"hist"       , "pe"},                                // draw options
-    //     "Hadronic Final State E-p_{z}",               // canvas title
-    //     "#Sigma(E-p_{z}) [GeV]",                       // x label
-    //     "Counts",                                       // y label
-    //     "figs/EPz_distribution_logY.png",                   // save name
-    //     false,                                          // isLogX
-    //     true                                           // isLogY
-    // );
-    // plot_ptr->SetLegendPosition(0.2, 0.7, 0.4, 0.9);
-    // plots.push_back(plot_ptr);
+    plot_ptr = new PlotOptions1D(
+        {"h_EPz_truth", "h_EPz"},                      // histogram names (reco first so y-axis scales properly)
+        {"MC Truth"   , "Reconstruction"},                // legend entries
+        {"hist"       , "pe"},                                // draw options
+        "Hadronic Final State E-p_{z}",               // canvas title
+        "#Sigma(E-p_{z}) [GeV]",                       // x label
+        "Counts",                                       // y label
+        "figs/EPz_distribution_logY.png",                   // save name
+        false,                                          // isLogX
+        true                                           // isLogY
+    );
+    plot_ptr->SetLegendPosition(0.2, 0.7, 0.4, 0.9);
+    plots.push_back(plot_ptr);
 
 
 //////////////////////////////////////////////////////////////////////

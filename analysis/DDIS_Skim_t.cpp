@@ -82,7 +82,7 @@ void undoAfterburn(P3MVector& a){
 std::vector<P3MVector> ProcessTruthProtons(
     TTreeReaderArray<double>& mc_px, TTreeReaderArray<double>& mc_py, TTreeReaderArray<double>& mc_pz,
     TTreeReaderArray<double>& mc_mass, TTreeReaderArray<int>& mc_gen_status, TTreeReaderArray<int>& mc_pdg,
-    const BeamInfo& beams, TH1D* h_theta, TH1D* h_t, TH1D* h_xL, TH1D* h_xpom
+    const BeamInfo& beams, TH1D* h_theta, TH1D* h_t, TH1D* h_xL, TH1D* h_xpom, TH1D* h_beta, float xBj
 ) {
     std::vector<P3MVector> truth_protons;
     
@@ -100,6 +100,14 @@ std::vector<P3MVector> ProcessTruthProtons(
 
             // Calculate x_pom = 1 - x_L (using p'z/pz method)
             double xpom = 1.0 - xL_pz;
+
+            // Calculate beta = x_Bj / x_pom (if both are valid)
+            if (xpom > 0 && xBj > 0 && xBj <= 1.0) {
+                double beta = xBj / xpom;
+                if (beta > 0 && beta <= 1.0) {
+                    h_beta->Fill(beta);
+                }
+            }
 
             // if (xL_pz < 0.99) continue; // x_L cut to avoid the self imposed effects;
 
@@ -121,7 +129,9 @@ void ProcessB0Protons(
     TTreeReaderArray<double>& mc_px, TTreeReaderArray<double>& mc_py, TTreeReaderArray<double>& mc_pz,
     TTreeReaderArray<double>& mc_mass, TTreeReaderArray<int>& mc_gen_status, TTreeReaderArray<int>& mc_pdg,
     const BeamInfo& beams, MethodHistograms& hist, MethodHistograms& hist_cutFirstBin,
-    int& n_matches, double t_first_bin_edge
+    int& n_matches, double t_first_bin_edge, float xBj, float Q2,
+    TH1D* h_beta, TH1D* h_beta_res, TH2D* h_beta_corr, 
+    TH2D* h_beta_vs_Q2, TH2D* h_beta_vs_xpom, TH2D* h_beta_vs_t
 ) {
     for(unsigned int i = 0; i < tsassoc_rec_id.GetSize(); i++){
         auto mc_idx = tsassoc_sim_id[i];
@@ -158,6 +168,16 @@ void ProcessB0Protons(
         double xpom_reco = 1.0 - xL_reco_pz;
         double xpom_truth = 1.0 - xL_truth_pz;
 
+        // Calculate beta = x_Bj / x_pom
+        double beta_reco = -999.0;
+        double beta_truth = -999.0;
+        if (xpom_reco > 0 && xBj > 0 && xBj <= 1.0) {
+            beta_reco = xBj / xpom_reco;
+        }
+        if (xpom_truth > 0 && xBj > 0 && xBj <= 1.0) {
+            beta_truth = xBj / xpom_truth;
+        }
+
         // if (xL_reco_pz < 0.99) continue; // x_L cut to avoid the self imposed effects;
 
         // Fill original histograms (all events)
@@ -171,6 +191,29 @@ void ProcessB0Protons(
         hist.h_xpom_corr->Fill(xpom_truth, xpom_reco);
         if(xpom_truth > 1e-6) {
             hist.h_xpom_res->Fill((xpom_reco - xpom_truth) / xpom_truth);
+        }
+
+        // Fill beta histograms
+        if (beta_reco > 0 && beta_reco <= 1.0) {
+            h_beta->Fill(beta_reco);
+            
+            // Fill physics correlations
+            if (Q2 > 0) {
+                h_beta_vs_Q2->Fill(Q2, beta_reco);
+            }
+            if (xpom_reco > 0) {
+                h_beta_vs_xpom->Fill(xpom_reco, beta_reco);
+            }
+            if (t_reco > 0) {
+                h_beta_vs_t->Fill(t_reco, beta_reco);
+            }
+            
+            // Fill resolution and correlation if truth is available
+            if (beta_truth > 0 && beta_truth <= 1.0) {
+                double beta_res = (beta_reco - beta_truth) / beta_truth;
+                h_beta_res->Fill(beta_res);
+                h_beta_corr->Fill(beta_truth, beta_reco);
+            }
         }
 
         // Fill cut histograms (skip first |t| bin)
@@ -197,7 +240,8 @@ void ProcessRPProtons(
     TTreeReaderArray<float>& rp_px, TTreeReaderArray<float>& rp_py, TTreeReaderArray<float>& rp_pz,
     TTreeReaderArray<float>& rp_mass, TTreeReaderArray<int>& rp_pdg,
     const std::vector<P3MVector>& truth_protons, const BeamInfo& beams,
-    MethodHistograms& hist, int& n_matches
+    MethodHistograms& hist, int& n_matches, float xBj, 
+    TH1D* h_beta, TH1D* h_beta_res, TH2D* h_beta_corr
 ) {
     for(int i = 0; i < rp_px.GetSize(); i++){
         if(rp_pdg[i] != 2212) continue;
@@ -241,6 +285,16 @@ void ProcessRPProtons(
             double xpom_reco = 1.0 - xL_reco_pz;
             double xpom_truth = 1.0 - xL_truth_pz;
 
+            // Calculate beta = x_Bj / x_pom
+            double beta_reco = -999.0;
+            double beta_truth = -999.0;
+            if (xpom_reco > 0 && xBj > 0 && xBj <= 1.0) {
+                beta_reco = xBj / xpom_reco;
+            }
+            if (xpom_truth > 0 && xBj > 0 && xBj <= 1.0) {
+                beta_truth = xBj / xpom_truth;
+            }
+
             // if (xL_reco_pz < 0.99) continue; // x_L cut to avoid the self imposed effects;
 
             hist.FillCorrelation(t_truth, t_reco);
@@ -253,6 +307,18 @@ void ProcessRPProtons(
             hist.h_xpom_corr->Fill(xpom_truth, xpom_reco);
             if(xpom_truth > 1e-6) {
                 hist.h_xpom_res->Fill((xpom_reco - xpom_truth) / xpom_truth);
+            }
+
+            // Fill beta histograms
+            if (beta_reco > 0 && beta_reco <= 1.0) {
+                h_beta->Fill(beta_reco);
+                
+                // Fill resolution and correlation if truth is available
+                if (beta_truth > 0 && beta_truth <= 1.0) {
+                    double beta_res = (beta_reco - beta_truth) / beta_truth;
+                    h_beta_res->Fill(beta_res);
+                    h_beta_corr->Fill(beta_truth, beta_reco);
+                }
             }
 
             n_matches++;
@@ -315,6 +381,38 @@ void analyzeProtonsMandelstamT(TString fileList){
     }
     TH1D* h_xpom_MC = new TH1D("xpom_MC", "Truth x_{pom};x_{pom};Counts", n_xpom_bins, xpom_bins);
 
+    // Create beta histograms (beta = x_Bj / x_pom)
+    TH1D* h_beta_MC = new TH1D("beta_MC", "Truth #beta;#beta;Counts", 100, 0.0, 1.0);
+    TH1D* h_beta_B0 = new TH1D("beta_B0", "B0 Reco #beta;#beta;Counts", 100, 0.0, 1.0);
+    TH1D* h_beta_RP = new TH1D("beta_RP", "RP Reco #beta;#beta;Counts", 100, 0.0, 1.0);
+    
+    // Beta resolution histograms
+    TH1D* h_beta_res_B0 = new TH1D("beta_res_B0", 
+                                    "B0 #beta Resolution;(#beta_{reco}-#beta_{truth})/#beta_{truth};Counts",
+                                    100, -2.0, 2.0);
+    TH1D* h_beta_res_RP = new TH1D("beta_res_RP", 
+                                    "RP #beta Resolution;(#beta_{reco}-#beta_{truth})/#beta_{truth};Counts",
+                                    100, -2.0, 2.0);
+    
+    // Beta 2D correlation histograms
+    TH2D* h_beta_corr_B0 = new TH2D("beta_corr_B0", 
+                                     "B0 #beta Correlation;Truth #beta;Reco #beta",
+                                     100, 0.0, 1.0, 100, 0.0, 1.0);
+    TH2D* h_beta_corr_RP = new TH2D("beta_corr_RP", 
+                                     "RP #beta Correlation;Truth #beta;Reco #beta",
+                                     100, 0.0, 1.0, 100, 0.0, 1.0);
+    
+    // Physics correlation: beta vs Q2, xpom, t
+    TH2D* h_beta_vs_Q2 = new TH2D("beta_vs_Q2", 
+                                   "#beta vs Q^{2};Q^{2} [GeV^{2}];#beta",
+                                   50, 0.1, 100.0, 50, 0.0, 1.0);
+    TH2D* h_beta_vs_xpom = new TH2D("beta_vs_xpom", 
+                                     "#beta vs x_{pom};x_{pom};#beta",
+                                     50, 1e-4, 0.4, 50, 0.0, 1.0);
+    TH2D* h_beta_vs_t = new TH2D("beta_vs_t", 
+                                  "#beta vs |t|;|t| [GeV^{2}];#beta",
+                                  50, 0.0, 2.0, 50, 0.0, 1.0);
+
     // Create histograms for each method
     MethodHistograms hist_B0("B0", t_bins);
     MethodHistograms hist_B0_cutFirstBin("B0_cutFirstBin", t_bins);  // Duplicate with first |t| bin cut
@@ -342,6 +440,10 @@ void analyzeProtonsMandelstamT(TString fileList){
     TTreeReaderArray<float> rp_pz_array(tree_reader, "ForwardRomanPotRecParticles.momentum.z");
     TTreeReaderArray<float> rp_mass_array(tree_reader, "ForwardRomanPotRecParticles.mass");
     TTreeReaderArray<int> rp_pdg_array(tree_reader, "ForwardRomanPotRecParticles.PDG");
+    
+    // Read x_Bj from InclusiveKinematicsElectron (for beta calculation)
+    TTreeReaderArray<float> xBj_Electron(tree_reader, "InclusiveKinematicsElectron.x");
+    TTreeReaderArray<float> Q2_Electron(tree_reader, "InclusiveKinematicsElectron.Q2");
     
     // Find beam particles
     cout << "Finding beam particles..." << endl;
@@ -387,10 +489,20 @@ void analyzeProtonsMandelstamT(TString fileList){
     int n_truth_protons = 0, n_b0_matches = 0, n_rp_matches = 0;
     
     while(tree_reader.Next()){
+        // Get x_Bj and Q2 from InclusiveKinematicsElectron
+        float xBj = -999.0;
+        float Q2 = -999.0;
+        if (xBj_Electron.GetSize() > 0) {
+            xBj = xBj_Electron[0];
+        }
+        if (Q2_Electron.GetSize() > 0) {
+            Q2 = Q2_Electron[0];
+        }
+        
         // Process truth protons
         auto truth_protons = ProcessTruthProtons(
             mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
-            mc_genStatus_array, mc_pdg_array, beams, h_theta_MC, h_t_MC, h_xL_MC, h_xpom_MC
+            mc_genStatus_array, mc_pdg_array, beams, h_theta_MC, h_t_MC, h_xL_MC, h_xpom_MC, h_beta_MC, xBj
         );
         n_truth_protons += truth_protons.size();
         
@@ -400,13 +512,16 @@ void analyzeProtonsMandelstamT(TString fileList){
             tsre_px_array, tsre_py_array, tsre_pz_array,
             mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
             mc_genStatus_array, mc_pdg_array,
-            beams, hist_B0, hist_B0_cutFirstBin, n_b0_matches, t_bins[1]
+            beams, hist_B0, hist_B0_cutFirstBin, n_b0_matches, t_bins[1], xBj, Q2,
+            h_beta_B0, h_beta_res_B0, h_beta_corr_B0,
+            h_beta_vs_Q2, h_beta_vs_xpom, h_beta_vs_t
         );
         
         // Process RP protons
         ProcessRPProtons(
             rp_px_array, rp_py_array, rp_pz_array, rp_mass_array, rp_pdg_array,
-            truth_protons, beams, hist_RP, n_rp_matches
+            truth_protons, beams, hist_RP, n_rp_matches, xBj,
+            h_beta_RP, h_beta_res_RP, h_beta_corr_RP
         );
     }
     
@@ -431,6 +546,19 @@ void analyzeProtonsMandelstamT(TString fileList){
     hist_B0.Write();
     hist_B0_cutFirstBin.Write();  // B0 histograms with first |t| bin cut
     hist_RP.Write();
+    
+    // Write beta histograms
+    h_beta_MC->Write();
+    h_beta_B0->Write();
+    h_beta_RP->Write();
+    h_beta_res_B0->Write();
+    h_beta_res_RP->Write();
+    h_beta_corr_B0->Write();
+    h_beta_corr_RP->Write();
+    h_beta_vs_Q2->Write();
+    h_beta_vs_xpom->Write();
+    h_beta_vs_t->Write();
+    
     outfile->Close();
     
     cout << "\nAnalysis complete! Output saved to proton_mandelstam_analysis.root" << endl;

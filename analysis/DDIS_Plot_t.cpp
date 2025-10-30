@@ -299,6 +299,99 @@ int main(int argc, char** argv) {
     ));
 
     //////////////////////////////////////////////////////////////////////
+    // Beta = x_Bj / x_pom Plots
+    //////////////////////////////////////////////////////////////////////
+
+    // Beta distributions with log y-axis for better visibility
+    PlotOptions1D* plot_beta_logy = new PlotOptions1D(
+        {"beta_MC", "beta_B0", "beta_RP"},
+        {"MC Truth", "Reco B0 (5.5-20 mrad)", "Reco RP (<5 mrad)"},
+        {"hist", "pe", "pe"},
+        "#beta = x_{Bj} / x_{pom} Distributions",
+        "#beta",
+        "Counts",
+        "figs/beta_distributions_logy.png",
+        false,  // isLogX
+        true    // isLogY
+    );
+    plot_beta_logy->SetLegendPosition(0.6, 0.7, 0.85, 0.9);
+    plots.push_back(plot_beta_logy);
+
+    // Beta resolution plots
+    plots.push_back(new PlotOptionsRelRes(
+        "beta_res_B0",
+        "(#beta_{reco} - #beta_{truth})/#beta_{truth}",
+        "Counts",
+        -999., -999.,
+        "figs/beta_resolution_B0.png"
+    ));
+
+    plots.push_back(new PlotOptionsRelRes(
+        "beta_res_RP",
+        "(#beta_{reco} - #beta_{truth})/#beta_{truth}",
+        "Counts",
+        -999., -999.,
+        "figs/beta_resolution_RP.png"
+    ));
+
+    // Beta response matrices
+    plots.push_back(new PlotOptionsResponseMatrix(
+        "beta_corr_B0",
+        "Truth #beta",
+        "B0 Reco #beta",
+        "figs/response_matrix_beta_B0.png",
+        false,  // logX
+        false,  // logY
+        {0.0, 1.0},
+        {0.0, 1.0}
+    ));
+
+    plots.push_back(new PlotOptionsResponseMatrix(
+        "beta_corr_RP",
+        "Truth #beta",
+        "RP Reco #beta",
+        "figs/response_matrix_beta_RP.png",
+        false,  // logX
+        false,  // logY
+        {0.0, 1.0},
+        {0.0, 1.0}
+    ));
+
+    // Physics correlations: Beta vs other kinematic variables
+    plots.push_back(new PlotOptionsResponseMatrix(
+        "beta_vs_Q2",
+        "Q^{2} [GeV^{2}]",
+        "#beta",
+        "figs/beta_vs_Q2.png",
+        true,   // logX (Q² often on log scale)
+        false,  // logY
+        {0.1, 100.0},
+        {0.0, 1.0}
+    ));
+
+    plots.push_back(new PlotOptionsResponseMatrix(
+        "beta_vs_xpom",
+        "x_{pom}",
+        "#beta",
+        "figs/beta_vs_xpom.png",
+        true,   // logX
+        false,  // logY
+        {1e-4, 0.4},
+        {0.0, 1.0}
+    ));
+
+    plots.push_back(new PlotOptionsResponseMatrix(
+        "beta_vs_t",
+        "|t| [GeV^{2}]",
+        "#beta",
+        "figs/beta_vs_t.png",
+        false,  // logX
+        false,  // logY
+        {0.0, 2.0},
+        {0.0, 1.0}
+    ));
+
+    //////////////////////////////////////////////////////////////////////
     // B0 Comparison: Original vs First Bin Cut
     //////////////////////////////////////////////////////////////////////
 
