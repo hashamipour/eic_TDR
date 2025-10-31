@@ -45,6 +45,22 @@ void undoAfterburn(P3MVector& p);
 double rapidity(const P3MVector& p4);
 double calculatePseudorapidity(const P3MVector& p4);
 
+// Function: E-pz calculation for matched particles
+void CalculateSumEPz_Matched(
+    TTreeReaderArray<float>& re_px,
+    TTreeReaderArray<float>& re_py,
+    TTreeReaderArray<float>& re_pz,
+    TTreeReaderArray<float>& re_energy,
+    TTreeReaderArray<double>& mc_px,
+    TTreeReaderArray<double>& mc_py,
+    TTreeReaderArray<double>& mc_pz,
+    TTreeReaderArray<double>& mc_mass,
+    TTreeReaderArray<unsigned int>& assoc_rec_id,
+    TTreeReaderArray<unsigned int>& assoc_sim_id,
+    double& sumEPz_truth,
+    double& sumEPz_reco
+);
+
 const Float_t fMass_proton{0.938272};
 const Float_t fMass_electron{0.000511};
 double MASS_PROTON   = fMass_proton;
@@ -284,6 +300,76 @@ double CalculateSumEPz(
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Calculate sum(E - pz) for MATCHED reco-MC particles only
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Calculate sum(E - pz) for matched reco-MC particle pairs
+ *
+ * This function computes both truth and reco E-pz sums using ONLY particles that have
+ * matches in both reco and MC via associations. Reco particles without MC matches
+ * and MC particles without reco matches do NOT contribute to either sum.
+ *
+ * @param re_px Reconstructed particle px array
+ * @param re_py Reconstructed particle py array
+ * @param re_pz Reconstructed particle pz array
+ * @param re_energy Reconstructed particle energy array
+ * @param mc_px MC particle px array
+ * @param mc_py MC particle py array
+ * @param mc_pz MC particle pz array
+ * @param mc_mass MC particle mass array
+ * @param assoc_rec_id Association reconstructed particle ID array
+ * @param assoc_sim_id Association simulated (MC) particle ID array
+ * @param sumEPz_truth [output] Sum of (E - pz) for matched MC particles
+ * @param sumEPz_reco [output] Sum of (E - pz) for matched reco particles
+ */
+void CalculateSumEPz_Matched(
+    TTreeReaderArray<float>& re_px,
+    TTreeReaderArray<float>& re_py,
+    TTreeReaderArray<float>& re_pz,
+    TTreeReaderArray<float>& re_energy,
+    TTreeReaderArray<double>& mc_px,
+    TTreeReaderArray<double>& mc_py,
+    TTreeReaderArray<double>& mc_pz,
+    TTreeReaderArray<double>& mc_mass,
+    TTreeReaderArray<unsigned int>& assoc_rec_id,
+    TTreeReaderArray<unsigned int>& assoc_sim_id,
+    double& sumEPz_truth,
+    double& sumEPz_reco
+) {
+    // Initialize output sums
+    sumEPz_truth = 0.0;
+    sumEPz_reco = 0.0;
+
+    // Loop over all reconstructed particles
+    for(unsigned int i = 0; i < re_energy.GetSize(); i++){
+        // Search for this reco particle in associations
+        int mc_idx = -1;
+        for(unsigned int j = 0; j < assoc_rec_id.GetSize(); j++){
+            if(assoc_rec_id[j] == i) {
+                mc_idx = assoc_sim_id[j];
+                break;
+            }
+        }
+
+        // If no association found, skip this reco particle
+        if(mc_idx < 0) continue;
+
+        // Calculate reco E - pz
+        double E_reco = re_energy[i];
+        double pz_reco = re_pz[i];
+        sumEPz_reco += (E_reco - pz_reco);
+
+        // Calculate MC E - pz for the matched particle
+        double px_mc = mc_px[mc_idx];
+        double py_mc = mc_py[mc_idx];
+        double pz_mc = mc_pz[mc_idx];
+        double m_mc = mc_mass[mc_idx];
+        double E_mc = TMath::Sqrt(px_mc*px_mc + py_mc*py_mc + pz_mc*pz_mc + m_mc*m_mc);
+        sumEPz_truth += (E_mc - pz_mc);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -435,9 +521,9 @@ int main(int argc, char** argv) {
     TH1D* h_Q2_DA       = new TH1D("h_Q2_DA",";Q^{2}",n_bins, bin_edges_Q2.data());
     TH1D* h_Q2_ESigma   = new TH1D("h_Q2_ESigma",";Q^{2}",n_bins, bin_edges_Q2.data());
 
-    // E-pz histograms (expect peak around 2*E_electron for 10x100 GeV beams ~ 20 GeV)
-    TH1D* h_EPz_truth = new TH1D("h_EPz_truth", "Sum(E-p_{z});#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
-    TH1D* h_EPz = new TH1D("h_EPz", "Reco Sum(E-p_{z});#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
+    // E-pz histograms for MATCHED particles (expect peak around 2*E_electron for 10x100 GeV beams ~ 20 GeV)
+    TH1D* h_EPz_truth = new TH1D("h_EPz_truth", "MC Truth Sum(E-p_{z}) - Matched Particles Only;#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
+    TH1D* h_EPz = new TH1D("h_EPz", "Reco Sum(E-p_{z}) - Matched Particles Only;#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
 
     //---------------------------------------------------------
     // DECLARE TTREEREADER AND BRANCHES TO USE
@@ -591,12 +677,16 @@ int main(int argc, char** argv) {
         h_Corr_Q2_DA->Fill(electron_Q2_truth, electron_Q2_DA);
         h_Corr_Q2_ESigma->Fill(electron_Q2_truth, electron_Q2_ESigma);
 
-        // Calculate and fill E-pz histograms
-        double sumEPz_truth = CalculateSumEPz_Truth(mc_px_array, mc_py_array, mc_pz_array, mc_mass_array, mc_genStatus_array, mc_pdg_array);
-        h_EPz_truth->Fill(sumEPz_truth);
-
-        double sumEPz = CalculateSumEPz(re_px_array, re_py_array, re_pz_array, re_energy_array, electron_scat_index);
-        h_EPz->Fill(sumEPz);
+        // Calculate and fill E-pz histograms using MATCHED particles only
+        double sumEPz_truth_matched, sumEPz_reco_matched;
+        CalculateSumEPz_Matched(
+            re_px_array, re_py_array, re_pz_array, re_energy_array,
+            mc_px_array, mc_py_array, mc_pz_array, mc_mass_array,
+            assoc_rec_id, assoc_sim_id,
+            sumEPz_truth_matched, sumEPz_reco_matched
+        );
+        h_EPz_truth->Fill(sumEPz_truth_matched);
+        h_EPz->Fill(sumEPz_reco_matched);
     }
     std::cout<<"\nDone looping over events.\n"<<std::endl;
 
