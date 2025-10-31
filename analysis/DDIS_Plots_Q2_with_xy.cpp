@@ -532,6 +532,38 @@ int main(int argc, char** argv) {
     plot_ptr->SetLegendPosition(0.2, 0.7, 0.4, 0.9);
     plots.push_back(plot_ptr);
 
+    // eta_max distribution plot comparing truth and reconstruction
+    plot_ptr = new PlotOptions1D(
+        {"h_eta_max_truth", "h_eta_max"},                  // histogram names
+        {"MC Truth", "Reconstruction"},                    // legend entries
+        {"hist", "pe"},                                    // draw options
+        "Maximum Pseudorapidity per Event",               // canvas title
+        "#eta_{max}",                                      // x label
+        "Counts",                                          // y label
+        "figs/eta_max_distribution.png",                  // save name
+        false,                                             // isLogX
+        false                                              // isLogY
+    );
+    plot_ptr->SetLegendPosition(0.2, 0.7, 0.4, 0.9);
+    plots.push_back(plot_ptr);
+
+
+
+
+    // eta_max distribution plot comparing truth and reconstruction with log Y-axis
+    plot_ptr = new PlotOptions1D(
+        {"h_eta_max_truth", "h_eta_max"},                  // histogram names
+        {"MC Truth", "Reconstruction"},                    // legend entries
+        {"hist", "pe"},                                    // draw options
+        "Maximum Pseudorapidity per Event",               // canvas title
+        "#eta_{max}",                                      // x label
+        "Counts",                                          // y label
+        "figs/eta_max_distribution.png",                  // save name
+        false,                                             // isLogX
+        true                                              // isLogY
+    );
+    plot_ptr->SetLegendPosition(0.1, 0.7, 0.3, 0.9);
+    plots.push_back(plot_ptr);
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////

@@ -525,6 +525,10 @@ int main(int argc, char** argv) {
     TH1D* h_EPz_truth = new TH1D("h_EPz_truth", "MC Truth Sum(E-p_{z}) - Matched Particles Only;#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
     TH1D* h_EPz = new TH1D("h_EPz", "Reco Sum(E-p_{z}) - Matched Particles Only;#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
 
+    // Eta_max histograms (reco and truth)
+    TH1D* h_eta_max = new TH1D("h_eta_max", "Maximum Pseudorapidity per Event (Reco);#eta_{max};Counts", 50, -4.0, 6.0);
+    TH1D* h_eta_max_truth = new TH1D("h_eta_max_truth", "Maximum Pseudorapidity per Event (Truth);#eta_{max};Counts", 50, -4.0, 6.0);
+
     //---------------------------------------------------------
     // DECLARE TTREEREADER AND BRANCHES TO USE
     //---------------------------------------------------------
@@ -687,6 +691,46 @@ int main(int argc, char** argv) {
         );
         h_EPz_truth->Fill(sumEPz_truth_matched);
         h_EPz->Fill(sumEPz_reco_matched);
+
+        // Calculate eta_max for reco and truth (using matched particles via associations)
+        double eta_max_reco = -999.0;
+        double eta_max_truth = -999.0;
+        
+        // Loop over reconstructed particles
+        for(unsigned int j = 0; j < re_energy_array.GetSize(); j++){
+            // Calculate reco eta
+            P3MVector particle_reco(re_px_array[j], re_py_array[j], re_pz_array[j], 0.0);
+            double eta_reco = particle_reco.Eta();
+            if(eta_reco > eta_max_reco){
+                eta_max_reco = eta_reco;
+            }
+            
+            // Find corresponding MC particle through associations
+            int mc_idx = -1;
+            for(unsigned int k = 0; k < assoc_rec_id.GetSize(); k++){
+                if(assoc_rec_id[k] == j) {
+                    mc_idx = assoc_sim_id[k];
+                    break;
+                }
+            }
+            
+            // If association found, calculate MC eta
+            if(mc_idx >= 0 && mc_idx < mc_px_array.GetSize()){
+                P3MVector particle_mc(mc_px_array[mc_idx], mc_py_array[mc_idx], mc_pz_array[mc_idx], mc_mass_array[mc_idx]);
+                double eta_mc = particle_mc.Eta();
+                if(eta_mc > eta_max_truth){
+                    eta_max_truth = eta_mc;
+                }
+            }
+        }
+        
+        // Fill histograms if valid
+        if(eta_max_reco > -999.0){
+            h_eta_max->Fill(eta_max_reco);
+        }
+        if(eta_max_truth > -999.0){
+            h_eta_max_truth->Fill(eta_max_truth);
+        }
     }
     std::cout<<"\nDone looping over events.\n"<<std::endl;
 
@@ -742,6 +786,10 @@ int main(int argc, char** argv) {
     // Write E-pz histograms
     h_EPz_truth->Write();
     h_EPz->Write();
+
+    // Write eta_max histograms
+    h_eta_max->Write();
+    h_eta_max_truth->Write();
 
     outputFile->Close();
     delete events;
