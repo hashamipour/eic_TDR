@@ -529,6 +529,10 @@ int main(int argc, char** argv) {
     TH1D* h_eta_max = new TH1D("h_eta_max", "Maximum Pseudorapidity per Event (Reco);#eta_{max};Counts", 50, -4.0, 6.0);
     TH1D* h_eta_max_truth = new TH1D("h_eta_max_truth", "Maximum Pseudorapidity per Event (Truth);#eta_{max};Counts", 50, -4.0, 6.0);
 
+    // M_X^2 histograms (hadronic invariant mass squared, excluding scattered electron)
+    TH1D* h_MX2 = new TH1D("h_MX2", "Hadronic Invariant Mass Squared (Reco);M_{X}^{2} [GeV^{2}];Counts", 100, 0.0, 200.0);
+    TH1D* h_MX2_truth = new TH1D("h_MX2_truth", "Hadronic Invariant Mass Squared (Truth);M_{X}^{2} [GeV^{2}];Counts", 100, 0.0, 200.0);
+
     //---------------------------------------------------------
     // DECLARE TTREEREADER AND BRANCHES TO USE
     //---------------------------------------------------------
@@ -731,6 +735,56 @@ int main(int argc, char** argv) {
         if(eta_max_truth > -999.0){
             h_eta_max_truth->Fill(eta_max_truth);
         }
+
+        // Calculate M_X^2 (hadronic invariant mass squared, excluding scattered electron)
+        // Get scattered electron index
+        int scat_e_idx = -1;
+        if(electron_scat_index.GetSize() > 0) {
+            scat_e_idx = electron_scat_index[0];
+        }
+
+        // Sum all reconstructed particles (excluding scattered electron)
+        P3EVector total_hadrons_reco(0.0, 0.0, 0.0, 0.0);
+        for(unsigned int j = 0; j < re_energy_array.GetSize(); j++){
+            // Skip the scattered electron
+            if((int)j == scat_e_idx) continue;
+            
+            P3EVector particle(re_px_array[j], re_py_array[j], re_pz_array[j], re_energy_array[j]);
+            total_hadrons_reco += particle;
+        }
+        double MX2_reco = total_hadrons_reco.M2();
+        
+        // Calculate M_X^2 for truth (sum matched MC particles, excluding scattered electron)
+        P3EVector total_hadrons_truth(0.0, 0.0, 0.0, 0.0);
+        for(unsigned int j = 0; j < re_energy_array.GetSize(); j++){
+            // Skip the scattered electron
+            if((int)j == scat_e_idx) continue;
+            
+            // Find corresponding MC particle through associations
+            int mc_idx = -1;
+            for(unsigned int k = 0; k < assoc_rec_id.GetSize(); k++){
+                if(assoc_rec_id[k] == j) {
+                    mc_idx = assoc_sim_id[k];
+                    break;
+                }
+            }
+            
+            // If association found, add to truth sum
+            if(mc_idx >= 0 && mc_idx < mc_px_array.GetSize()){
+                double px_mc = mc_px_array[mc_idx];
+                double py_mc = mc_py_array[mc_idx];
+                double pz_mc = mc_pz_array[mc_idx];
+                double m_mc = mc_mass_array[mc_idx];
+                double E_mc = TMath::Sqrt(px_mc*px_mc + py_mc*py_mc + pz_mc*pz_mc + m_mc*m_mc);
+                P3EVector particle_mc(px_mc, py_mc, pz_mc, E_mc);
+                total_hadrons_truth += particle_mc;
+            }
+        }
+        double MX2_truth = total_hadrons_truth.M2();
+        
+        // Fill M_X^2 histograms
+        h_MX2->Fill(MX2_reco);
+        h_MX2_truth->Fill(MX2_truth);
     }
     std::cout<<"\nDone looping over events.\n"<<std::endl;
 
@@ -790,6 +844,10 @@ int main(int argc, char** argv) {
     // Write eta_max histograms
     h_eta_max->Write();
     h_eta_max_truth->Write();
+
+    // Write M_X^2 histograms
+    h_MX2->Write();
+    h_MX2_truth->Write();
 
     outputFile->Close();
     delete events;

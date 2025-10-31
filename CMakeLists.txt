@@ -36,15 +36,18 @@ target_include_directories(eicplot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_executable(ddis_skim_q2_xy analysis/DDIS_Skim_Q2_with_xy.cpp)
 target_link_libraries(ddis_skim_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
-
-add_executable(ddis_plots_q2_xy analysis/DDIS_Plots_Q2_with_xy.cpp)
-target_link_libraries(ddis_plots_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
-
-add_executable(ddis_plots_t analysis/DDIS_Plot_t.cpp)
-target_link_libraries(ddis_plots_t PRIVATE eicplot ${ROOT_LIBRARIES})
-
 add_executable(skim_t analysis/DDIS_Skim_t.cpp)
 target_link_libraries(skim_t PRIVATE eicplot ${ROOT_LIBRARIES})
+add_executable(ddis_skim_combined analysis/DDIS_Skim_Combined.cpp)
+target_link_libraries(ddis_skim_combined PRIVATE eicplot ${ROOT_LIBRARIES})
+
+add_executable(ddis_plot_q2_xy analysis/DDIS_Plots_Q2_with_xy.cpp)
+target_link_libraries(ddis_plot_q2_xy PRIVATE eicplot ${ROOT_LIBRARIES})
+add_executable(ddis_plot_t analysis/DDIS_Plot_t.cpp)
+target_link_libraries(ddis_plot_t PRIVATE eicplot ${ROOT_LIBRARIES})
+add_executable(ddis_plot_combined analysis/DDIS_Plot_Combined.cpp)
+target_link_libraries(ddis_plot_combined PRIVATE eicplot ${ROOT_LIBRARIES})
+
 
 
 

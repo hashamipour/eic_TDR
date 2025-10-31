@@ -143,32 +143,6 @@ ddis_skim_q2_xy/fast:
 .PHONY : ddis_skim_q2_xy/fast
 
 #=============================================================================
-# Target rules for targets named ddis_plots_q2_xy
-
-# Build rule for target.
-ddis_plots_q2_xy: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_plots_q2_xy
-.PHONY : ddis_plots_q2_xy
-
-# fast build rule for target.
-ddis_plots_q2_xy/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/build
-.PHONY : ddis_plots_q2_xy/fast
-
-#=============================================================================
-# Target rules for targets named ddis_plots_t
-
-# Build rule for target.
-ddis_plots_t: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_plots_t
-.PHONY : ddis_plots_t
-
-# fast build rule for target.
-ddis_plots_t/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/build
-.PHONY : ddis_plots_t/fast
-
-#=============================================================================
 # Target rules for targets named skim_t
 
 # Build rule for target.
@@ -181,12 +155,88 @@ skim_t/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/skim_t.dir/build.make CMakeFiles/skim_t.dir/build
 .PHONY : skim_t/fast
 
+#=============================================================================
+# Target rules for targets named ddis_skim_combined
+
+# Build rule for target.
+ddis_skim_combined: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_skim_combined
+.PHONY : ddis_skim_combined
+
+# fast build rule for target.
+ddis_skim_combined/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_combined.dir/build.make CMakeFiles/ddis_skim_combined.dir/build
+.PHONY : ddis_skim_combined/fast
+
+#=============================================================================
+# Target rules for targets named ddis_plot_q2_xy
+
+# Build rule for target.
+ddis_plot_q2_xy: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_plot_q2_xy
+.PHONY : ddis_plot_q2_xy
+
+# fast build rule for target.
+ddis_plot_q2_xy/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_q2_xy.dir/build.make CMakeFiles/ddis_plot_q2_xy.dir/build
+.PHONY : ddis_plot_q2_xy/fast
+
+#=============================================================================
+# Target rules for targets named ddis_plot_t
+
+# Build rule for target.
+ddis_plot_t: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_plot_t
+.PHONY : ddis_plot_t
+
+# fast build rule for target.
+ddis_plot_t/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_t.dir/build.make CMakeFiles/ddis_plot_t.dir/build
+.PHONY : ddis_plot_t/fast
+
+#=============================================================================
+# Target rules for targets named ddis_plot_combined
+
+# Build rule for target.
+ddis_plot_combined: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ddis_plot_combined
+.PHONY : ddis_plot_combined
+
+# fast build rule for target.
+ddis_plot_combined/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_combined.dir/build.make CMakeFiles/ddis_plot_combined.dir/build
+.PHONY : ddis_plot_combined/fast
+
+analysis/DDIS_Plot_Combined.o: analysis/DDIS_Plot_Combined.cpp.o
+.PHONY : analysis/DDIS_Plot_Combined.o
+
+# target to build an object file
+analysis/DDIS_Plot_Combined.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_combined.dir/build.make CMakeFiles/ddis_plot_combined.dir/analysis/DDIS_Plot_Combined.cpp.o
+.PHONY : analysis/DDIS_Plot_Combined.cpp.o
+
+analysis/DDIS_Plot_Combined.i: analysis/DDIS_Plot_Combined.cpp.i
+.PHONY : analysis/DDIS_Plot_Combined.i
+
+# target to preprocess a source file
+analysis/DDIS_Plot_Combined.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_combined.dir/build.make CMakeFiles/ddis_plot_combined.dir/analysis/DDIS_Plot_Combined.cpp.i
+.PHONY : analysis/DDIS_Plot_Combined.cpp.i
+
+analysis/DDIS_Plot_Combined.s: analysis/DDIS_Plot_Combined.cpp.s
+.PHONY : analysis/DDIS_Plot_Combined.s
+
+# target to generate assembly for a file
+analysis/DDIS_Plot_Combined.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_combined.dir/build.make CMakeFiles/ddis_plot_combined.dir/analysis/DDIS_Plot_Combined.cpp.s
+.PHONY : analysis/DDIS_Plot_Combined.cpp.s
+
 analysis/DDIS_Plot_t.o: analysis/DDIS_Plot_t.cpp.o
 .PHONY : analysis/DDIS_Plot_t.o
 
 # target to build an object file
 analysis/DDIS_Plot_t.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/analysis/DDIS_Plot_t.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_t.dir/build.make CMakeFiles/ddis_plot_t.dir/analysis/DDIS_Plot_t.cpp.o
 .PHONY : analysis/DDIS_Plot_t.cpp.o
 
 analysis/DDIS_Plot_t.i: analysis/DDIS_Plot_t.cpp.i
@@ -194,7 +244,7 @@ analysis/DDIS_Plot_t.i: analysis/DDIS_Plot_t.cpp.i
 
 # target to preprocess a source file
 analysis/DDIS_Plot_t.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/analysis/DDIS_Plot_t.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_t.dir/build.make CMakeFiles/ddis_plot_t.dir/analysis/DDIS_Plot_t.cpp.i
 .PHONY : analysis/DDIS_Plot_t.cpp.i
 
 analysis/DDIS_Plot_t.s: analysis/DDIS_Plot_t.cpp.s
@@ -202,7 +252,7 @@ analysis/DDIS_Plot_t.s: analysis/DDIS_Plot_t.cpp.s
 
 # target to generate assembly for a file
 analysis/DDIS_Plot_t.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_t.dir/build.make CMakeFiles/ddis_plots_t.dir/analysis/DDIS_Plot_t.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_t.dir/build.make CMakeFiles/ddis_plot_t.dir/analysis/DDIS_Plot_t.cpp.s
 .PHONY : analysis/DDIS_Plot_t.cpp.s
 
 analysis/DDIS_Plots_Q2_with_xy.o: analysis/DDIS_Plots_Q2_with_xy.cpp.o
@@ -210,7 +260,7 @@ analysis/DDIS_Plots_Q2_with_xy.o: analysis/DDIS_Plots_Q2_with_xy.cpp.o
 
 # target to build an object file
 analysis/DDIS_Plots_Q2_with_xy.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_q2_xy.dir/build.make CMakeFiles/ddis_plot_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.o
 .PHONY : analysis/DDIS_Plots_Q2_with_xy.cpp.o
 
 analysis/DDIS_Plots_Q2_with_xy.i: analysis/DDIS_Plots_Q2_with_xy.cpp.i
@@ -218,7 +268,7 @@ analysis/DDIS_Plots_Q2_with_xy.i: analysis/DDIS_Plots_Q2_with_xy.cpp.i
 
 # target to preprocess a source file
 analysis/DDIS_Plots_Q2_with_xy.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_q2_xy.dir/build.make CMakeFiles/ddis_plot_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.i
 .PHONY : analysis/DDIS_Plots_Q2_with_xy.cpp.i
 
 analysis/DDIS_Plots_Q2_with_xy.s: analysis/DDIS_Plots_Q2_with_xy.cpp.s
@@ -226,8 +276,32 @@ analysis/DDIS_Plots_Q2_with_xy.s: analysis/DDIS_Plots_Q2_with_xy.cpp.s
 
 # target to generate assembly for a file
 analysis/DDIS_Plots_Q2_with_xy.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plots_q2_xy.dir/build.make CMakeFiles/ddis_plots_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_plot_q2_xy.dir/build.make CMakeFiles/ddis_plot_q2_xy.dir/analysis/DDIS_Plots_Q2_with_xy.cpp.s
 .PHONY : analysis/DDIS_Plots_Q2_with_xy.cpp.s
+
+analysis/DDIS_Skim_Combined.o: analysis/DDIS_Skim_Combined.cpp.o
+.PHONY : analysis/DDIS_Skim_Combined.o
+
+# target to build an object file
+analysis/DDIS_Skim_Combined.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_combined.dir/build.make CMakeFiles/ddis_skim_combined.dir/analysis/DDIS_Skim_Combined.cpp.o
+.PHONY : analysis/DDIS_Skim_Combined.cpp.o
+
+analysis/DDIS_Skim_Combined.i: analysis/DDIS_Skim_Combined.cpp.i
+.PHONY : analysis/DDIS_Skim_Combined.i
+
+# target to preprocess a source file
+analysis/DDIS_Skim_Combined.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_combined.dir/build.make CMakeFiles/ddis_skim_combined.dir/analysis/DDIS_Skim_Combined.cpp.i
+.PHONY : analysis/DDIS_Skim_Combined.cpp.i
+
+analysis/DDIS_Skim_Combined.s: analysis/DDIS_Skim_Combined.cpp.s
+.PHONY : analysis/DDIS_Skim_Combined.s
+
+# target to generate assembly for a file
+analysis/DDIS_Skim_Combined.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ddis_skim_combined.dir/build.make CMakeFiles/ddis_skim_combined.dir/analysis/DDIS_Skim_Combined.cpp.s
+.PHONY : analysis/DDIS_Skim_Combined.cpp.s
 
 analysis/DDIS_Skim_Q2_with_xy.o: analysis/DDIS_Skim_Q2_with_xy.cpp.o
 .PHONY : analysis/DDIS_Skim_Q2_with_xy.o
@@ -477,17 +551,25 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... ddis_plots_q2_xy"
-	@echo "... ddis_plots_t"
+	@echo "... ddis_plot_combined"
+	@echo "... ddis_plot_q2_xy"
+	@echo "... ddis_plot_t"
+	@echo "... ddis_skim_combined"
 	@echo "... ddis_skim_q2_xy"
 	@echo "... eicplot"
 	@echo "... skim_t"
+	@echo "... analysis/DDIS_Plot_Combined.o"
+	@echo "... analysis/DDIS_Plot_Combined.i"
+	@echo "... analysis/DDIS_Plot_Combined.s"
 	@echo "... analysis/DDIS_Plot_t.o"
 	@echo "... analysis/DDIS_Plot_t.i"
 	@echo "... analysis/DDIS_Plot_t.s"
 	@echo "... analysis/DDIS_Plots_Q2_with_xy.o"
 	@echo "... analysis/DDIS_Plots_Q2_with_xy.i"
 	@echo "... analysis/DDIS_Plots_Q2_with_xy.s"
+	@echo "... analysis/DDIS_Skim_Combined.o"
+	@echo "... analysis/DDIS_Skim_Combined.i"
+	@echo "... analysis/DDIS_Skim_Combined.s"
 	@echo "... analysis/DDIS_Skim_Q2_with_xy.o"
 	@echo "... analysis/DDIS_Skim_Q2_with_xy.i"
 	@echo "... analysis/DDIS_Skim_Q2_with_xy.s"

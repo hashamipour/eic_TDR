@@ -126,7 +126,9 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/eicplot.dir/DependInfo.cmake"
   "CMakeFiles/ddis_skim_q2_xy.dir/DependInfo.cmake"
-  "CMakeFiles/ddis_plots_q2_xy.dir/DependInfo.cmake"
-  "CMakeFiles/ddis_plots_t.dir/DependInfo.cmake"
   "CMakeFiles/skim_t.dir/DependInfo.cmake"
+  "CMakeFiles/ddis_skim_combined.dir/DependInfo.cmake"
+  "CMakeFiles/ddis_plot_q2_xy.dir/DependInfo.cmake"
+  "CMakeFiles/ddis_plot_t.dir/DependInfo.cmake"
+  "CMakeFiles/ddis_plot_combined.dir/DependInfo.cmake"
   )
