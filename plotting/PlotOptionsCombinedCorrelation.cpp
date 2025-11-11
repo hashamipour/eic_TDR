@@ -54,15 +54,19 @@ void PlotOptionsCombinedCorrelation::Plot(TFile* inputFile) {
             graph->GetYaxis()->SetTitle(m_yLabel);
             graph->GetXaxis()->SetTitleOffset(1.3);
             graph->GetYaxis()->SetTitleOffset(1.3);
-            
-            if (m_xRange.first != -999. && m_xRange.second != -999.) {
-                graph->GetXaxis()->SetLimits(m_xRange.first, m_xRange.second);
+
+            // Use base class ranges if set, otherwise fall back to constructor parameters
+            auto xRange = m_rangeX ? *m_rangeX : m_xRange;
+            auto yRange = m_rangeY ? *m_rangeY : m_yRange;
+
+            if (xRange.first != -999. && xRange.second != -999.) {
+                graph->GetXaxis()->SetLimits(xRange.first, xRange.second);
             }
-            if (m_yRange.first != -999. && m_yRange.second != -999.) {
-                graph->GetHistogram()->SetMinimum(m_yRange.first);
-                graph->GetHistogram()->SetMaximum(m_yRange.second);
+            if (yRange.first != -999. && yRange.second != -999.) {
+                graph->GetHistogram()->SetMinimum(yRange.first);
+                graph->GetHistogram()->SetMaximum(yRange.second);
             }
-            
+
             graph->Draw("AP");
             firstPlot = false;
         } else {

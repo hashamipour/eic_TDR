@@ -410,6 +410,8 @@ CMakeFiles/ddis_skim_combined.dir/analysis/DDIS_Skim_Combined.cpp.o: \
   /opt/local/include/root/TTime.h /opt/local/include/root/TStyle.h \
   /opt/local/include/root/TAttText.h /opt/local/include/root/TColor.h \
   /opt/local/include/root/TMath.h /opt/local/include/root/TError.h \
+  /opt/local/include/root/TProfile2D.h \
+  /opt/local/include/root/TProfile.h \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/iostream \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/istream \
   /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/bits/istream.tcc \

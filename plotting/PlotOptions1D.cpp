@@ -77,10 +77,14 @@ void PlotOptions1D::Plot(TFile* inputFile) {
             hist->SetLineColor(kBlue);
             hist->SetMarkerColor(kBlue);
             hist->SetMarkerStyle(20);
-        } else if (m_histNames[i].Contains("ESigma")) {
+        } else if (m_histNames[i].Contains("Sigma")) {
             hist->SetLineColor(kGreen + 2);
             hist->SetMarkerColor(kGreen + 2);
             hist->SetMarkerStyle(20);
+        } else if (m_histNames[i].Contains("Sum")) {
+            hist->SetLineColor(kOrange+7);
+            hist->SetMarkerColor(kOrange+7);
+            hist->SetMarkerStyle(24);  // Hollow circle
         }
 
         // Draw with user draw options; ensure SAME for i>0
@@ -144,7 +148,7 @@ void PlotOptions1D::Plot(TFile* inputFile) {
     gPad->Update(); // Update the pad after drawing the legend to finalize its position
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    // ---------- Axes labels ----------
+    // ---------- Axes labels and ranges ----------
     if (firstHist) {
         firstHist->GetXaxis()->SetTitle(m_xLabel);
         firstHist->GetYaxis()->SetTitle(m_yLabel);
@@ -152,6 +156,14 @@ void PlotOptions1D::Plot(TFile* inputFile) {
         firstHist->GetYaxis()->SetTitleSize(0.04);
         firstHist->GetXaxis()->SetTitleOffset(1.0);
         firstHist->GetYaxis()->SetTitleOffset(1.0);
+
+        // Apply custom ranges if set
+        if (m_rangeX) {
+            firstHist->GetXaxis()->SetRangeUser(m_rangeX->first, m_rangeX->second);
+        }
+        if (m_rangeY) {
+            firstHist->GetYaxis()->SetRangeUser(m_rangeY->first, m_rangeY->second);
+        }
     }
 
     // ---------- Add ePIC simulation labels ----------

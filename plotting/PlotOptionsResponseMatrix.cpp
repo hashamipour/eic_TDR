@@ -76,14 +76,18 @@ void PlotOptionsResponseMatrix::Plot(TFile* inputFile) {
     gPad->Clear();
     h_matrix_perc->Draw("COLZ");
 
-    if ((this->m_xRange.first != -999.) && (this->m_xRange.second != -999.)) {
-        // h_matrix_perc->GetXaxis()->SetLimits(this->m_xRange.first, this->m_xRange.second);
-        // Logger::debug(Form("Set X axis range to [%.2f, %.2f]", this->m_xRange.first, this->m_xRange.second));
-        h_matrix_perc->GetXaxis()->SetRangeUser(this->m_xRange.first, this->m_xRange.second);
+    // Use base class ranges if set, otherwise fall back to constructor parameters
+    auto xRange = m_rangeX ? *m_rangeX : m_xRange;
+    auto yRange = m_rangeY ? *m_rangeY : m_yRange;
+
+    if ((xRange.first != -999.) && (xRange.second != -999.)) {
+        // h_matrix_perc->GetXaxis()->SetLimits(xRange.first, xRange.second);
+        // Logger::debug(Form("Set X axis range to [%.2f, %.2f]", xRange.first, xRange.second));
+        h_matrix_perc->GetXaxis()->SetRangeUser(xRange.first, xRange.second);
     }
-    if ((this->m_yRange.first != -999.) && (this->m_yRange.second != -999.)) {
-        // h_matrix_perc->GetYaxis()->SetLimits(this->m_yRange.first, this->m_yRange.second);
-        h_matrix_perc->GetYaxis()->SetRangeUser(this->m_yRange.first, this->m_yRange.second);
+    if ((yRange.first != -999.) && (yRange.second != -999.)) {
+        // h_matrix_perc->GetYaxis()->SetLimits(yRange.first, yRange.second);
+        h_matrix_perc->GetYaxis()->SetRangeUser(yRange.first, yRange.second);
     }
 
     double xmin = h_matrix_perc->GetXaxis()->GetBinLowEdge(h_matrix_perc->GetXaxis()->GetFirst());

@@ -199,6 +199,12 @@ void PlotOptionsRelRes::Plot(TFile* inputFile) {
     hist->GetYaxis()->SetTitleSize(0.05);
     hist->GetXaxis()->SetTitleOffset(1.3);
     hist->GetYaxis()->SetTitleOffset(0.9);
+
+    // Apply custom X range if set via base class
+    if (m_rangeX) {
+        hist->GetXaxis()->SetRangeUser(m_rangeX->first, m_rangeX->second);
+    }
+
     hist->SetLineColor(kGreen + 3);
     hist->SetMarkerColor(kGreen + 3);
     hist->SetMarkerStyle(20);

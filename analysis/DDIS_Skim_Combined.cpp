@@ -13,6 +13,7 @@
 #include <TMath.h>
 #include <TObject.h>
 #include <TString.h>
+#include <TProfile2D.h>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -177,16 +178,16 @@ int main(int argc, char** argv) {
 
     // Create TTree for event-level data
     TTree* tree = new TTree("Q2_tree", "Q2 Kinematics Data");
-    float out_x_truth, out_x_EM, out_x_DA, out_x_ESigma;
-    float out_y_truth, out_y_EM, out_y_DA, out_y_ESigma;
+    float out_x_truth, out_x_EM, out_x_DA, out_x_Sigma;
+    float out_y_truth, out_y_EM, out_y_DA, out_y_Sigma;
     tree->Branch("x_truth",    &out_x_truth,   "x_truth/F");
     tree->Branch("x_EM",       &out_x_EM,      "x_EM/F");
     tree->Branch("x_DA",       &out_x_DA,      "x_DA/F");
-    tree->Branch("x_ESigma",   &out_x_ESigma,  "x_ESigma/F");
+    tree->Branch("x_Sigma",    &out_x_Sigma,   "x_Sigma/F");
     tree->Branch("y_truth",    &out_y_truth,   "y_truth/F");
     tree->Branch("y_EM",       &out_y_EM,      "y_EM/F");
     tree->Branch("y_DA",       &out_y_DA,      "y_DA/F");
-    tree->Branch("y_ESigma",   &out_y_ESigma,  "y_ESigma/F");
+    tree->Branch("y_Sigma",    &out_y_Sigma,   "y_Sigma/F");
 
     //---------------------------------------------------------
     // DECLARE OUTPUT HISTOGRAMS (Q2/xy part)
@@ -200,24 +201,24 @@ int main(int argc, char** argv) {
     std::vector<Double_t> x_bins = GetLogBins(1.0e-4, 1.0, 25);
     TH1D* h_x_EM     = new TH1D("x_EM",     "electron method;x_{Bj}", x_bins.size()-1, x_bins.data());
     TH1D* h_x_DA     = new TH1D("x_DA",     "DA method;x_{Bj}",       x_bins.size()-1, x_bins.data());
-    TH1D* h_x_ESigma = new TH1D("x_ESigma", "ESigma method;x_{Bj}",   x_bins.size()-1, x_bins.data());
+    TH1D* h_x_Sigma  = new TH1D("x_Sigma",  "Sigma method;x_{Bj}",    x_bins.size()-1, x_bins.data());
     TH1D* h_x_truth  = new TH1D("x_truth",  "truth;x_{Bj}",           x_bins.size()-1, x_bins.data());
 
     // y histograms (0..1)
-    int n_y_bins = 20;
+    int n_y_bins = 10;
     TH1D* h_y_EM     = new TH1D("y_EM",     "electron method;y", n_y_bins, 0.0, 1.0);
     TH1D* h_y_DA     = new TH1D("y_DA",     "DA method;y",       n_y_bins, 0.0, 1.0);
-    TH1D* h_y_ESigma = new TH1D("y_ESigma", "ESigma method;y",   n_y_bins, 0.0, 1.0);
+    TH1D* h_y_Sigma  = new TH1D("y_Sigma",  "Sigma method;y",    n_y_bins, 0.0, 1.0);
     TH1D* h_y_truth  = new TH1D("y_truth",  "truth;y",           n_y_bins, 0.0, 1.0);
 
     // Relative resolution histograms
     TH1D* h_RelRes_x_EM     = new TH1D("x_RelRes_EM",     "electron method;#frac{x(Reco)-x(MC)}{x(MC)}", 101, -0.15, 0.15);
     TH1D* h_RelRes_x_DA     = new TH1D("x_RelRes_DA",     "DA method;#frac{x(Reco)-x(MC)}{x(MC)}",       101, -0.15, 0.15);
-    TH1D* h_RelRes_x_ESigma = new TH1D("x_RelRes_ESigma", "ESigma method;#frac{x(Reco)-x(MC)}{x(MC)}",   101, -0.15, 0.15);
+    TH1D* h_RelRes_x_Sigma = new TH1D("x_RelRes_Sigma", "Sigma method;#frac{x(Reco)-x(MC)}{x(MC)}",   101, -0.15, 0.15);
 
     TH1D* h_RelRes_y_EM     = new TH1D("y_RelRes_EM",     "electron method;#frac{y(Reco)-y(MC)}{y(MC)}", 101, -0.15, 0.15);
     TH1D* h_RelRes_y_DA     = new TH1D("y_RelRes_DA",     "DA method;#frac{y(Reco)-y(MC)}{y(MC)}",       101, -0.15, 0.15);
-    TH1D* h_RelRes_y_ESigma = new TH1D("y_RelRes_ESigma", "ESigma method;#frac{y(Reco)-y(MC)}{y(MC)}",   101, -0.15, 0.15);
+    TH1D* h_RelRes_y_Sigma = new TH1D("y_RelRes_Sigma", "Sigma method;#frac{y(Reco)-y(MC)}{y(MC)}",   101, -0.15, 0.15);
 
     // 2D binned relres vs truth
     int n_binned = 51;
@@ -225,31 +226,43 @@ int main(int argc, char** argv) {
         x_bins.size()-1, x_bins.data(), n_binned, -0.15, 0.15);
     TH2D* h_RelRes_x_binned_DA     = new TH2D("x_RelRes_binned_DA",     "x: truth vs rel. res (DA);x_{truth};#frac{x(Reco)-x(MC)}{x(MC)}",       
         x_bins.size()-1, x_bins.data(), n_binned, -0.15, 0.15);
-    TH2D* h_RelRes_x_binned_ESigma = new TH2D("x_RelRes_binned_ESigma", "x: truth vs rel. res (ESigma);x_{truth};#frac{x(Reco)-x(MC)}{x(MC)}",   
+    TH2D* h_RelRes_x_binned_Sigma = new TH2D("x_RelRes_binned_Sigma", "x: truth vs rel. res (Sigma);x_{truth};#frac{x(Reco)-x(MC)}{x(MC)}",   
         x_bins.size()-1, x_bins.data(), n_binned, -0.15, 0.15);
 
     TH2D* h_RelRes_y_binned_EM     = new TH2D("y_RelRes_binned_EM",     "y: truth vs rel. res (EM);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",       n_y_bins, 0.0, 1.0, n_binned, -0.15, 0.15);
     TH2D* h_RelRes_y_binned_DA     = new TH2D("y_RelRes_binned_DA",     "y: truth vs rel. res (DA);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",       n_y_bins, 0.0, 1.0, n_binned, -0.15, 0.15);
-    TH2D* h_RelRes_y_binned_ESigma = new TH2D("y_RelRes_binned_ESigma", "y: truth vs rel. res (ESigma);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",   n_y_bins, 0.0, 1.0, n_binned, -0.15, 0.15);
+    TH2D* h_RelRes_y_binned_Sigma = new TH2D("y_RelRes_binned_Sigma", "y: truth vs rel. res (Sigma);y_{truth};#frac{y(Reco)-y(MC)}{y(MC)}",   n_y_bins, 0.0, 1.0, n_binned, -0.15, 0.15);
 
     // Correlation plots (truth vs reco)
     TH2D* h_Corr_x_EM     = new TH2D("x_Corr_EM",     "x correlation (EM);x_{truth};x_{EM}",           x_bins.size()-1, x_bins.data(), x_bins.size()-1, x_bins.data());
     TH2D* h_Corr_x_DA     = new TH2D("x_Corr_DA",     "x correlation (DA);x_{truth};x_{DA}",           x_bins.size()-1, x_bins.data(), x_bins.size()-1, x_bins.data());
-    TH2D* h_Corr_x_ESigma = new TH2D("x_Corr_ESigma", "x correlation (ESigma);x_{truth};x_{ESigma}",   x_bins.size()-1, x_bins.data(), x_bins.size()-1, x_bins.data());
+    TH2D* h_Corr_x_Sigma = new TH2D("x_Corr_Sigma", "x correlation (Sigma);x_{truth};x_{Sigma}",   x_bins.size()-1, x_bins.data(), x_bins.size()-1, x_bins.data());
 
     TH2D* h_Corr_y_EM     = new TH2D("y_Corr_EM",     "y correlation (EM);y_{truth};y_{EM}",           n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
     TH2D* h_Corr_y_DA     = new TH2D("y_Corr_DA",     "y correlation (DA);y_{truth};y_{DA}",           n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
-    TH2D* h_Corr_y_ESigma = new TH2D("y_Corr_ESigma", "y correlation (ESigma);y_{truth};y_{ESigma}",   n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
-    
+    TH2D* h_Corr_y_Sigma = new TH2D("y_Corr_Sigma", "y correlation (Sigma);y_{truth};y_{Sigma}",   n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
+
+    // TProfile2D for Q2 resolution - BINNED in (x_Bj, y) but DISPLAYED in (x_Bj, Q2)
+    // Since Q2 = s*x*y, binning in (x,y) creates a parallelogram in (x,Q2) space
+    TProfile2D* h_Q2_RelRes_vs_xy_EM = new TProfile2D("Q2_RelRes_vs_xy_EM",
+        "Q^{2} Rel. Res. binned in (x_{Bj}, y) (EM);x_{Bj};y",
+        x_bins.size()-1, x_bins.data(), n_y_bins, 0.0, 1.0, "s");
+    TProfile2D* h_Q2_RelRes_vs_xy_DA = new TProfile2D("Q2_RelRes_vs_xy_DA",
+        "Q^{2} Rel. Res. binned in (x_{Bj}, y) (DA);x_{Bj};y",
+        x_bins.size()-1, x_bins.data(), n_y_bins, 0.0, 1.0, "s");
+    TProfile2D* h_Q2_RelRes_vs_xy_Sigma = new TProfile2D("Q2_RelRes_vs_xy_Sigma",
+        "Q^{2} Rel. Res. binned in (x_{Bj}, y) (Sigma);x_{Bj};y",
+        x_bins.size()-1, x_bins.data(), n_y_bins, 0.0, 1.0, "s");
+
     TH1D* h_RelRes_Q2_EM = new TH1D("Q2_RelRes_EM","electron method;#frac{Q^{2}(Reco)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
     TH1D* h_RelRes_Q2_DA = new TH1D("Q2_RelRes_DA","DA method;#frac{Q^{2}(DA)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
-    TH1D* h_RelRes_Q2_ESigma = new TH1D("Q2_RelRes_ESigma","ESigma method;#frac{Q^{2}(ESigma)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
+    TH1D* h_RelRes_Q2_Sigma = new TH1D("Q2_RelRes_Sigma","Sigma method;#frac{Q^{2}(Sigma)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
     
     TH2D* h_RelRes_Q2_binned_EM = new TH2D("Q2_RelRes_binned_EM",";Q^{2} [GeV^{2}];#frac{Q^{2}(EM)-Q^{2}(MC)}{Q^{2}(MC)}",
         n_bins, bin_edges_Q2.data(), n_binned,-0.15,0.15);
     TH2D* h_RelRes_Q2_binned_DA = new TH2D("Q2_RelRes_binned_DA",";Q^{2} [GeV^{2}];#frac{Q^{2}(DA)-Q^{2}(MC)}{Q^{2}(MC)}",
         n_bins, bin_edges_Q2.data(), n_binned,-0.15,0.15);
-    TH2D* h_RelRes_Q2_binned_ESigma = new TH2D("Q2_RelRes_binned_ESigma",";Q^{2} [GeV^{2}];#frac{Q^{2}(ESigma)-Q^{2}(MC)}{Q^{2}(MC)}",
+    TH2D* h_RelRes_Q2_binned_Sigma = new TH2D("Q2_RelRes_binned_Sigma",";Q^{2} [GeV^{2}];#frac{Q^{2}(Sigma)-Q^{2}(MC)}{Q^{2}(MC)}",
         n_bins, bin_edges_Q2.data(), n_binned,-0.15,0.15);
 
     
@@ -259,14 +272,14 @@ int main(int argc, char** argv) {
     TH2D* h_Corr_Q2_DA = new TH2D("Corr_Q2_DA", ";Q^{2}_{MC};Q^{2}_{DA}",
                                     n_bins, bin_edges_Q2.data(),
                                     n_bins, bin_edges_Q2.data());
-    TH2D* h_Corr_Q2_ESigma = new TH2D("Corr_Q2_ESigma", ";Q^{2}_{MC};Q^{2}_{ESigma}",
+    TH2D* h_Corr_Q2_Sigma = new TH2D("Corr_Q2_Sigma", ";Q^{2}_{MC};Q^{2}_{Sigma}",
                                     n_bins, bin_edges_Q2.data(),
                                     n_bins, bin_edges_Q2.data());
 
     TH1D* h_Q2_truth    = new TH1D("h_Q2_truth","Q^2;# of events",n_bins, bin_edges_Q2.data());
     TH1D* h_Q2_EM       = new TH1D("h_Q2_EM",";Q^{2}",n_bins, bin_edges_Q2.data());
     TH1D* h_Q2_DA       = new TH1D("h_Q2_DA",";Q^{2}",n_bins, bin_edges_Q2.data());
-    TH1D* h_Q2_ESigma   = new TH1D("h_Q2_ESigma",";Q^{2}",n_bins, bin_edges_Q2.data());
+    TH1D* h_Q2_Sigma   = new TH1D("h_Q2_Sigma",";Q^{2}",n_bins, bin_edges_Q2.data());
 
     // E-pz histograms for MATCHED particles
     TH1D* h_EPz_truth = new TH1D("h_EPz_truth", "MC Truth Sum(E-p_{z}) - Matched Particles Only;#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
@@ -300,8 +313,29 @@ int main(int argc, char** argv) {
     TH1D* h_t_RP_histo = new TH1D("t_RP_histo", "RP Reco Mandelstam t;|t| [GeV^{2}];Counts",
                                    t_bins.size()-1, t_bins.data());
 
+    // Differential cross section d(sigma)/dt histograms
+    TH1D* h_dsigma_dt_MC = new TH1D("dsigma_dt_MC", "Truth d#sigma/dt;|t| [GeV^{2}];d#sigma/dt [nb/GeV^{2}]",
+                                     t_bins.size()-1, t_bins.data());
+    TH1D* h_dsigma_dt_B0 = new TH1D("dsigma_dt_B0", "B0 Reco d#sigma/dt;|t| [GeV^{2}];d#sigma/dt [nb/GeV^{2}]",
+                                     t_bins.size()-1, t_bins.data());
+    TH1D* h_dsigma_dt_RP = new TH1D("dsigma_dt_RP", "RP Reco d#sigma/dt;|t| [GeV^{2}];d#sigma/dt [nb/GeV^{2}]",
+                                     t_bins.size()-1, t_bins.data());
+
     // Angular histograms
     TH1D* h_theta_MC = new TH1D("theta_MC", "MC Proton Scattering Angle;#theta [mrad];Counts", 100, 0.0, 25.0);
+
+    // Create logarithmic binning for theta_all_TS (0.01 to 10000 mrad)
+    // const int n_theta_bins = 100;
+    // double theta_bins[n_theta_bins + 1];
+    // double theta_min = 0.01;
+    // double theta_max = 10000.0;
+    // double log_theta_min = TMath::Log10(theta_min);
+    // double log_theta_max = TMath::Log10(theta_max);
+    // for(int i = 0; i <= n_theta_bins; i++){
+    //     theta_bins[i] = TMath::Power(10, log_theta_min + i * (log_theta_max - log_theta_min) / n_theta_bins);
+    // }
+    TH1D* h_theta_all_TS = new TH1D("theta_all_TS", "All Truth-Seeded Proton Angles;#theta [mrad];Counts", 100, 0.0, 25.0);
+
     TH1D* h_theta_B0 = new TH1D("theta_B0", "B0 Proton Scattering Angle;#theta [mrad];Counts", 100, 0.0, 25.0);
     TH1D* h_theta_RP = new TH1D("theta_RP", "RP Proton Scattering Angle;#theta [mrad];Counts", 100, 0.0, 25.0);
     
@@ -367,6 +401,27 @@ int main(int argc, char** argv) {
     TH2D* h_xpom_corr_RP = new TH2D("xpom_corr_RP", "RP x_pom Correlation (from x_L);Truth x_{pom};Reco x_{pom}",
                                      n_xpom_bins, xpom_bins, n_xpom_bins, xpom_bins);
 
+    // Beta histograms (beta = x_Bj / x_pom, using x_pom from definition)
+    TH1D* h_beta_MC = new TH1D("beta_MC", "Truth #beta (from x_{pom} def);#beta;Counts", 10, 0.0, 1.0);
+    TH1D* h_beta_B0 = new TH1D("beta_B0", "B0 Reco #beta (from x_{pom} def);#beta;Counts", 10, 0.0, 1.0);
+    TH1D* h_beta_RP = new TH1D("beta_RP", "RP Reco #beta (from x_{pom} def);#beta;Counts", 10, 0.0, 1.0);
+
+    // Beta resolution histograms
+    TH1D* h_beta_res_B0 = new TH1D("beta_res_B0",
+                                    "B0 #beta Resolution;(#beta_{reco}-#beta_{truth})/#beta_{truth};Counts",
+                                    100, -1.0, 1.0);
+    TH1D* h_beta_res_RP = new TH1D("beta_res_RP",
+                                    "RP #beta Resolution;(#beta_{reco}-#beta_{truth})/#beta_{truth};Counts",
+                                    100, -1.0, 1.0);
+
+    // Beta 2D correlation histograms
+    TH2D* h_beta_corr_B0 = new TH2D("beta_corr_B0",
+                                     "B0 #beta Correlation;Truth #beta;Reco #beta",
+                                     10, 0.0, 1.0, 10, 0.0, 1.0);
+    TH2D* h_beta_corr_RP = new TH2D("beta_corr_RP",
+                                     "RP #beta Correlation;Truth #beta;Reco #beta",
+                                     10, 0.0, 1.0, 10, 0.0, 1.0);
+
     //---------------------------------------------------------
     // DECLARE TTREEREADER AND BRANCHES TO USE
     //---------------------------------------------------------
@@ -397,29 +452,29 @@ int main(int argc, char** argv) {
     TTreeReaderArray<int>   rp_pdg_array          = {tree_reader, "ForwardRomanPotRecParticles.PDG"};
 
     // Set up SetBranchAddress for Q2, x, y, W from InclusiveKinematics
-    Float_t electron_Q2_EM, electron_Q2_DA, electron_Q2_ESigma, electron_Q2_truth;
-    Float_t electron_x_EM, electron_x_DA, electron_x_ESigma, electron_x_truth;
-    Float_t electron_y_EM, electron_y_DA, electron_y_ESigma, electron_y_truth;
-    Float_t electron_W_EM, electron_W_DA, electron_W_ESigma, electron_W_truth;
+    Float_t electron_Q2_EM, electron_Q2_DA, electron_Q2_Sigma, electron_Q2_truth;
+    Float_t electron_x_EM, electron_x_DA, electron_x_Sigma, electron_x_truth;
+    Float_t electron_y_EM, electron_y_DA, electron_y_Sigma, electron_y_truth;
+    Float_t electron_W_EM, electron_W_DA, electron_W_Sigma, electron_W_truth;
 
     events->SetBranchAddress("InclusiveKinematicsElectron.Q2", &electron_Q2_EM);
     events->SetBranchAddress("InclusiveKinematicsDA.Q2"      , &electron_Q2_DA);
-    events->SetBranchAddress("InclusiveKinematicsESigma.Q2"  , &electron_Q2_ESigma);
+    events->SetBranchAddress("InclusiveKinematicsSigma.Q2"  , &electron_Q2_Sigma);
     events->SetBranchAddress("InclusiveKinematicsTruth.Q2"   , &electron_Q2_truth);
 
     events->SetBranchAddress("InclusiveKinematicsElectron.x", &electron_x_EM);
     events->SetBranchAddress("InclusiveKinematicsDA.x"      , &electron_x_DA);
-    events->SetBranchAddress("InclusiveKinematicsESigma.x"  , &electron_x_ESigma);
+    events->SetBranchAddress("InclusiveKinematicsSigma.x"  , &electron_x_Sigma);
     events->SetBranchAddress("InclusiveKinematicsTruth.x"   , &electron_x_truth);
 
     events->SetBranchAddress("InclusiveKinematicsElectron.y", &electron_y_EM);
     events->SetBranchAddress("InclusiveKinematicsDA.y"      , &electron_y_DA);
-    events->SetBranchAddress("InclusiveKinematicsESigma.y"  , &electron_y_ESigma);
+    events->SetBranchAddress("InclusiveKinematicsSigma.y"  , &electron_y_Sigma);
     events->SetBranchAddress("InclusiveKinematicsTruth.y"   , &electron_y_truth);
 
     events->SetBranchAddress("InclusiveKinematicsElectron.W", &electron_W_EM);
     events->SetBranchAddress("InclusiveKinematicsDA.W"      , &electron_W_DA);
-    events->SetBranchAddress("InclusiveKinematicsESigma.W"  , &electron_W_ESigma);
+    events->SetBranchAddress("InclusiveKinematicsSigma.W"  , &electron_W_Sigma);
     events->SetBranchAddress("InclusiveKinematicsTruth.W"   , &electron_W_truth);
 
     //---------------------------------------------------------
@@ -481,54 +536,54 @@ int main(int argc, char** argv) {
         // Fill Q2/x/y histograms
         h_x_EM->Fill(electron_x_EM);
         h_x_DA->Fill(electron_x_DA);
-        h_x_ESigma->Fill(electron_x_ESigma);
+        h_x_Sigma->Fill(electron_x_Sigma);
         h_x_truth->Fill(electron_x_truth);
 
         h_y_EM->Fill(electron_y_EM);
         h_y_DA->Fill(electron_y_DA);
-        h_y_ESigma->Fill(electron_y_ESigma);
+        h_y_Sigma->Fill(electron_y_Sigma);
         h_y_truth->Fill(electron_y_truth);
 
         // Relative resolutions vs truth (guard against zero)
         if (electron_x_truth != 0.0f) {
             h_RelRes_x_EM->Fill(    (electron_x_EM     - electron_x_truth)    / electron_x_truth);
             h_RelRes_x_DA->Fill(    (electron_x_DA     - electron_x_truth)    / electron_x_truth);
-            h_RelRes_x_ESigma->Fill((electron_x_ESigma - electron_x_truth)    / electron_x_truth);
+            h_RelRes_x_Sigma->Fill((electron_x_Sigma - electron_x_truth)    / electron_x_truth);
             h_RelRes_x_binned_EM->Fill(    electron_x_truth, (electron_x_EM     - electron_x_truth)/electron_x_truth);
             h_RelRes_x_binned_DA->Fill(    electron_x_truth, (electron_x_DA     - electron_x_truth)/electron_x_truth);
-            h_RelRes_x_binned_ESigma->Fill(electron_x_truth, (electron_x_ESigma - electron_x_truth)/electron_x_truth);
+            h_RelRes_x_binned_Sigma->Fill(electron_x_truth, (electron_x_Sigma - electron_x_truth)/electron_x_truth);
         }
         if (electron_y_truth != 0.0f) {
             h_RelRes_y_EM->Fill(    (electron_y_EM     - electron_y_truth)    / electron_y_truth);
             h_RelRes_y_DA->Fill(    (electron_y_DA     - electron_y_truth)    / electron_y_truth);
-            h_RelRes_y_ESigma->Fill((electron_y_ESigma - electron_y_truth)    / electron_y_truth);
+            h_RelRes_y_Sigma->Fill((electron_y_Sigma - electron_y_truth)    / electron_y_truth);
             h_RelRes_y_binned_EM->Fill(    electron_y_truth, (electron_y_EM     - electron_y_truth)/electron_y_truth);
             h_RelRes_y_binned_DA->Fill(    electron_y_truth, (electron_y_DA     - electron_y_truth)/electron_y_truth);
-            h_RelRes_y_binned_ESigma->Fill(electron_y_truth, (electron_y_ESigma - electron_y_truth)/electron_y_truth);
+            h_RelRes_y_binned_Sigma->Fill(electron_y_truth, (electron_y_Sigma - electron_y_truth)/electron_y_truth);
         }
 
         // Correlations
         h_Corr_x_EM->Fill(electron_x_truth, electron_x_EM);
         h_Corr_x_DA->Fill(electron_x_truth, electron_x_DA);
-        h_Corr_x_ESigma->Fill(electron_x_truth, electron_x_ESigma);
+        h_Corr_x_Sigma->Fill(electron_x_truth, electron_x_Sigma);
 
         h_Corr_y_EM->Fill(electron_y_truth, electron_y_EM);
         h_Corr_y_DA->Fill(electron_y_truth, electron_y_DA);
-        h_Corr_y_ESigma->Fill(electron_y_truth, electron_y_ESigma);
+        h_Corr_y_Sigma->Fill(electron_y_truth, electron_y_Sigma);
 
         h_Q2_EM->Fill(electron_Q2_EM);
         h_Q2_DA->Fill(electron_Q2_DA);
-        h_Q2_ESigma->Fill(electron_Q2_ESigma);
+        h_Q2_Sigma->Fill(electron_Q2_Sigma);
 
         // Also fill the output tree for x and y
         out_x_truth  = electron_x_truth;
         out_x_EM     = electron_x_EM;
         out_x_DA     = electron_x_DA;
-        out_x_ESigma = electron_x_ESigma;
+        out_x_Sigma = electron_x_Sigma;
         out_y_truth  = electron_y_truth;
         out_y_EM     = electron_y_EM;
         out_y_DA     = electron_y_DA;
-        out_y_ESigma = electron_y_ESigma;
+        out_y_Sigma = electron_y_Sigma;
         tree->Fill();
         
         // Fill histograms for truth
@@ -536,15 +591,25 @@ int main(int argc, char** argv) {
 
         h_RelRes_Q2_EM->Fill((electron_Q2_EM - electron_Q2_truth)/electron_Q2_truth);
         h_RelRes_Q2_DA->Fill((electron_Q2_DA - electron_Q2_truth)/electron_Q2_truth);
-        h_RelRes_Q2_ESigma->Fill((electron_Q2_ESigma - electron_Q2_truth)/electron_Q2_truth);
+        h_RelRes_Q2_Sigma->Fill((electron_Q2_Sigma - electron_Q2_truth)/electron_Q2_truth);
         h_RelRes_Q2_binned_EM->Fill(electron_Q2_truth, (electron_Q2_EM - electron_Q2_truth)/electron_Q2_truth);
         h_RelRes_Q2_binned_DA->Fill(electron_Q2_truth, (electron_Q2_DA - electron_Q2_truth)/electron_Q2_truth);
-        h_RelRes_Q2_binned_ESigma->Fill(electron_Q2_truth, (electron_Q2_ESigma - electron_Q2_truth)/electron_Q2_truth);
+        h_RelRes_Q2_binned_Sigma->Fill(electron_Q2_truth, (electron_Q2_Sigma - electron_Q2_truth)/electron_Q2_truth);
+
+        // Fill Q2 resolution profile histograms - binned in (x_Bj, y)
+        if(electron_Q2_truth > 0.0f && electron_x_truth > 0.0f && electron_y_truth > 0.0f) {
+            h_Q2_RelRes_vs_xy_EM->Fill(electron_x_truth, electron_y_truth,
+                                       (electron_Q2_EM - electron_Q2_truth)/electron_Q2_truth);
+            h_Q2_RelRes_vs_xy_DA->Fill(electron_x_truth, electron_y_truth,
+                                       (electron_Q2_DA - electron_Q2_truth)/electron_Q2_truth);
+            h_Q2_RelRes_vs_xy_Sigma->Fill(electron_x_truth, electron_y_truth,
+                                           (electron_Q2_Sigma - electron_Q2_truth)/electron_Q2_truth);
+        }
 
         // Fill correlation histograms
         h_Corr_Q2_EM->Fill(electron_Q2_truth, electron_Q2_EM);
         h_Corr_Q2_DA->Fill(electron_Q2_truth, electron_Q2_DA);
-        h_Corr_Q2_ESigma->Fill(electron_Q2_truth, electron_Q2_ESigma);
+        h_Corr_Q2_Sigma->Fill(electron_Q2_truth, electron_Q2_Sigma);
 
         // Calculate and fill E-pz histograms using MATCHED particles only
         double sumEPz_truth_matched, sumEPz_reco_matched;
@@ -677,12 +742,21 @@ int main(int argc, char** argv) {
                 truth_protons.push_back(p);
                 h_theta_MC->Fill(p.Theta() * 1000.0);
                 h_t_MC->Fill(t_val);
+                h_dsigma_dt_MC->Fill(t_val);
                 h_xL_MC->Fill(xL_pz);
                 h_xpom_MC->Fill(xpom_from_xL);
                 
                 if(xpom_from_def > 0 && xpom_from_def < 1.0) {
                     h_xpom_def_MC->Fill(xpom_from_def);
                     h_xpom_comp_MC->Fill(xpom_from_xL, xpom_from_def);
+
+                    // Calculate beta = x_Bj / x_pom (using x_pom from definition)
+                    if(electron_x_truth > 0) {
+                        double beta_truth = electron_x_truth / xpom_from_def;
+                        if(beta_truth > 0 && beta_truth <= 1.0) {
+                            h_beta_MC->Fill(beta_truth);
+                        }
+                    }
                 }
             }
         }
@@ -690,15 +764,22 @@ int main(int argc, char** argv) {
         // Process B0 protons (truth-seeded)
         for(unsigned int j = 0; j < tsassoc_rec_id.GetSize(); j++){
             auto mc_idx = tsassoc_sim_id[j];
+            // std::cout << "TS assoc sim ID: " << mc_idx << std::endl;
             
             if(mc_idx >= (unsigned)mc_pdg_array.GetSize() || mc_genStatus_array[mc_idx] != 1 || mc_pdg_array[mc_idx] != 2212)
                 continue;
-                
+            
+            // std::cout << "Processing B0 proton with MC index: " << mc_idx << std::endl;
             P3MVector p_reco(tsre_px_array[j], tsre_py_array[j], tsre_pz_array[j], mc_mass_array[mc_idx]);
             undoAfterburn(p_reco);
-            
+
+            // Fill histogram for ALL truth-seeded protons (before acceptance cut)
+            h_theta_all_TS->Fill(p_reco.Theta() * 1000.0);
+
             // B0 angular acceptance
+            // std::cout << "B0 proton Theta: " << p_reco.Theta() << std::endl;
             if(p_reco.Theta() <= 0.0055 || p_reco.Theta() >= 0.02) continue;
+            // std::cout << "B0 proton accepted with Theta: " << p_reco.Theta() << std::endl;
             
             h_theta_B0->Fill(p_reco.Theta() * 1000.0);
             
@@ -725,17 +806,18 @@ int main(int argc, char** argv) {
             double xpom_reco_from_def = -999.0;
             double denominator_reco = W2_EM + electron_Q2_EM - m_p_sq;
             if(denominator_reco > 0) {
-                xpom_reco_from_def = (MX2_reco + electron_Q2_EM - t_reco_abs) / denominator_reco;
+                xpom_reco_from_def = (MX2_reco + electron_Q2_EM + t_reco_abs) / denominator_reco;
             }
             
             double xpom_truth_from_def = -999.0;
             double denominator_truth = W2_truth + electron_Q2_truth - m_p_sq;
             if(denominator_truth > 0) {
-                xpom_truth_from_def = (MX2_truth + electron_Q2_truth - t_truth_abs) / denominator_truth;
+                xpom_truth_from_def = (MX2_truth + electron_Q2_truth + t_truth_abs) / denominator_truth;
             }
 
             // Fill histograms
             h_t_B0->Fill(t_reco_abs);
+            h_dsigma_dt_B0->Fill(t_reco_abs);
             h_t_corr_B0->Fill(t_truth_abs, t_reco_abs);
             if(t_truth_abs > 1e-6) {
                 h_t_res_B0->Fill((t_reco_abs - t_truth_abs) / t_truth_abs);
@@ -757,6 +839,23 @@ int main(int argc, char** argv) {
             if(xpom_reco_from_def > 0 && xpom_reco_from_def < 1.0) {
                 h_xpom_def_B0->Fill(xpom_reco_from_def);
                 h_xpom_comp_B0->Fill(xpom_reco_from_xL, xpom_reco_from_def);
+
+                // Calculate beta = x_Bj / x_pom (using x_pom from definition) for B0
+                if(electron_x_EM > 0) {
+                    double beta_reco = electron_x_EM / xpom_reco_from_def;
+                    if(beta_reco > 0 && beta_reco <= 1.0) {
+                        h_beta_B0->Fill(beta_reco);
+
+                        // Calculate truth beta if xpom_truth_from_def is valid
+                        if(xpom_truth_from_def > 0 && xpom_truth_from_def < 1.0 && electron_x_truth > 0) {
+                            double beta_truth = electron_x_truth / xpom_truth_from_def;
+                            if(beta_truth > 0 && beta_truth <= 1.0) {
+                                h_beta_corr_B0->Fill(beta_truth, beta_reco);
+                                h_beta_res_B0->Fill((beta_reco - beta_truth) / beta_truth);
+                            }
+                        }
+                    }
+                }
             }
         }
         
@@ -811,6 +910,7 @@ int main(int argc, char** argv) {
 
                 // Fill histograms
                 h_t_RP_histo->Fill(t_reco_abs);
+                h_dsigma_dt_RP->Fill(t_reco_abs);
                 h_t_corr_RP->Fill(t_truth_abs, t_reco_abs);
                 if(t_truth_abs > 1e-6) {
                     h_t_res_RP->Fill((t_reco_abs - t_truth_abs) / t_truth_abs);
@@ -832,11 +932,79 @@ int main(int argc, char** argv) {
                 if(xpom_reco_from_def > 0 && xpom_reco_from_def < 1.0) {
                     h_xpom_def_RP->Fill(xpom_reco_from_def);
                     h_xpom_comp_RP->Fill(xpom_reco_from_xL, xpom_reco_from_def);
+
+                    // Calculate beta = x_Bj / x_pom (using x_pom from definition) for RP
+                    if(electron_x_EM > 0) {
+                        double beta_reco = electron_x_EM / xpom_reco_from_def;
+                        if(beta_reco > 0 && beta_reco <= 1.0) {
+                            h_beta_RP->Fill(beta_reco);
+
+                            // Calculate truth beta if xpom_truth_from_def is valid
+                            if(xpom_truth_from_def > 0 && xpom_truth_from_def < 1.0 && electron_x_truth > 0) {
+                                double beta_truth = electron_x_truth / xpom_truth_from_def;
+                                if(beta_truth > 0 && beta_truth <= 1.0) {
+                                    h_beta_corr_RP->Fill(beta_truth, beta_reco);
+                                    h_beta_res_RP->Fill((beta_reco - beta_truth) / beta_truth);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
     std::cout<<"\nDone looping over events.\n"<<std::endl;
+
+    // Calculate and scale differential cross sections d(sigma)/dt
+    // dsigma/dt = (sigma_total / N_gen) * (N_events_in_bin / delta_t)
+    const double sigma_total = 4.22; // nb for 10x100 GeV configuration
+    const double N_gen = 100000.0;   // Number of generated events
+    const double scale_factor = sigma_total / N_gen;
+
+    std::cout << "Calculating differential cross sections..." << std::endl;
+    std::cout << "Total cross section: " << sigma_total << " nb" << std::endl;
+    std::cout << "Generated events: " << N_gen << std::endl;
+
+    // Scale MC dsigma/dt histogram
+    for(int i = 1; i <= h_dsigma_dt_MC->GetNbinsX(); i++) {
+        double bin_content = h_dsigma_dt_MC->GetBinContent(i);
+        double bin_error = h_dsigma_dt_MC->GetBinError(i);
+        double bin_width = h_dsigma_dt_MC->GetBinWidth(i);
+
+        double dsigma_dt = (bin_content * scale_factor) / bin_width;
+        double dsigma_dt_error = (bin_error * scale_factor) / bin_width;
+
+        h_dsigma_dt_MC->SetBinContent(i, dsigma_dt);
+        h_dsigma_dt_MC->SetBinError(i, dsigma_dt_error);
+    }
+
+    // Scale B0 dsigma/dt histogram
+    for(int i = 1; i <= h_dsigma_dt_B0->GetNbinsX(); i++) {
+        double bin_content = h_dsigma_dt_B0->GetBinContent(i);
+        double bin_error = h_dsigma_dt_B0->GetBinError(i);
+        double bin_width = h_dsigma_dt_B0->GetBinWidth(i);
+
+        double dsigma_dt = (bin_content * scale_factor) / bin_width;
+        double dsigma_dt_error = (bin_error * scale_factor) / bin_width;
+
+        h_dsigma_dt_B0->SetBinContent(i, dsigma_dt);
+        h_dsigma_dt_B0->SetBinError(i, dsigma_dt_error);
+    }
+
+    // Scale RP dsigma/dt histogram
+    for(int i = 1; i <= h_dsigma_dt_RP->GetNbinsX(); i++) {
+        double bin_content = h_dsigma_dt_RP->GetBinContent(i);
+        double bin_error = h_dsigma_dt_RP->GetBinError(i);
+        double bin_width = h_dsigma_dt_RP->GetBinWidth(i);
+
+        double dsigma_dt = (bin_content * scale_factor) / bin_width;
+        double dsigma_dt_error = (bin_error * scale_factor) / bin_width;
+
+        h_dsigma_dt_RP->SetBinContent(i, dsigma_dt);
+        h_dsigma_dt_RP->SetBinError(i, dsigma_dt_error);
+    }
+
+    std::cout << "Differential cross sections calculated!" << std::endl;
 
     // Write all histograms and TTree to the output file
     outputFile->cd();
@@ -845,38 +1013,44 @@ int main(int argc, char** argv) {
     // Write Q2/xy histograms
     h_RelRes_Q2_EM->Write();
     h_RelRes_Q2_DA->Write();
-    h_RelRes_Q2_ESigma->Write();
+    h_RelRes_Q2_Sigma->Write();
     h_RelRes_Q2_binned_EM->Write();
     h_RelRes_Q2_binned_DA->Write();
-    h_RelRes_Q2_binned_ESigma->Write();
+    h_RelRes_Q2_binned_Sigma->Write();
     h_Corr_Q2_EM->Write();
     h_Corr_Q2_DA->Write();
-    h_Corr_Q2_ESigma->Write();
+    h_Corr_Q2_Sigma->Write();
     h_Q2_truth->Write();
     h_Q2_EM->Write();
     h_Q2_DA->Write();
-    h_Q2_ESigma->Write();
+    h_Q2_Sigma->Write();
     
-    h_x_truth->Write();  h_x_EM->Write();  h_x_DA->Write();  h_x_ESigma->Write();
-    h_y_truth->Write();  h_y_EM->Write();  h_y_DA->Write();  h_y_ESigma->Write();
+    h_x_truth->Write();  h_x_EM->Write();  h_x_DA->Write();  h_x_Sigma->Write();
+    h_y_truth->Write();  h_y_EM->Write();  h_y_DA->Write();  h_y_Sigma->Write();
     h_RelRes_x_EM->Write();
     h_RelRes_x_DA->Write();
-    h_RelRes_x_ESigma->Write();
+    h_RelRes_x_Sigma->Write();
     h_RelRes_y_EM->Write();
     h_RelRes_y_DA->Write();
-    h_RelRes_y_ESigma->Write();
+    h_RelRes_y_Sigma->Write();
     h_RelRes_x_binned_EM->Write();
     h_RelRes_x_binned_DA->Write();
-    h_RelRes_x_binned_ESigma->Write();
+    h_RelRes_x_binned_Sigma->Write();
     h_RelRes_y_binned_EM->Write();
     h_RelRes_y_binned_DA->Write();
-    h_RelRes_y_binned_ESigma->Write();
+    h_RelRes_y_binned_Sigma->Write();
     h_Corr_x_EM->Write();
     h_Corr_x_DA->Write();
-    h_Corr_x_ESigma->Write();
+    h_Corr_x_Sigma->Write();
     h_Corr_y_EM->Write();
     h_Corr_y_DA->Write();
-    h_Corr_y_ESigma->Write();
+    h_Corr_y_Sigma->Write();
+
+    // Write Q2 resolution profile histograms (binned in x_Bj, y)
+    h_Q2_RelRes_vs_xy_EM->Write();
+    h_Q2_RelRes_vs_xy_DA->Write();
+    h_Q2_RelRes_vs_xy_Sigma->Write();
+
     h_EPz_truth->Write();
     h_EPz->Write();
     h_eta_max->Write();
@@ -888,7 +1062,11 @@ int main(int argc, char** argv) {
     h_t_MC->Write();
     h_t_B0->Write();
     h_t_RP_histo->Write();
+    h_dsigma_dt_MC->Write();
+    h_dsigma_dt_B0->Write();
+    h_dsigma_dt_RP->Write();
     h_theta_MC->Write();
+    h_theta_all_TS->Write();
     h_theta_B0->Write();
     h_theta_RP->Write();
     h_xL_MC->Write();
@@ -915,6 +1093,15 @@ int main(int argc, char** argv) {
     h_xL_corr_RP->Write();
     h_xpom_corr_B0->Write();
     h_xpom_corr_RP->Write();
+
+    // Write beta histograms
+    h_beta_MC->Write();
+    h_beta_B0->Write();
+    h_beta_RP->Write();
+    h_beta_res_B0->Write();
+    h_beta_res_RP->Write();
+    h_beta_corr_B0->Write();
+    h_beta_corr_RP->Write();
 
     outputFile->Close();
     delete events;

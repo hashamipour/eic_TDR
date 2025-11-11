@@ -418,4 +418,7 @@ CMakeFiles/ddis_plot_combined.dir/analysis/DDIS_Plot_Combined.cpp.o: \
   /opt/local/include/root/TInetAddress.h \
   /opt/local/include/root/TTimer.h \
   /opt/local/include/root/TSysEvtHandler.h \
-  /opt/local/include/root/TTime.h /opt/local/include/root/TError.h
+  /opt/local/include/root/TTime.h /opt/local/include/root/TError.h \
+  /opt/local/include/root/TMarker.h /opt/local/include/root/TLatex.h \
+  /opt/local/include/root/TText.h /opt/local/include/root/TProfile2D.h \
+  /opt/local/include/root/TProfile.h /opt/local/include/root/TMath.h

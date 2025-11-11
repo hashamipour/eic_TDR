@@ -22,6 +22,8 @@ class PlotOptions {
         // Now they are optional pairs
         std::optional<std::pair<double, double>> m_legendLB;
         std::optional<std::pair<double, double>> m_legendRT;
+        std::optional<std::pair<double, double>> m_rangeX;
+        std::optional<std::pair<double, double>> m_rangeY;
     public:
         virtual ~PlotOptions();
         virtual void Plot(TFile* inputFile) = 0;
@@ -29,6 +31,12 @@ class PlotOptions {
             m_legendLB = {xlb, ylb};
             m_legendRT = {xrt, yrt};
             // Logger::debug("Legend position set to: (" + std::to_string(xlb) + ", " + std::to_string(ylb) + ") - (" + std::to_string(xrt) + ", " + std::to_string(yrt) + ")");
+        }
+        void SetRangeX(double xmin, double xmax) {
+            m_rangeX = {xmin, xmax};
+        }
+        void SetRangeY(double ymin, double ymax) {
+            m_rangeY = {ymin, ymax};
         }
 };
 

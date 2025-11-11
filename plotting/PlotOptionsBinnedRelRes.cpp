@@ -311,8 +311,11 @@ void PlotOptionsBinnedRelRes::Plot(TFile* inputFile) {
     g_RMS->SetMarkerColor(kBlack);
     g_RMS->SetLineColor(kBlack);
     g_RMS->SetLineWidth(2);
-    if (m_xAxisRange.first != -999. && m_xAxisRange.second != -999.) {
-        g_RMS->GetXaxis()->SetLimits(m_xAxisRange.first, m_xAxisRange.second);
+
+    // Use base class range if set, otherwise fall back to constructor parameter
+    auto xRange = m_rangeX ? *m_rangeX : m_xAxisRange;
+    if (xRange.first != -999. && xRange.second != -999.) {
+        g_RMS->GetXaxis()->SetLimits(xRange.first, xRange.second);
     }
     g_RMS->Draw("AP");
 
