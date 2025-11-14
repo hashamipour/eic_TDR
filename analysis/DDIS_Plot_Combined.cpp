@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
     plot_ptr = new PlotOptions1D(
         {"h_EPz_truth", "h_EPz"},
         {"MC Truth"   , "Reconstruction"},
-        {"hist"       , "pe"},
+        {"hist"       , "E1"},  // MC as histogram, reco as points with error bars
         "Hadronic Final State E-p_{z}",
         "#Sigma(E-p_{z}) [GeV]",
         "Counts",
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
     plot_ptr = new PlotOptions1D(
         {"h_EPz_truth", "h_EPz"},
         {"MC Truth"   , "Reconstruction"},
-        {"hist"       , "pe"},
+        {"hist"       , "E1"},  // MC as histogram, reco as points with error bars
         "Hadronic Final State E-p_{z}",
         "#Sigma(E-p_{z}) [GeV]",
         "Counts",
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     plot_ptr = new PlotOptions1D(
         {"h_eta_max_truth", "h_eta_max"},
         {"MC Truth", "Reconstruction"},
-        {"hist", "pe"},
+        {"hist", "E1"},  // MC as histogram, reco as points with error bars
         "Maximum Pseudorapidity per Event",
         "#eta_{max}",
         "Counts",
@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
     plot_ptr = new PlotOptions1D(
         {"h_eta_max_truth", "h_eta_max"},
         {"MC Truth", "Reconstruction"},
-        {"hist", "pe"},
+        {"hist", "E1"},  // MC as histogram, reco as points with error bars
         "Maximum Pseudorapidity per Event",
         "#eta_{max}",
         "Counts",
@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
     plot_ptr = new PlotOptions1D(
         {"h_MX2_truth", "h_MX2"},
         {"MC Truth", "Reconstruction"},
-        {"hist", "pe"},
+        {"hist", "E1"},  // MC as histogram, reco as points with error bars
         "Hadronic Invariant Mass Squared",
         "M_{X}^{2} [GeV^{2}]",
         "Counts",
@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
     plot_ptr = new PlotOptions1D(
         {"h_MX2_truth", "h_MX2"},
         {"MC Truth", "Reconstruction"},
-        {"hist", "pe"},
+        {"hist", "E1"},  // MC as histogram, reco as points with error bars
         "Hadronic Invariant Mass Squared",
         "M_{X}^{2} [GeV^{2}]",
         "Counts",
@@ -341,9 +341,9 @@ int main(int argc, char** argv) {
 
 
         plot_ptr = new PlotOptions1D(
-        {"xpom_def_MC", "xpom_def_B0", "xpom_def_RP"},
-        {"x_{pom} MC", "x_{pom} B0 Reco", "x_{pom} RP Reco"},
-        {"hist", "hist", "hist"},
+        {"xpom_def_MC", "xpom_def_B0", "xpom_def_RP", "xpom_def_Sum"},
+        {"x_{pom} MC", "x_{pom} B0 Reco", "x_{pom} RP Reco", "B0+RP Sum"},
+        {"hist", "E1", "E1", "E1"},  // MC as histogram, reco as points with error bars
         "RP Reco x_{pom} Comparison",
         "x_{pom}",
         "Counts",
@@ -427,9 +427,9 @@ int main(int argc, char** argv) {
 
     // Beta distributions with log y-axis for better visibility
     PlotOptions1D* plot_beta_logy = new PlotOptions1D(
-        {"beta_MC", "beta_B0", "beta_RP"},
-        {"MC Truth", "B0 Reco", "RP Reco"},
-        {"hist", "hist", "hist"},
+        {"beta_MC", "beta_B0", "beta_RP", "beta_Sum"},
+        {"MC Truth", "B0 Reco", "RP Reco", "B0+RP Sum"},
+        {"hist", "E1", "E1", "E1"},  // MC as histogram, reco as points with error bars
         "#beta = x_{Bj} / x_{pom} Distributions (from x_{pom} definition)",
         "#beta",
         "Counts",
@@ -541,20 +541,25 @@ int main(int argc, char** argv) {
     std::cout << "Creating Q2 resolution visualizations with hollow circles..." << std::endl;
 
     // Function to create hollow circle plots for Q2 resolution
-    // Profile is binned in (x_Bj, y) but displayed in (x_Bj, Q2) space
-    auto createResolutionCirclePlot = [](TProfile2D* profile, const char* outputName, const char* title, double s, bool showEntries = false) {
+    // Profile is binned in (x, Q2) and displayed in (x, Q2) space
+    auto createResolutionCirclePlot = [](TProfile2D* profile, const char* outputName, const char* title, bool showEntries = false) {
         if (!profile) {
             std::cerr << "Error: Profile histogram not found!" << std::endl;
             return;
         }
 
+        // Transparency settings
+        const double marker_alpha = 0.75;          // Alpha for hollow circles (low stats)
+        const double marker_alpha_filled = 0.9;    // Alpha for filled circles (high stats)
+        const double legend_alpha = 0.9;           // Alpha for legend markers
+
         TCanvas* c = new TCanvas("c_temp", title, 1600, 1200);
         gStyle->SetOptStat(0);
 
-        // Create empty 2D histogram for axes (x_Bj on x-axis, Q2 on y-axis)
+        // Create empty 2D histogram for axes (x on x-axis, Q2 on y-axis)
         TH2D* h_axes = new TH2D("h_axes_temp", title,
                                 10, 0.0001, 1.0, 10, 1.0, 150.0);
-        h_axes->GetXaxis()->SetTitle("x_{Bj}");
+        h_axes->GetXaxis()->SetTitle("x");
         h_axes->GetYaxis()->SetTitle("Q^{2} [GeV^{2}]");
         h_axes->Draw("AXIS");
 
@@ -565,14 +570,11 @@ int main(int argc, char** argv) {
         double q2_max = 150.0;
 
         // Draw hollow circles for each bin
-        // Profile is binned in (x_Bj, y) but we display at (x_Bj, Q2 = s*x*y)
+        // Profile is binned in (x, Q2) and displayed at (x, Q2)
         for(int i = 1; i <= profile->GetNbinsX(); ++i) {
             for(int j = 1; j <= profile->GetNbinsY(); ++j) {
-                double x = profile->GetXaxis()->GetBinCenter(i);  // x_Bj
-                double y = profile->GetYaxis()->GetBinCenter(j);  // inelasticity
-
-                // Transform to Q2 space: Q2 = s * x * y
-                double q2 = s * x * y;
+                double x = profile->GetXaxis()->GetBinCenter(i);  // x
+                double q2 = profile->GetYaxis()->GetBinCenter(j);  // Q2
 
                 // Skip circles outside the plot range
                 if(x < x_min || x > x_max || q2 < q2_min || q2 > q2_max) continue;
@@ -589,11 +591,12 @@ int main(int argc, char** argv) {
                 double size = 0.1 + 15.0 * resolution_rms;
                 if(size > 4.0) size = 4.0; // Cap maximum size
 
-                // Choose marker style: filled circle for < 100 entries, hollow for >= 100
-                int marker_style = (entries < 100) ? 20 : 24;  // 20=filled, 24=hollow
+                // Choose marker style: hollow circle for < 100 entries, filled for >= 100
+                int marker_style = (entries < 100) ? 24 : 20;  // 24=hollow, 20=filled
+                double alpha = (entries < 100) ? marker_alpha : marker_alpha_filled;
 
                 TMarker* marker = new TMarker(x, q2, marker_style);
-                marker->SetMarkerColor(kGreen+2);  // Forest green for all
+                marker->SetMarkerColorAlpha(kGreen+2, alpha);
                 marker->SetMarkerSize(size);
                 marker->Draw("SAME");
 
@@ -619,15 +622,15 @@ int main(int argc, char** argv) {
         legend->SetBorderSize(0);
         legend->SetTextSize(0.03);
 
-        TMarker* m_hollow = new TMarker(0, 0, 24);
-        m_hollow->SetMarkerColor(kGreen+2);
-        m_hollow->SetMarkerSize(2.0);
-        legend->AddEntry(m_hollow, "Entries #geq 100", "p");
-
         TMarker* m_filled = new TMarker(0, 0, 20);
-        m_filled->SetMarkerColor(kGreen+2);
+        m_filled->SetMarkerColorAlpha(kGreen+2, legend_alpha);
         m_filled->SetMarkerSize(2.0);
-        legend->AddEntry(m_filled, "Entries < 100", "p");
+        legend->AddEntry(m_filled, "Entries #geq 100", "p");
+
+        TMarker* m_hollow = new TMarker(0, 0, 24);
+        m_hollow->SetMarkerColorAlpha(kGreen+2, legend_alpha);
+        m_hollow->SetMarkerSize(2.0);
+        legend->AddEntry(m_hollow, "Entries < 100", "p");
 
         // Add size scale examples
         std::vector<double> example_res = {0.02, 0.05, 0.10};
@@ -637,7 +640,7 @@ int main(int argc, char** argv) {
             if(size > 4.0) size = 4.0;
 
             TMarker* m_size = new TMarker(0, 0, 24);
-            m_size->SetMarkerColor(kGreen+2);
+            m_size->SetMarkerColorAlpha(kGreen+2, legend_alpha);
             m_size->SetMarkerSize(size);
             legend->AddEntry(m_size, Form("%.2f", res_val), "p");
         }
@@ -659,11 +662,16 @@ int main(int argc, char** argv) {
     // Function to create best method comparison plot
     // Shows the best (smallest) resolution per bin, color-coded by method
     auto createBestMethodPlot = [](TProfile2D* prof_EM, TProfile2D* prof_DA, TProfile2D* prof_Sigma,
-                                    const char* outputName, const char* title, double s, bool showEntries = false) {
+                                    const char* outputName, const char* title, bool showEntries = false) {
         if (!prof_EM || !prof_DA || !prof_Sigma) {
             std::cerr << "Error: One or more profile histograms not found!" << std::endl;
             return;
         }
+
+        // Transparency settings
+        const double marker_alpha = 1.0;          // Alpha for hollow circles (low stats)
+        const double marker_alpha_filled = 0.85;    // Alpha for filled circles (high stats)
+        const double legend_alpha = 1.0;           // Alpha for legend markers
 
         TCanvas* c = new TCanvas("c_best", title, 1600, 1200);
         gStyle->SetOptStat(0);
@@ -671,7 +679,7 @@ int main(int argc, char** argv) {
         // Create empty 2D histogram for axes
         TH2D* h_axes = new TH2D("h_axes_best", title,
                                 10, 0.0001, 1.0, 10, 1.0, 150.0);
-        h_axes->GetXaxis()->SetTitle("x_{Bj}");
+        h_axes->GetXaxis()->SetTitle("x");
         h_axes->GetYaxis()->SetTitle("Q^{2} [GeV^{2}]");
         h_axes->Draw("AXIS");
 
@@ -684,9 +692,8 @@ int main(int argc, char** argv) {
         // Draw circles for best method in each bin
         for(int i = 1; i <= prof_EM->GetNbinsX(); ++i) {
             for(int j = 1; j <= prof_EM->GetNbinsY(); ++j) {
-                double x = prof_EM->GetXaxis()->GetBinCenter(i);
-                double y = prof_EM->GetYaxis()->GetBinCenter(j);
-                double q2 = s * x * y;
+                double x = prof_EM->GetXaxis()->GetBinCenter(i);  // x
+                double q2 = prof_EM->GetYaxis()->GetBinCenter(j);  // Q2
 
                 // Skip circles outside the plot range
                 if(x < x_min || x > x_max || q2 < q2_min || q2 > q2_max) continue;
@@ -729,17 +736,18 @@ int main(int argc, char** argv) {
                 double size = 0.3 + 25.0 * best_res;
                 if(size > 4.0) size = 4.0;
 
-                // Choose marker style: filled circle for < 100 entries, hollow for >= 100
-                int marker_style = (best_entries < 100) ? 20 : 24;  // 20=filled, 24=hollow
+                // Choose marker style: hollow circle for < 100 entries, filled for >= 100
+                int marker_style = (best_entries < 100) ? 24 : 20;  // 24=hollow, 20=filled
+                double alpha = (best_entries < 100) ? marker_alpha : marker_alpha_filled;
 
                 // Create marker with color based on best method
                 TMarker* marker = new TMarker(x, q2, marker_style);
                 if(best_method == 0) {
-                    marker->SetMarkerColor(kRed);      // Electron method
+                    marker->SetMarkerColorAlpha(kRed, alpha);      // Electron method
                 } else if(best_method == 1) {
-                    marker->SetMarkerColor(kBlue);     // DA method
+                    marker->SetMarkerColorAlpha(kBlue, alpha);     // DA method
                 } else {
-                    marker->SetMarkerColor(kGreen+2);  // Sigma method
+                    marker->SetMarkerColorAlpha(kGreen+2, alpha);  // Sigma method
                 }
                 marker->SetMarkerSize(size);
                 marker->Draw("SAME");
@@ -766,18 +774,18 @@ int main(int argc, char** argv) {
         legend->SetBorderSize(0);
         legend->SetTextSize(0.03);
 
-        TMarker* m_EM = new TMarker(0, 0, 24);
-        m_EM->SetMarkerColor(kRed);
+        TMarker* m_EM = new TMarker(0, 0, 20);
+        m_EM->SetMarkerColorAlpha(kRed, legend_alpha);
         m_EM->SetMarkerSize(2.0);
         legend->AddEntry(m_EM, "Electron Method", "p");
 
-        TMarker* m_DA = new TMarker(0, 0, 24);
-        m_DA->SetMarkerColor(kBlue);
+        TMarker* m_DA = new TMarker(0, 0, 20);
+        m_DA->SetMarkerColorAlpha(kBlue, legend_alpha);
         m_DA->SetMarkerSize(2.0);
         legend->AddEntry(m_DA, "DA Method", "p");
 
-        TMarker* m_Sigma = new TMarker(0, 0, 24);
-        m_Sigma->SetMarkerColor(kGreen+2);
+        TMarker* m_Sigma = new TMarker(0, 0, 20);
+        m_Sigma->SetMarkerColorAlpha(kGreen+2, legend_alpha);
         m_Sigma->SetMarkerSize(2.0);
         legend->AddEntry(m_Sigma, "Sigma Method", "p");
 
@@ -791,15 +799,15 @@ int main(int argc, char** argv) {
         legend2->SetBorderSize(0);
         legend2->SetTextSize(0.03);
 
-        TMarker* m_hollow = new TMarker(0, 0, 24);
-        m_hollow->SetMarkerColor(kBlack);
-        m_hollow->SetMarkerSize(2.0);
-        legend2->AddEntry(m_hollow, "Entries #geq 100", "p");
-
         TMarker* m_filled = new TMarker(0, 0, 20);
-        m_filled->SetMarkerColor(kBlack);
+        m_filled->SetMarkerColorAlpha(kBlack, legend_alpha);
         m_filled->SetMarkerSize(2.0);
-        legend2->AddEntry(m_filled, "Entries < 100", "p");
+        legend2->AddEntry(m_filled, "Entries #geq 100", "p");
+
+        TMarker* m_hollow = new TMarker(0, 0, 24);
+        m_hollow->SetMarkerColorAlpha(kBlack, legend_alpha);
+        m_hollow->SetMarkerSize(2.0);
+        legend2->AddEntry(m_hollow, "Entries < 100", "p");
 
         // Add size scale examples
         std::vector<double> example_res = {0.02, 0.05, 0.10};
@@ -809,7 +817,7 @@ int main(int argc, char** argv) {
             if(size > 4.0) size = 4.0;
 
             TMarker* m_size = new TMarker(0, 0, 24);
-            m_size->SetMarkerColor(kBlack);
+            m_size->SetMarkerColorAlpha(kBlack, legend_alpha);
             m_size->SetMarkerSize(size);
             legend2->AddEntry(m_size, Form("%.2f", res_val), "p");
         }
@@ -829,28 +837,22 @@ int main(int argc, char** argv) {
     };
 
     // Create Q2 resolution circle plots
-    // Histograms are binned in (x_Bj, y) but displayed in (x_Bj, Q2) space
-    // s = 4*E_e*E_p (center-of-mass energy squared)
-    // For 18x275 GeV: s = 19800 GeV²
-    // For 10x100 GeV: s = 4000 GeV²
-    // For 5x41 GeV: s = 820 GeV²
-    double s = 4000.0; // Default
-
+    // Histograms are binned in (x, Q2) and displayed in (x, Q2) space
     TProfile2D* prof_EM = (TProfile2D*)inputFile->Get("Q2_RelRes_vs_xy_EM");
     TProfile2D* prof_DA = (TProfile2D*)inputFile->Get("Q2_RelRes_vs_xy_DA");
     TProfile2D* prof_Sigma = (TProfile2D*)inputFile->Get("Q2_RelRes_vs_xy_Sigma");
 
     if (prof_EM) {
         createResolutionCirclePlot(prof_EM, "figs/Q2_RelRes_Q2x_EM.png",
-                                  "Q^{2} Relative Resolution vs x_{Bj} and Q^{2} (Electron Method)", s);
+                                  "Q^{2} Relative Resolution vs x and Q^{2} (Electron Method)");
     }
     if (prof_DA) {
         createResolutionCirclePlot(prof_DA, "figs/Q2_RelRes_Q2x_DA.png",
-                                  "Q^{2} Relative Resolution vs x_{Bj} and Q^{2} (Double Angle Method)", s);
+                                  "Q^{2} Relative Resolution vs x and Q^{2} (Double Angle Method)");
     }
     if (prof_Sigma) {
         createResolutionCirclePlot(prof_Sigma, "figs/Q2_RelRes_Q2x_Sigma.png",
-                                  "Q^{2} Relative Resolution vs x_{Bj} and Q^{2} (Sigma Method)", s);
+                                  "Q^{2} Relative Resolution vs x and Q^{2} (Sigma Method)");
     }
 
     // Create best method comparison plot
@@ -858,7 +860,93 @@ int main(int argc, char** argv) {
         std::cout << "Creating best method comparison plot..." << std::endl;
         createBestMethodPlot(prof_EM, prof_DA, prof_Sigma,
                             "figs/Q2_RelRes_Q2x_BestMethod.png",
-                            "Q^{2} Relative Resolution - Best Method per Bin", s);
+                            "Q^{2} Relative Resolution - Best Method per Bin");
+    }
+
+    //=================================================================
+    // X RESOLUTION CIRCLE PLOTS in (x, Q2) plane
+    //=================================================================
+    std::cout << "Creating x resolution circle plots..." << std::endl;
+
+    TProfile2D* prof_x_EM = (TProfile2D*)inputFile->Get("x_RelRes_vs_xQ2_EM");
+    TProfile2D* prof_x_DA = (TProfile2D*)inputFile->Get("x_RelRes_vs_xQ2_DA");
+    TProfile2D* prof_x_Sigma = (TProfile2D*)inputFile->Get("x_RelRes_vs_xQ2_Sigma");
+
+    if (prof_x_EM) {
+        createResolutionCirclePlot(prof_x_EM, "figs/x_RelRes_xQ2_EM.png",
+                                  "x Relative Resolution vs x and Q^{2} (Electron Method)");
+    }
+    if (prof_x_DA) {
+        createResolutionCirclePlot(prof_x_DA, "figs/x_RelRes_xQ2_DA.png",
+                                  "x Relative Resolution vs x and Q^{2} (Double Angle Method)");
+    }
+    if (prof_x_Sigma) {
+        createResolutionCirclePlot(prof_x_Sigma, "figs/x_RelRes_xQ2_Sigma.png",
+                                  "x Relative Resolution vs x and Q^{2} (Sigma Method)");
+    }
+
+    // Create best method comparison plot for x resolution
+    if (prof_x_EM && prof_x_DA && prof_x_Sigma) {
+        std::cout << "Creating x resolution best method comparison plot..." << std::endl;
+        createBestMethodPlot(prof_x_EM, prof_x_DA, prof_x_Sigma,
+                            "figs/x_RelRes_xQ2_BestMethod.png",
+                            "x Relative Resolution - Best Method per Bin");
+    }
+
+    //=================================================================
+    // Y RESOLUTION CIRCLE PLOTS in (x, Q2) plane
+    //=================================================================
+    std::cout << "Creating y resolution circle plots..." << std::endl;
+
+    TProfile2D* prof_y_EM = (TProfile2D*)inputFile->Get("y_RelRes_vs_xQ2_EM");
+    TProfile2D* prof_y_DA = (TProfile2D*)inputFile->Get("y_RelRes_vs_xQ2_DA");
+    TProfile2D* prof_y_Sigma = (TProfile2D*)inputFile->Get("y_RelRes_vs_xQ2_Sigma");
+
+    if (prof_y_EM) {
+        createResolutionCirclePlot(prof_y_EM, "figs/y_RelRes_xQ2_EM.png",
+                                  "y Relative Resolution vs x and Q^{2} (Electron Method)");
+    }
+    if (prof_y_DA) {
+        createResolutionCirclePlot(prof_y_DA, "figs/y_RelRes_xQ2_DA.png",
+                                  "y Relative Resolution vs x and Q^{2} (Double Angle Method)");
+    }
+    if (prof_y_Sigma) {
+        createResolutionCirclePlot(prof_y_Sigma, "figs/y_RelRes_xQ2_Sigma.png",
+                                  "y Relative Resolution vs x and Q^{2} (Sigma Method)");
+    }
+
+    // Create best method comparison plot for y resolution
+    if (prof_y_EM && prof_y_DA && prof_y_Sigma) {
+        std::cout << "Creating y resolution best method comparison plot..." << std::endl;
+        createBestMethodPlot(prof_y_EM, prof_y_DA, prof_y_Sigma,
+                            "figs/y_RelRes_xQ2_BestMethod.png",
+                            "y Relative Resolution - Best Method per Bin");
+    }
+
+    //=================================================================
+    // E-pz 2D PLOT
+    //=================================================================
+    std::cout << "Creating E-pz 2D plot..." << std::endl;
+
+    TH2D* h_EPz_2D = (TH2D*)inputFile->Get("h_EPz_2D");
+    if (h_EPz_2D) {
+        TCanvas* c_EPz = new TCanvas("c_EPz_2D", "E-pz 2D", 1200, 1000);
+        gStyle->SetOptStat(0);
+        gStyle->SetPalette(kBird);  // Use the same color palette as response matrices
+
+        h_EPz_2D->SetTitle("E-p_{z} Reco vs Truth;#Sigma(E-p_{z})_{truth} [GeV];#Sigma(E-p_{z})_{reco} [GeV]");
+        h_EPz_2D->Draw("COLZ");
+
+        // Add ePIC simulation labels
+        TLatex latex;
+        latex.SetTextSize(0.04);
+        latex.SetNDC();
+        latex.SetTextColor(kBlack);
+        latex.DrawLatex(0.15, 0.92, "#bf{ePIC} Simulation (100k events)");
+        latex.DrawLatex(0.60, 0.92, "#bf{Diff. DIS} 10x100 GeV");
+
+        c_EPz->SaveAs("figs/EPz_2D.png");
+        delete c_EPz;
     }
 
     //=================================================================
@@ -1128,8 +1216,7 @@ int main(int argc, char** argv) {
     std::cout << "\nPlotting complete! All plots saved to figs/ directory" << std::endl;
     std::cout << "\nKey plots created:" << std::endl;
     std::cout << "  Q2/xy analysis: response matrices, E-pz, eta_max, M_X^2" << std::endl;
-    std::cout << "  Q2 resolution: hollow circle plots binned in (x_Bj, y), displayed in (x_Bj, Q2) plane" << std::endl;
-    std::cout << "                 Creates parallelogram pattern due to Q2 = s*x*y transformation" << std::endl;
+    std::cout << "  Q2 resolution: hollow circle plots binned in (x, Q2), displayed in (x, Q2) plane" << std::endl;
     std::cout << "                 Best method comparison plot: color-coded by best resolution method" << std::endl;
     std::cout << "                 (Red=Electron, Blue=DA, Green=Sigma)" << std::endl;
     std::cout << "  Mandelstam t analysis: t, x_L, x_pom response matrices" << std::endl;

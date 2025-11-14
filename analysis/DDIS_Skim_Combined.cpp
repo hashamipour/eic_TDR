@@ -243,17 +243,38 @@ int main(int argc, char** argv) {
     TH2D* h_Corr_y_DA     = new TH2D("y_Corr_DA",     "y correlation (DA);y_{truth};y_{DA}",           n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
     TH2D* h_Corr_y_Sigma = new TH2D("y_Corr_Sigma", "y correlation (Sigma);y_{truth};y_{Sigma}",   n_y_bins, 0.0, 1.0, n_y_bins, 0.0, 1.0);
 
-    // TProfile2D for Q2 resolution - BINNED in (x_Bj, y) but DISPLAYED in (x_Bj, Q2)
-    // Since Q2 = s*x*y, binning in (x,y) creates a parallelogram in (x,Q2) space
+    // TProfile2D for Q2 resolution - BINNED in (x, Q2) and DISPLAYED in (x, Q2)
     TProfile2D* h_Q2_RelRes_vs_xy_EM = new TProfile2D("Q2_RelRes_vs_xy_EM",
-        "Q^{2} Rel. Res. binned in (x_{Bj}, y) (EM);x_{Bj};y",
-        x_bins.size()-1, x_bins.data(), n_y_bins, 0.0, 1.0, "s");
+        "Q^{2} Rel. Res. binned in (x, Q^{2}) (EM);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
     TProfile2D* h_Q2_RelRes_vs_xy_DA = new TProfile2D("Q2_RelRes_vs_xy_DA",
-        "Q^{2} Rel. Res. binned in (x_{Bj}, y) (DA);x_{Bj};y",
-        x_bins.size()-1, x_bins.data(), n_y_bins, 0.0, 1.0, "s");
+        "Q^{2} Rel. Res. binned in (x, Q^{2}) (DA);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
     TProfile2D* h_Q2_RelRes_vs_xy_Sigma = new TProfile2D("Q2_RelRes_vs_xy_Sigma",
-        "Q^{2} Rel. Res. binned in (x_{Bj}, y) (Sigma);x_{Bj};y",
-        x_bins.size()-1, x_bins.data(), n_y_bins, 0.0, 1.0, "s");
+        "Q^{2} Rel. Res. binned in (x, Q^{2}) (Sigma);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
+
+    // TProfile2D for x resolution - BINNED in (x, Q2) and DISPLAYED in (x, Q2)
+    TProfile2D* h_x_RelRes_vs_xQ2_EM = new TProfile2D("x_RelRes_vs_xQ2_EM",
+        "x Rel. Res. binned in (x, Q^{2}) (EM);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
+    TProfile2D* h_x_RelRes_vs_xQ2_DA = new TProfile2D("x_RelRes_vs_xQ2_DA",
+        "x Rel. Res. binned in (x, Q^{2}) (DA);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
+    TProfile2D* h_x_RelRes_vs_xQ2_Sigma = new TProfile2D("x_RelRes_vs_xQ2_Sigma",
+        "x Rel. Res. binned in (x, Q^{2}) (Sigma);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
+
+    // TProfile2D for y resolution - BINNED in (x, Q2) and DISPLAYED in (x, Q2)
+    TProfile2D* h_y_RelRes_vs_xQ2_EM = new TProfile2D("y_RelRes_vs_xQ2_EM",
+        "y Rel. Res. binned in (x, Q^{2}) (EM);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
+    TProfile2D* h_y_RelRes_vs_xQ2_DA = new TProfile2D("y_RelRes_vs_xQ2_DA",
+        "y Rel. Res. binned in (x, Q^{2}) (DA);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
+    TProfile2D* h_y_RelRes_vs_xQ2_Sigma = new TProfile2D("y_RelRes_vs_xQ2_Sigma",
+        "y Rel. Res. binned in (x, Q^{2}) (Sigma);x;Q^{2} [GeV^{2}]",
+        x_bins.size()-1, x_bins.data(), n_bins, bin_edges_Q2.data(), "s");
 
     TH1D* h_RelRes_Q2_EM = new TH1D("Q2_RelRes_EM","electron method;#frac{Q^{2}(Reco)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
     TH1D* h_RelRes_Q2_DA = new TH1D("Q2_RelRes_DA","DA method;#frac{Q^{2}(DA)-Q^{2}(MC)}{Q^{2}(MC)}",101,-0.15,0.15);
@@ -285,6 +306,7 @@ int main(int argc, char** argv) {
     // E-pz histograms for MATCHED particles
     TH1D* h_EPz_truth = new TH1D("h_EPz_truth", "MC Truth Sum(E-p_{z}) - Matched Particles Only;#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
     TH1D* h_EPz = new TH1D("h_EPz", "Reco Sum(E-p_{z}) - Matched Particles Only;#Sigma(E-p_{z}) [GeV];Counts", 50, 0, 25);
+    TH2D* h_EPz_2D = new TH2D("h_EPz_2D", "E-p_{z} Reco vs Truth;#Sigma(E-p_{z})_{truth} [GeV];#Sigma(E-p_{z})_{reco} [GeV]", 50, 0, 25, 50, 0, 25);
 
     // Eta_max histograms (reco and truth)
     TH1D* h_eta_max = new TH1D("h_eta_max", "Maximum Pseudorapidity per Event (Reco);#eta_{max};Counts", 50, -4.0, 6.0);
@@ -365,7 +387,8 @@ int main(int argc, char** argv) {
     TH1D* h_xpom_def_MC = new TH1D("xpom_def_MC", "Truth x_{pom} (from definition);x_{pom};Counts", n_xpom_bins, xpom_bins);
     TH1D* h_xpom_def_B0 = new TH1D("xpom_def_B0", "B0 Reco x_{pom} (from definition);x_{pom};Counts", n_xpom_bins, xpom_bins);
     TH1D* h_xpom_def_RP = new TH1D("xpom_def_RP", "RP Reco x_{pom} (from definition);x_{pom};Counts", n_xpom_bins, xpom_bins);
-    
+    TH1D* h_xpom_def_Sum = new TH1D("xpom_def_Sum", "B0+RP Sum x_{pom} (from definition);x_{pom};Counts", n_xpom_bins, xpom_bins);
+
     // Comparison histograms: x_pom from definition vs from x_L
     TH2D* h_xpom_comp_MC = new TH2D("xpom_comp_MC", "Truth: x_{pom} from x_L vs from definition;x_{pom} (1-x_L);x_{pom} (definition)",
                                      n_xpom_bins, xpom_bins, n_xpom_bins, xpom_bins);
@@ -406,6 +429,7 @@ int main(int argc, char** argv) {
     TH1D* h_beta_MC = new TH1D("beta_MC", "Truth #beta (from x_{pom} def);#beta;Counts", 10, 0.0, 1.0);
     TH1D* h_beta_B0 = new TH1D("beta_B0", "B0 Reco #beta (from x_{pom} def);#beta;Counts", 10, 0.0, 1.0);
     TH1D* h_beta_RP = new TH1D("beta_RP", "RP Reco #beta (from x_{pom} def);#beta;Counts", 10, 0.0, 1.0);
+    TH1D* h_beta_Sum = new TH1D("beta_Sum", "B0+RP Sum #beta (from x_{pom} def);#beta;Counts", 10, 0.0, 1.0);
 
     // Beta resolution histograms
     TH1D* h_beta_res_B0 = new TH1D("beta_res_B0",
@@ -635,14 +659,32 @@ int main(int argc, char** argv) {
         h_RelRes_Q2_binned_DA->Fill(electron_Q2_truth, (electron_Q2_DA - electron_Q2_truth)/electron_Q2_truth);
         h_RelRes_Q2_binned_Sigma->Fill(electron_Q2_truth, (electron_Q2_Sigma - electron_Q2_truth)/electron_Q2_truth);
 
-        // Fill Q2 resolution profile histograms - binned in (x_Bj, y)
-        if(electron_Q2_truth > 0.0f && electron_x_truth > 0.0f && electron_y_truth > 0.0f) {
-            h_Q2_RelRes_vs_xy_EM->Fill(electron_x_truth, electron_y_truth,
+        // Fill Q2 resolution profile histograms - binned in (x, Q2)
+        if(electron_Q2_truth > 0.0f && electron_x_truth > 0.0f) {
+            h_Q2_RelRes_vs_xy_EM->Fill(electron_x_truth, electron_Q2_truth,
                                        (electron_Q2_EM - electron_Q2_truth)/electron_Q2_truth);
-            h_Q2_RelRes_vs_xy_DA->Fill(electron_x_truth, electron_y_truth,
+            h_Q2_RelRes_vs_xy_DA->Fill(electron_x_truth, electron_Q2_truth,
                                        (electron_Q2_DA - electron_Q2_truth)/electron_Q2_truth);
-            h_Q2_RelRes_vs_xy_Sigma->Fill(electron_x_truth, electron_y_truth,
+            h_Q2_RelRes_vs_xy_Sigma->Fill(electron_x_truth, electron_Q2_truth,
                                            (electron_Q2_Sigma - electron_Q2_truth)/electron_Q2_truth);
+
+            // Fill x resolution profile histograms - binned in (x, Q2)
+            h_x_RelRes_vs_xQ2_EM->Fill(electron_x_truth, electron_Q2_truth,
+                                       (electron_x_EM - electron_x_truth)/electron_x_truth);
+            h_x_RelRes_vs_xQ2_DA->Fill(electron_x_truth, electron_Q2_truth,
+                                       (electron_x_DA - electron_x_truth)/electron_x_truth);
+            h_x_RelRes_vs_xQ2_Sigma->Fill(electron_x_truth, electron_Q2_truth,
+                                          (electron_x_Sigma - electron_x_truth)/electron_x_truth);
+        }
+
+        // Fill y resolution profile histograms - binned in (x, Q2)
+        if(electron_Q2_truth > 0.0f && electron_x_truth > 0.0f && electron_y_truth > 0.0f) {
+            h_y_RelRes_vs_xQ2_EM->Fill(electron_x_truth, electron_Q2_truth,
+                                       (electron_y_EM - electron_y_truth)/electron_y_truth);
+            h_y_RelRes_vs_xQ2_DA->Fill(electron_x_truth, electron_Q2_truth,
+                                       (electron_y_DA - electron_y_truth)/electron_y_truth);
+            h_y_RelRes_vs_xQ2_Sigma->Fill(electron_x_truth, electron_Q2_truth,
+                                          (electron_y_Sigma - electron_y_truth)/electron_y_truth);
         }
 
         // Fill correlation histograms
@@ -660,6 +702,7 @@ int main(int argc, char** argv) {
         );
         h_EPz_truth->Fill(sumEPz_truth_matched);
         h_EPz->Fill(sumEPz_reco_matched);
+        h_EPz_2D->Fill(sumEPz_truth_matched, sumEPz_reco_matched);
 
         // Calculate eta_max for reco and truth (using matched particles via associations)
         double eta_max_reco = -999.0;
@@ -882,6 +925,7 @@ int main(int argc, char** argv) {
             // Fill x_pom from definition histograms
             if(xpom_reco_from_def > 0 && xpom_reco_from_def < 1.0) {
                 h_xpom_def_B0->Fill(xpom_reco_from_def);
+                h_xpom_def_Sum->Fill(xpom_reco_from_def);  // Add to sum histogram
                 h_xpom_comp_B0->Fill(xpom_reco_from_xL, xpom_reco_from_def);
 
                 // Calculate beta = x_Bj / x_pom (using x_pom from definition) for B0
@@ -889,6 +933,7 @@ int main(int argc, char** argv) {
                     double beta_reco = electron_x_EM / xpom_reco_from_def;
                     if(beta_reco > 0 && beta_reco <= 1.0) {
                         h_beta_B0->Fill(beta_reco);
+                        h_beta_Sum->Fill(beta_reco);  // Add to sum histogram
 
                         // Fill 3D histogram for triple differential cross section
                         if(electron_Q2_EM > 0) {
@@ -980,6 +1025,7 @@ int main(int argc, char** argv) {
                 // Fill x_pom from definition histograms
                 if(xpom_reco_from_def > 0 && xpom_reco_from_def < 1.0) {
                     h_xpom_def_RP->Fill(xpom_reco_from_def);
+                    h_xpom_def_Sum->Fill(xpom_reco_from_def);  // Add to sum histogram
                     h_xpom_comp_RP->Fill(xpom_reco_from_xL, xpom_reco_from_def);
 
                     // Calculate beta = x_Bj / x_pom (using x_pom from definition) for RP
@@ -987,6 +1033,7 @@ int main(int argc, char** argv) {
                         double beta_reco = electron_x_EM / xpom_reco_from_def;
                         if(beta_reco > 0 && beta_reco <= 1.0) {
                             h_beta_RP->Fill(beta_reco);
+                            h_beta_Sum->Fill(beta_reco);  // Add to sum histogram
 
                             // Fill 3D histogram for triple differential cross section
                             if(electron_Q2_EM > 0) {
@@ -1170,13 +1217,24 @@ int main(int argc, char** argv) {
     h_Corr_y_DA->Write();
     h_Corr_y_Sigma->Write();
 
-    // Write Q2 resolution profile histograms (binned in x_Bj, y)
+    // Write Q2 resolution profile histograms (binned in x, Q2)
     h_Q2_RelRes_vs_xy_EM->Write();
     h_Q2_RelRes_vs_xy_DA->Write();
     h_Q2_RelRes_vs_xy_Sigma->Write();
 
+    // Write x resolution profile histograms (binned in x, Q2)
+    h_x_RelRes_vs_xQ2_EM->Write();
+    h_x_RelRes_vs_xQ2_DA->Write();
+    h_x_RelRes_vs_xQ2_Sigma->Write();
+
+    // Write y resolution profile histograms (binned in x, Q2)
+    h_y_RelRes_vs_xQ2_EM->Write();
+    h_y_RelRes_vs_xQ2_DA->Write();
+    h_y_RelRes_vs_xQ2_Sigma->Write();
+
     h_EPz_truth->Write();
     h_EPz->Write();
+    h_EPz_2D->Write();
     h_eta_max->Write();
     h_eta_max_truth->Write();
     h_MX2->Write();
@@ -1202,6 +1260,7 @@ int main(int argc, char** argv) {
     h_xpom_def_MC->Write();
     h_xpom_def_B0->Write();
     h_xpom_def_RP->Write();
+    h_xpom_def_Sum->Write();
     h_xpom_comp_MC->Write();
     h_xpom_comp_B0->Write();
     h_xpom_comp_RP->Write();
@@ -1222,6 +1281,7 @@ int main(int argc, char** argv) {
     h_beta_MC->Write();
     h_beta_B0->Write();
     h_beta_RP->Write();
+    h_beta_Sum->Write();
     h_beta_res_B0->Write();
     h_beta_res_RP->Write();
     h_beta_corr_B0->Write();

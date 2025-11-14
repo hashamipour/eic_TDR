@@ -85,6 +85,11 @@ void PlotOptions1D::Plot(TFile* inputFile) {
             hist->SetLineColor(kOrange+7);
             hist->SetMarkerColor(kOrange+7);
             hist->SetMarkerStyle(24);  // Hollow circle
+        } else if (m_histNames[i].Contains("h_EPz") || m_histNames[i].Contains("h_eta_max") || m_histNames[i].Contains("h_MX2")) {
+            // Reconstruction histograms for E-pz, eta_max, MX2 (not truth versions)
+            hist->SetLineColor(kOrange+7);
+            hist->SetMarkerColor(kOrange+7);
+            hist->SetMarkerStyle(20);  // Filled circle
         }
 
         // Draw with user draw options; ensure SAME for i>0
