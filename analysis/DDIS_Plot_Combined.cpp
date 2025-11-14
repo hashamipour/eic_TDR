@@ -12,6 +12,7 @@
 #include <TLatex.h>
 #include <TProfile2D.h>
 #include <TH2.h>
+#include <TH3.h>
 #include <TMath.h>
 #include <TString.h>
 
@@ -861,6 +862,253 @@ int main(int argc, char** argv) {
     }
 
     //=================================================================
+    // TRIPLE DIFFERENTIAL CROSS SECTION d³σ/(dQ² dβ dx_pom) PLOTS
+    //=================================================================
+    std::cout << "Creating triple differential cross section 1D slices..." << std::endl;
+
+    // Load the 3D histograms
+    TH3D* h_d3sigma_MC = (TH3D*)inputFile->Get("d3sigma_dQ2dbeta_dxpom_MC");
+    TH3D* h_d3sigma_B0 = (TH3D*)inputFile->Get("d3sigma_dQ2dbeta_dxpom_B0");
+    TH3D* h_d3sigma_RP = (TH3D*)inputFile->Get("d3sigma_dQ2dbeta_dxpom_RP");
+
+    if (h_d3sigma_MC && h_d3sigma_B0 && h_d3sigma_RP) {
+        int n_Q2_bins = h_d3sigma_MC->GetNbinsX();
+        int n_beta_bins = h_d3sigma_MC->GetNbinsY();
+        int n_xpom_bins = h_d3sigma_MC->GetNbinsZ();
+
+        //=================================================================
+        // PLOT 1: d³σ vs β for each (Q², x_pom) bin
+        // Grid: columns = Q² bins, rows = x_pom bins
+        // Compare MC (black hist), B0 (red points), RP (blue points), Sum (orange points)
+        //=================================================================
+        std::cout << "Creating d3sigma vs beta comparison plots..." << std::endl;
+
+        // Create canvas with grid layout: n_xpom_bins rows x n_Q2_bins columns
+        TCanvas* c_beta = new TCanvas("c_d3sigma_vs_beta", "d3sigma vs beta", 400*n_Q2_bins, 300*n_xpom_bins);
+        c_beta->Divide(n_Q2_bins, n_xpom_bins);
+
+        for (int xpom_bin = 1; xpom_bin <= n_xpom_bins; xpom_bin++) {
+            for (int Q2_bin = 1; Q2_bin <= n_Q2_bins; Q2_bin++) {
+                int pad_num = (xpom_bin - 1) * n_Q2_bins + Q2_bin;
+
+                double Q2_low = h_d3sigma_MC->GetXaxis()->GetBinLowEdge(Q2_bin);
+                double Q2_high = h_d3sigma_MC->GetXaxis()->GetBinUpEdge(Q2_bin);
+                double xpom_low = h_d3sigma_MC->GetZaxis()->GetBinLowEdge(xpom_bin);
+                double xpom_high = h_d3sigma_MC->GetZaxis()->GetBinUpEdge(xpom_bin);
+
+                // Create 1D histograms for this (Q², x_pom) slice
+                TH1D* h_slice_MC = new TH1D(TString::Format("slice_beta_MC_Q%d_xp%d", Q2_bin, xpom_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], x_{pom}=[%.3f,%.3f]", Q2_low, Q2_high, xpom_low, xpom_high),
+                    n_beta_bins, h_d3sigma_MC->GetYaxis()->GetXmin(), h_d3sigma_MC->GetYaxis()->GetXmax());
+
+                TH1D* h_slice_B0 = new TH1D(TString::Format("slice_beta_B0_Q%d_xp%d", Q2_bin, xpom_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], x_{pom}=[%.3f,%.3f]", Q2_low, Q2_high, xpom_low, xpom_high),
+                    n_beta_bins, h_d3sigma_B0->GetYaxis()->GetXmin(), h_d3sigma_B0->GetYaxis()->GetXmax());
+
+                TH1D* h_slice_RP = new TH1D(TString::Format("slice_beta_RP_Q%d_xp%d", Q2_bin, xpom_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], x_{pom}=[%.3f,%.3f]", Q2_low, Q2_high, xpom_low, xpom_high),
+                    n_beta_bins, h_d3sigma_RP->GetYaxis()->GetXmin(), h_d3sigma_RP->GetYaxis()->GetXmax());
+
+                TH1D* h_slice_Sum = new TH1D(TString::Format("slice_beta_Sum_Q%d_xp%d", Q2_bin, xpom_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], x_{pom}=[%.3f,%.3f]", Q2_low, Q2_high, xpom_low, xpom_high),
+                    n_beta_bins, h_d3sigma_MC->GetYaxis()->GetXmin(), h_d3sigma_MC->GetYaxis()->GetXmax());
+
+                // Fill the 1D histograms
+                for (int beta_bin = 1; beta_bin <= n_beta_bins; beta_bin++) {
+                    double value_MC = h_d3sigma_MC->GetBinContent(Q2_bin, beta_bin, xpom_bin);
+                    double error_MC = h_d3sigma_MC->GetBinError(Q2_bin, beta_bin, xpom_bin);
+                    h_slice_MC->SetBinContent(beta_bin, value_MC);
+                    h_slice_MC->SetBinError(beta_bin, error_MC);
+
+                    double value_B0 = h_d3sigma_B0->GetBinContent(Q2_bin, beta_bin, xpom_bin);
+                    double error_B0 = h_d3sigma_B0->GetBinError(Q2_bin, beta_bin, xpom_bin);
+                    h_slice_B0->SetBinContent(beta_bin, value_B0);
+                    h_slice_B0->SetBinError(beta_bin, error_B0);
+
+                    double value_RP = h_d3sigma_RP->GetBinContent(Q2_bin, beta_bin, xpom_bin);
+                    double error_RP = h_d3sigma_RP->GetBinError(Q2_bin, beta_bin, xpom_bin);
+                    h_slice_RP->SetBinContent(beta_bin, value_RP);
+                    h_slice_RP->SetBinError(beta_bin, error_RP);
+
+                    // Create sum of B0 and RP
+                    double value_Sum = value_B0 + value_RP;
+                    double error_Sum = TMath::Sqrt(error_B0*error_B0 + error_RP*error_RP);
+                    h_slice_Sum->SetBinContent(beta_bin, value_Sum);
+                    h_slice_Sum->SetBinError(beta_bin, error_Sum);
+                }
+
+                // Set axis titles
+                h_slice_MC->GetXaxis()->SetTitle("#beta");
+                h_slice_MC->GetYaxis()->SetTitle("d^{3}#sigma/(dQ^{2}d#betadx_{pom}) [nb/GeV^{2}]");
+
+                // Set styles: MC = black histogram
+                h_slice_MC->SetLineColor(kBlack);
+                h_slice_MC->SetLineWidth(2);
+
+                // B0 = red points
+                h_slice_B0->SetMarkerStyle(20);
+                h_slice_B0->SetMarkerColor(kRed);
+                h_slice_B0->SetLineColor(kRed);
+                h_slice_B0->SetMarkerSize(0.8);
+
+                // RP = blue points
+                h_slice_RP->SetMarkerStyle(20);
+                h_slice_RP->SetMarkerColor(kBlue);
+                h_slice_RP->SetLineColor(kBlue);
+                h_slice_RP->SetMarkerSize(0.8);
+
+                // Sum = orange points
+                h_slice_Sum->SetMarkerStyle(20);
+                h_slice_Sum->SetMarkerColor(kOrange+7);
+                h_slice_Sum->SetLineColor(kOrange+7);
+                h_slice_Sum->SetMarkerSize(0.8);
+
+                // Draw all on the same pad
+                c_beta->cd(pad_num);
+                gPad->SetLogy();
+                h_slice_MC->Draw("HIST");
+                h_slice_B0->Draw("PE SAME");
+                h_slice_RP->Draw("PE SAME");
+                h_slice_Sum->Draw("PE SAME");
+
+                // Add legend only in the first pad
+                if (pad_num == 1) {
+                    TLegend* leg = new TLegend(0.5, 0.65, 0.88, 0.88);
+                    leg->AddEntry(h_slice_MC, "MC Truth", "l");
+                    leg->AddEntry(h_slice_B0, "B0 Reco", "pe");
+                    leg->AddEntry(h_slice_RP, "RP Reco", "pe");
+                    leg->AddEntry(h_slice_Sum, "B0+RP Sum", "pe");
+                    leg->SetTextSize(0.03);
+                    leg->Draw();
+                }
+            }
+        }
+
+        c_beta->SaveAs("figs/d3sigma_vs_beta.png");
+        delete c_beta;
+
+        //=================================================================
+        // PLOT 2: d³σ vs x_pom for each (Q², β) bin
+        // Grid: columns = Q² bins, rows = β bins
+        // Compare MC (black hist), B0 (red points), RP (blue points), Sum (orange points)
+        //=================================================================
+        std::cout << "Creating d3sigma vs x_pom comparison plots..." << std::endl;
+
+        TCanvas* c_xpom = new TCanvas("c_d3sigma_vs_xpom", "d3sigma vs xpom", 400*n_Q2_bins, 300*n_beta_bins);
+        c_xpom->Divide(n_Q2_bins, n_beta_bins);
+
+        for (int beta_bin = 1; beta_bin <= n_beta_bins; beta_bin++) {
+            for (int Q2_bin = 1; Q2_bin <= n_Q2_bins; Q2_bin++) {
+                int pad_num = (beta_bin - 1) * n_Q2_bins + Q2_bin;
+
+                double Q2_low = h_d3sigma_MC->GetXaxis()->GetBinLowEdge(Q2_bin);
+                double Q2_high = h_d3sigma_MC->GetXaxis()->GetBinUpEdge(Q2_bin);
+                double beta_low = h_d3sigma_MC->GetYaxis()->GetBinLowEdge(beta_bin);
+                double beta_high = h_d3sigma_MC->GetYaxis()->GetBinUpEdge(beta_bin);
+
+                // Create 1D histograms for this (Q², β) slice - with log binning
+                std::vector<double> xpom_edges;
+                for (int i = 0; i <= n_xpom_bins; i++) {
+                    xpom_edges.push_back(h_d3sigma_MC->GetZaxis()->GetBinLowEdge(i+1));
+                }
+
+                TH1D* h_slice_MC = new TH1D(TString::Format("slice_xpom_MC_Q%d_b%d", Q2_bin, beta_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], #beta=[%.2f,%.2f]", Q2_low, Q2_high, beta_low, beta_high),
+                    n_xpom_bins, xpom_edges.data());
+
+                TH1D* h_slice_B0 = new TH1D(TString::Format("slice_xpom_B0_Q%d_b%d", Q2_bin, beta_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], #beta=[%.2f,%.2f]", Q2_low, Q2_high, beta_low, beta_high),
+                    n_xpom_bins, xpom_edges.data());
+
+                TH1D* h_slice_RP = new TH1D(TString::Format("slice_xpom_RP_Q%d_b%d", Q2_bin, beta_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], #beta=[%.2f,%.2f]", Q2_low, Q2_high, beta_low, beta_high),
+                    n_xpom_bins, xpom_edges.data());
+
+                TH1D* h_slice_Sum = new TH1D(TString::Format("slice_xpom_Sum_Q%d_b%d", Q2_bin, beta_bin),
+                    TString::Format("Q^{2}=[%.1f,%.1f], #beta=[%.2f,%.2f]", Q2_low, Q2_high, beta_low, beta_high),
+                    n_xpom_bins, xpom_edges.data());
+
+                // Fill the 1D histograms
+                for (int xpom_bin = 1; xpom_bin <= n_xpom_bins; xpom_bin++) {
+                    double value_MC = h_d3sigma_MC->GetBinContent(Q2_bin, beta_bin, xpom_bin);
+                    double error_MC = h_d3sigma_MC->GetBinError(Q2_bin, beta_bin, xpom_bin);
+                    h_slice_MC->SetBinContent(xpom_bin, value_MC);
+                    h_slice_MC->SetBinError(xpom_bin, error_MC);
+
+                    double value_B0 = h_d3sigma_B0->GetBinContent(Q2_bin, beta_bin, xpom_bin);
+                    double error_B0 = h_d3sigma_B0->GetBinError(Q2_bin, beta_bin, xpom_bin);
+                    h_slice_B0->SetBinContent(xpom_bin, value_B0);
+                    h_slice_B0->SetBinError(xpom_bin, error_B0);
+
+                    double value_RP = h_d3sigma_RP->GetBinContent(Q2_bin, beta_bin, xpom_bin);
+                    double error_RP = h_d3sigma_RP->GetBinError(Q2_bin, beta_bin, xpom_bin);
+                    h_slice_RP->SetBinContent(xpom_bin, value_RP);
+                    h_slice_RP->SetBinError(xpom_bin, error_RP);
+
+                    // Create sum of B0 and RP
+                    double value_Sum = value_B0 + value_RP;
+                    double error_Sum = TMath::Sqrt(error_B0*error_B0 + error_RP*error_RP);
+                    h_slice_Sum->SetBinContent(xpom_bin, value_Sum);
+                    h_slice_Sum->SetBinError(xpom_bin, error_Sum);
+                }
+
+                // Set axis titles
+                h_slice_MC->GetXaxis()->SetTitle("x_{pom}");
+                h_slice_MC->GetYaxis()->SetTitle("d^{3}#sigma/(dQ^{2}d#betadx_{pom}) [nb/GeV^{2}]");
+
+                // Set styles: MC = black histogram
+                h_slice_MC->SetLineColor(kBlack);
+                h_slice_MC->SetLineWidth(2);
+
+                // B0 = red points
+                h_slice_B0->SetMarkerStyle(20);
+                h_slice_B0->SetMarkerColor(kRed);
+                h_slice_B0->SetLineColor(kRed);
+                h_slice_B0->SetMarkerSize(0.8);
+
+                // RP = blue points
+                h_slice_RP->SetMarkerStyle(20);
+                h_slice_RP->SetMarkerColor(kBlue);
+                h_slice_RP->SetLineColor(kBlue);
+                h_slice_RP->SetMarkerSize(0.8);
+
+                // Sum = orange points
+                h_slice_Sum->SetMarkerStyle(20);
+                h_slice_Sum->SetMarkerColor(kOrange+7);
+                h_slice_Sum->SetLineColor(kOrange+7);
+                h_slice_Sum->SetMarkerSize(0.8);
+
+                // Draw all on the same pad
+                c_xpom->cd(pad_num);
+                gPad->SetLogx();
+                gPad->SetLogy();
+                h_slice_MC->Draw("HIST");
+                h_slice_B0->Draw("PE SAME");
+                h_slice_RP->Draw("PE SAME");
+                h_slice_Sum->Draw("PE SAME");
+
+                // Add legend only in the first pad
+                if (pad_num == 1) {
+                    TLegend* leg = new TLegend(0.5, 0.65, 0.88, 0.88);
+                    leg->AddEntry(h_slice_MC, "MC Truth", "l");
+                    leg->AddEntry(h_slice_B0, "B0 Reco", "pe");
+                    leg->AddEntry(h_slice_RP, "RP Reco", "pe");
+                    leg->AddEntry(h_slice_Sum, "B0+RP Sum", "pe");
+                    leg->SetTextSize(0.03);
+                    leg->Draw();
+                }
+            }
+        }
+
+        c_xpom->SaveAs("figs/d3sigma_vs_xpom.png");
+        delete c_xpom;
+
+        std::cout << "Triple differential cross section 1D slice plots created!" << std::endl;
+    } else {
+        std::cout << "Warning: Could not find d3sigma histograms" << std::endl;
+    }
+
+    //=================================================================
     // PLOT ALL CONFIGURATIONS
     //=================================================================
 
@@ -889,6 +1137,10 @@ int main(int argc, char** argv) {
     std::cout << "  Beta analysis: distributions, resolutions, response matrices (MC, B0, RP)" << std::endl;
     std::cout << "  Differential cross section: d(sigma)/dt for MC, B0, RP, and B0+RP sum (linear and log-y)" << std::endl;
     std::cout << "                              Reconstructed data shown as points with error bars" << std::endl;
+    std::cout << "  Triple differential cross section: d^3(sigma)/(dQ^2 dbeta dx_pom) 1D slices" << std::endl;
+    std::cout << "                                      - vs beta (grid: Q2 columns x x_pom rows)" << std::endl;
+    std::cout << "                                      - vs x_pom (grid: Q2 columns x beta rows)" << std::endl;
+    std::cout << "                                      MC (black hist), B0 (red pts), RP (blue pts), Sum (orange pts)" << std::endl;
 
     return 0;
 }

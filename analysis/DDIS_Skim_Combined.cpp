@@ -8,6 +8,7 @@
 #include <TTree.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TH3.h>
 #include <TSystem.h>
 #include <TStyle.h>
 #include <TMath.h>
@@ -422,6 +423,44 @@ int main(int argc, char** argv) {
                                      "RP #beta Correlation;Truth #beta;Reco #beta",
                                      10, 0.0, 1.0, 10, 0.0, 1.0);
 
+    // Triple differential cross section d³σ/(dQ² dβ dx_pom)
+    // Binning: Q² (log), β (linear 0-1), x_pom (log)
+    const int n_beta_bins = 5;  // 5 bins from 0 to 1
+    double beta_bins[n_beta_bins + 1] = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0};
+
+    // Use fewer bins for Q² for the 3D histogram (use coarser binning)
+    const int n_Q2_3d_bins = 10;
+    std::vector<Double_t> Q2_3d_bins = GetLogBins(1.0, 100.0, n_Q2_3d_bins);
+
+    // Use fewer bins for x_pom for the 3D histogram
+    const int n_xpom_3d_bins = 8;
+    double xpom_3d_bins[n_xpom_3d_bins + 1];
+    double xpom_3d_min = 1e-3;
+    double xpom_3d_max = 0.1;
+    double log_3d_min = TMath::Log10(xpom_3d_min);
+    double log_3d_max = TMath::Log10(xpom_3d_max);
+    for(int i = 0; i <= n_xpom_3d_bins; i++){
+        xpom_3d_bins[i] = TMath::Power(10, log_3d_min + i * (log_3d_max - log_3d_min) / n_xpom_3d_bins);
+    }
+
+    TH3D* h_d3sigma_MC = new TH3D("d3sigma_dQ2dbeta_dxpom_MC",
+                                   "Truth d^{3}#sigma/(dQ^{2}d#betadx_{pom});Q^{2} [GeV^{2}];#beta;x_{pom}",
+                                   n_Q2_3d_bins, Q2_3d_bins.data(),
+                                   n_beta_bins, beta_bins,
+                                   n_xpom_3d_bins, xpom_3d_bins);
+
+    TH3D* h_d3sigma_B0 = new TH3D("d3sigma_dQ2dbeta_dxpom_B0",
+                                   "B0 Reco d^{3}#sigma/(dQ^{2}d#betadx_{pom});Q^{2} [GeV^{2}];#beta;x_{pom}",
+                                   n_Q2_3d_bins, Q2_3d_bins.data(),
+                                   n_beta_bins, beta_bins,
+                                   n_xpom_3d_bins, xpom_3d_bins);
+
+    TH3D* h_d3sigma_RP = new TH3D("d3sigma_dQ2dbeta_dxpom_RP",
+                                   "RP Reco d^{3}#sigma/(dQ^{2}d#betadx_{pom});Q^{2} [GeV^{2}];#beta;x_{pom}",
+                                   n_Q2_3d_bins, Q2_3d_bins.data(),
+                                   n_beta_bins, beta_bins,
+                                   n_xpom_3d_bins, xpom_3d_bins);
+
     //---------------------------------------------------------
     // DECLARE TTREEREADER AND BRANCHES TO USE
     //---------------------------------------------------------
@@ -755,6 +794,11 @@ int main(int argc, char** argv) {
                         double beta_truth = electron_x_truth / xpom_from_def;
                         if(beta_truth > 0 && beta_truth <= 1.0) {
                             h_beta_MC->Fill(beta_truth);
+
+                            // Fill 3D histogram for triple differential cross section
+                            if(electron_Q2_truth > 0) {
+                                h_d3sigma_MC->Fill(electron_Q2_truth, beta_truth, xpom_from_def);
+                            }
                         }
                     }
                 }
@@ -845,6 +889,11 @@ int main(int argc, char** argv) {
                     double beta_reco = electron_x_EM / xpom_reco_from_def;
                     if(beta_reco > 0 && beta_reco <= 1.0) {
                         h_beta_B0->Fill(beta_reco);
+
+                        // Fill 3D histogram for triple differential cross section
+                        if(electron_Q2_EM > 0) {
+                            h_d3sigma_B0->Fill(electron_Q2_EM, beta_reco, xpom_reco_from_def);
+                        }
 
                         // Calculate truth beta if xpom_truth_from_def is valid
                         if(xpom_truth_from_def > 0 && xpom_truth_from_def < 1.0 && electron_x_truth > 0) {
@@ -939,6 +988,11 @@ int main(int argc, char** argv) {
                         if(beta_reco > 0 && beta_reco <= 1.0) {
                             h_beta_RP->Fill(beta_reco);
 
+                            // Fill 3D histogram for triple differential cross section
+                            if(electron_Q2_EM > 0) {
+                                h_d3sigma_RP->Fill(electron_Q2_EM, beta_reco, xpom_reco_from_def);
+                            }
+
                             // Calculate truth beta if xpom_truth_from_def is valid
                             if(xpom_truth_from_def > 0 && xpom_truth_from_def < 1.0 && electron_x_truth > 0) {
                                 double beta_truth = electron_x_truth / xpom_truth_from_def;
@@ -1005,6 +1059,76 @@ int main(int argc, char** argv) {
     }
 
     std::cout << "Differential cross sections calculated!" << std::endl;
+
+    // Scale triple differential cross section d³σ/(dQ² dβ dx_pom) histograms
+    std::cout << "Calculating triple differential cross sections..." << std::endl;
+
+    // Scale MC d3sigma histogram
+    for(int i = 1; i <= h_d3sigma_MC->GetNbinsX(); i++) {          // Q² bins
+        for(int j = 1; j <= h_d3sigma_MC->GetNbinsY(); j++) {      // β bins
+            for(int k = 1; k <= h_d3sigma_MC->GetNbinsZ(); k++) {  // x_pom bins
+                double bin_content = h_d3sigma_MC->GetBinContent(i, j, k);
+                double bin_error = h_d3sigma_MC->GetBinError(i, j, k);
+
+                // Get bin widths for all three dimensions
+                double width_Q2 = h_d3sigma_MC->GetXaxis()->GetBinWidth(i);
+                double width_beta = h_d3sigma_MC->GetYaxis()->GetBinWidth(j);
+                double width_xpom = h_d3sigma_MC->GetZaxis()->GetBinWidth(k);
+                double bin_volume = width_Q2 * width_beta * width_xpom;
+
+                // Scale: d³σ/(dQ² dβ dx_pom) = (σ_total / N_gen) * (N_events / ΔQ² Δβ Δx_pom)
+                double d3sigma = (bin_content * scale_factor) / bin_volume;
+                double d3sigma_error = (bin_error * scale_factor) / bin_volume;
+
+                h_d3sigma_MC->SetBinContent(i, j, k, d3sigma);
+                h_d3sigma_MC->SetBinError(i, j, k, d3sigma_error);
+            }
+        }
+    }
+
+    // Scale B0 d3sigma histogram
+    for(int i = 1; i <= h_d3sigma_B0->GetNbinsX(); i++) {
+        for(int j = 1; j <= h_d3sigma_B0->GetNbinsY(); j++) {
+            for(int k = 1; k <= h_d3sigma_B0->GetNbinsZ(); k++) {
+                double bin_content = h_d3sigma_B0->GetBinContent(i, j, k);
+                double bin_error = h_d3sigma_B0->GetBinError(i, j, k);
+
+                double width_Q2 = h_d3sigma_B0->GetXaxis()->GetBinWidth(i);
+                double width_beta = h_d3sigma_B0->GetYaxis()->GetBinWidth(j);
+                double width_xpom = h_d3sigma_B0->GetZaxis()->GetBinWidth(k);
+                double bin_volume = width_Q2 * width_beta * width_xpom;
+
+                double d3sigma = (bin_content * scale_factor) / bin_volume;
+                double d3sigma_error = (bin_error * scale_factor) / bin_volume;
+
+                h_d3sigma_B0->SetBinContent(i, j, k, d3sigma);
+                h_d3sigma_B0->SetBinError(i, j, k, d3sigma_error);
+            }
+        }
+    }
+
+    // Scale RP d3sigma histogram
+    for(int i = 1; i <= h_d3sigma_RP->GetNbinsX(); i++) {
+        for(int j = 1; j <= h_d3sigma_RP->GetNbinsY(); j++) {
+            for(int k = 1; k <= h_d3sigma_RP->GetNbinsZ(); k++) {
+                double bin_content = h_d3sigma_RP->GetBinContent(i, j, k);
+                double bin_error = h_d3sigma_RP->GetBinError(i, j, k);
+
+                double width_Q2 = h_d3sigma_RP->GetXaxis()->GetBinWidth(i);
+                double width_beta = h_d3sigma_RP->GetYaxis()->GetBinWidth(j);
+                double width_xpom = h_d3sigma_RP->GetZaxis()->GetBinWidth(k);
+                double bin_volume = width_Q2 * width_beta * width_xpom;
+
+                double d3sigma = (bin_content * scale_factor) / bin_volume;
+                double d3sigma_error = (bin_error * scale_factor) / bin_volume;
+
+                h_d3sigma_RP->SetBinContent(i, j, k, d3sigma);
+                h_d3sigma_RP->SetBinError(i, j, k, d3sigma_error);
+            }
+        }
+    }
+
+    std::cout << "Triple differential cross sections calculated!" << std::endl;
 
     // Write all histograms and TTree to the output file
     outputFile->cd();
@@ -1102,6 +1226,11 @@ int main(int argc, char** argv) {
     h_beta_res_RP->Write();
     h_beta_corr_B0->Write();
     h_beta_corr_RP->Write();
+
+    // Write triple differential cross section histograms
+    h_d3sigma_MC->Write();
+    h_d3sigma_B0->Write();
+    h_d3sigma_RP->Write();
 
     outputFile->Close();
     delete events;
